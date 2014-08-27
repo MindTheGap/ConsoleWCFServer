@@ -1,0 +1,14 @@
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\obj\Debug\ChildsTubeConsoleServer.csprojResolveAssemblyReference.cache
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\Configuration.xml
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\ChildsTubeConsoleServer.exe.config
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\ChildsTubeConsoleServer.exe
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\ChildsTubeConsoleServer.pdb
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\EntityFramework.dll
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\EntityFramework.SqlServer.dll
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\EntityFramework.xml
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\EntityFramework.SqlServer.xml
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\obj\Debug\ChildsTubeConsoleServer.exe
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\obj\Debug\ChildsTubeConsoleServer.pdb
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\Newtonsoft.Json.dll
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\Newtonsoft.Json.pdb
+D:\Dropbox\Projects\ChildTube\Server\ChildsTubeServer\ChildsTubeConsoleServer\bin\Debug\Newtonsoft.Json.xml

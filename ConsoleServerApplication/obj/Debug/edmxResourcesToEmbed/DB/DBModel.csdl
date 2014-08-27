@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="mainDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="mainDBEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Episodes" EntityType="mainDBModel.Episode" />
+    <EntitySet Name="TV_Series" EntityType="mainDBModel.TV_Series" />
+    <AssociationSet Name="FK_Episode_TV_Series" Association="mainDBModel.FK_Episode_TV_Series">
+      <End Role="TV_Series" EntitySet="TV_Series" />
+      <End Role="Episode" EntitySet="Episodes" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Episode">
+    <Key>
+      <PropertyRef Name="EpisodeID" />
+    </Key>
+    <Property Name="EpisodeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TvSeriesID" Type="Int32" Nullable="false" />
+    <Property Name="EpisodeNumber" Type="Int32" Nullable="false" />
+    <Property Name="URLPath" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="SeriesNumber" Type="Int32" />
+    <NavigationProperty Name="TV_Series" Relationship="mainDBModel.FK_Episode_TV_Series" FromRole="Episode" ToRole="TV_Series" />
+  </EntityType>
+  <EntityType Name="TV_Series">
+    <Key>
+      <PropertyRef Name="TvSeriesID" />
+    </Key>
+    <Property Name="TvSeriesID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="Hits" Type="Int32" Nullable="false" />
+    <Property Name="SeriesImagePath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Episodes" Relationship="mainDBModel.FK_Episode_TV_Series" FromRole="TV_Series" ToRole="Episode" />
+  </EntityType>
+  <Association Name="FK_Episode_TV_Series">
+    <End Type="mainDBModel.TV_Series" Role="TV_Series" Multiplicity="1" />
+    <End Type="mainDBModel.Episode" Role="Episode" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TV_Series">
+        <PropertyRef Name="TvSeriesID" />
+      </Principal>
+      <Dependent Role="Episode">
+        <PropertyRef Name="TvSeriesID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

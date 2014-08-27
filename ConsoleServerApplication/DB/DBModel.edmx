@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="mainDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Episode">
+          <Key>
+            <PropertyRef Name="EpisodeID" />
+          </Key>
+          <Property Name="EpisodeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TvSeriesID" Type="int" Nullable="false" />
+          <Property Name="EpisodeNumber" Type="int" Nullable="false" />
+          <Property Name="URLPath" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="SeriesNumber" Type="int" />
+        </EntityType>
+        <EntityType Name="TV Series">
+          <Key>
+            <PropertyRef Name="TvSeriesID" />
+          </Key>
+          <Property Name="TvSeriesID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="Hits" Type="int" Nullable="false" />
+          <Property Name="SeriesImagePath" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <Association Name="FK_Episode_TV Series">
+          <End Role="TV Series" Type="Self.TV Series" Multiplicity="1" />
+          <End Role="Episode" Type="Self.Episode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TV Series">
+              <PropertyRef Name="TvSeriesID" />
+            </Principal>
+            <Dependent Role="Episode">
+              <PropertyRef Name="TvSeriesID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="mainDBModelStoreContainer">
+          <EntitySet Name="Episode" EntityType="Self.Episode" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TV Series" EntityType="Self.TV Series" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Episode_TV Series" Association="Self.FK_Episode_TV Series">
+            <End Role="TV Series" EntitySet="TV Series" />
+            <End Role="Episode" EntitySet="Episode" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="mainDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="mainDBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Episodes" EntityType="mainDBModel.Episode" />
+          <EntitySet Name="TV_Series" EntityType="mainDBModel.TV_Series" />
+          <AssociationSet Name="FK_Episode_TV_Series" Association="mainDBModel.FK_Episode_TV_Series">
+            <End Role="TV_Series" EntitySet="TV_Series" />
+            <End Role="Episode" EntitySet="Episodes" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Episode">
+          <Key>
+            <PropertyRef Name="EpisodeID" />
+          </Key>
+          <Property Name="EpisodeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TvSeriesID" Type="Int32" Nullable="false" />
+          <Property Name="EpisodeNumber" Type="Int32" Nullable="false" />
+          <Property Name="URLPath" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="SeriesNumber" Type="Int32" />
+          <NavigationProperty Name="TV_Series" Relationship="mainDBModel.FK_Episode_TV_Series" FromRole="Episode" ToRole="TV_Series" />
+        </EntityType>
+        <EntityType Name="TV_Series">
+          <Key>
+            <PropertyRef Name="TvSeriesID" />
+          </Key>
+          <Property Name="TvSeriesID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Hits" Type="Int32" Nullable="false" />
+          <Property Name="SeriesImagePath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Episodes" Relationship="mainDBModel.FK_Episode_TV_Series" FromRole="TV_Series" ToRole="Episode" />
+        </EntityType>
+        <Association Name="FK_Episode_TV_Series">
+          <End Type="mainDBModel.TV_Series" Role="TV_Series" Multiplicity="1" />
+          <End Type="mainDBModel.Episode" Role="Episode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TV_Series">
+              <PropertyRef Name="TvSeriesID" />
+            </Principal>
+            <Dependent Role="Episode">
+              <PropertyRef Name="TvSeriesID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="mainDBModelStoreContainer" CdmEntityContainer="mainDBEntities">
+          <EntitySetMapping Name="Episodes">
+            <EntityTypeMapping TypeName="mainDBModel.Episode">
+              <MappingFragment StoreEntitySet="Episode">
+                <ScalarProperty Name="SeriesNumber" ColumnName="SeriesNumber" />
+                <ScalarProperty Name="URLPath" ColumnName="URLPath" />
+                <ScalarProperty Name="EpisodeNumber" ColumnName="EpisodeNumber" />
+                <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+                <ScalarProperty Name="EpisodeID" ColumnName="EpisodeID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TV_Series">
+            <EntityTypeMapping TypeName="mainDBModel.TV_Series">
+              <MappingFragment StoreEntitySet="TV Series">
+                <ScalarProperty Name="SeriesImagePath" ColumnName="SeriesImagePath" />
+                <ScalarProperty Name="Hits" ColumnName="Hits" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
