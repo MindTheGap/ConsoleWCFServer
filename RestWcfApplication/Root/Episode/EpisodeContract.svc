@@ -1,0 +1,6 @@
+﻿<%@ ServiceHost 
+    Language="C#" 
+    Debug="true" 
+    Service="RestWcfApplication.Root.Episode.EpisodeContract" 
+    CodeBehind="EpisodeContract.svc.cs"
+    Factory="System.ServiceModel.Activation.WebServiceHostFactory" %>

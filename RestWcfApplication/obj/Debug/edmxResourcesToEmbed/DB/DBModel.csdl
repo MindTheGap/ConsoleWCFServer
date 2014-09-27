@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="ChildTubeMainDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+    <FunctionImport Name="prEpisodeDelete">
+      <Parameter Name="EpisodeID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="prEpisodeInsert" ReturnType="Collection(ChildTubeMainDBModel.prEpisodeInsert_Result)">
+      <Parameter Name="TvSeriesID" Mode="In" Type="Int32" />
+      <Parameter Name="EpisodeNumber" Mode="In" Type="Int32" />
+      <Parameter Name="URLPath" Mode="In" Type="String" />
+      <Parameter Name="SeriesNumber" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="prEpisodeSelect" ReturnType="Collection(ChildTubeMainDBModel.prEpisodeSelect_Result)">
+      <Parameter Name="EpisodeID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="prEpisodeUpdate" ReturnType="Collection(ChildTubeMainDBModel.prEpisodeUpdate_Result)">
+      <Parameter Name="EpisodeID" Mode="In" Type="Int32" />
+      <Parameter Name="TvSeriesID" Mode="In" Type="Int32" />
+      <Parameter Name="EpisodeNumber" Mode="In" Type="Int32" />
+      <Parameter Name="URLPath" Mode="In" Type="String" />
+      <Parameter Name="SeriesNumber" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="prTVSeriesDelete">
+      <Parameter Name="TvSeriesID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="prTVSeriesInsert" ReturnType="Collection(ChildTubeMainDBModel.prTVSeriesInsert_Result)">
+      <Parameter Name="Name" Mode="In" Type="String" />
+      <Parameter Name="Hits" Mode="In" Type="Int32" />
+      <Parameter Name="SeriesImagePath" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="prTVSeriesSelect" ReturnType="Collection(ChildTubeMainDBModel.prTVSeriesSelect_Result)">
+      <Parameter Name="TvSeriesID" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="prTVSeriesUpdate" ReturnType="Collection(ChildTubeMainDBModel.prTVSeriesUpdate_Result)">
+      <Parameter Name="TvSeriesID" Mode="In" Type="Int32" />
+      <Parameter Name="Name" Mode="In" Type="String" />
+      <Parameter Name="Hits" Mode="In" Type="Int32" />
+      <Parameter Name="SeriesImagePath" Mode="In" Type="String" />
+    </FunctionImport>
+    <FunctionImport Name="prUserDelete">
+      <Parameter Name="Id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="prUserInsert" ReturnType="Collection(ChildTubeMainDBModel.prUserInsert_Result)">
+      <Parameter Name="Email" Mode="In" Type="String" />
+      <Parameter Name="Activity" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="prUserSelect" ReturnType="Collection(ChildTubeMainDBModel.prUserSelect_Result)">
+      <Parameter Name="Id" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <FunctionImport Name="prUserUpdate" ReturnType="Collection(ChildTubeMainDBModel.prUserUpdate_Result)">
+      <Parameter Name="Id" Mode="In" Type="Int32" />
+      <Parameter Name="Email" Mode="In" Type="String" />
+      <Parameter Name="Activity" Mode="In" Type="Int32" />
+    </FunctionImport>
+    <EntitySet Name="Episodes" EntityType="ChildTubeMainDBModel.Episode" />
+    <EntitySet Name="TV_Series" EntityType="ChildTubeMainDBModel.TV_Series" />
+    <EntitySet Name="Users" EntityType="ChildTubeMainDBModel.User" />
+    <AssociationSet Name="FK_Episode_TV_Series" Association="ChildTubeMainDBModel.FK_Episode_TV_Series">
+      <End Role="TV_Series" EntitySet="TV_Series" />
+      <End Role="Episode" EntitySet="Episodes" />
+    </AssociationSet>
+  </EntityContainer>
+  <ComplexType Name="prEpisodeInsert_Result">
+    <Property Type="Int32" Name="EpisodeID" Nullable="false" />
+    <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
+    <Property Type="Int32" Name="EpisodeNumber" Nullable="false" />
+    <Property Type="String" Name="URLPath" Nullable="false" MaxLength="500" />
+    <Property Type="Int32" Name="SeriesNumber" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="prEpisodeSelect_Result">
+    <Property Type="Int32" Name="EpisodeID" Nullable="false" />
+    <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
+    <Property Type="Int32" Name="EpisodeNumber" Nullable="false" />
+    <Property Type="String" Name="URLPath" Nullable="false" MaxLength="500" />
+    <Property Type="Int32" Name="SeriesNumber" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="prEpisodeUpdate_Result">
+    <Property Type="Int32" Name="EpisodeID" Nullable="false" />
+    <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
+    <Property Type="Int32" Name="EpisodeNumber" Nullable="false" />
+    <Property Type="String" Name="URLPath" Nullable="false" MaxLength="500" />
+    <Property Type="Int32" Name="SeriesNumber" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="prTVSeriesInsert_Result">
+    <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="500" />
+    <Property Type="Int32" Name="Hits" Nullable="false" />
+    <Property Type="String" Name="SeriesImagePath" Nullable="true" MaxLength="500" />
+  </ComplexType>
+  <ComplexType Name="prTVSeriesSelect_Result">
+    <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="500" />
+    <Property Type="Int32" Name="Hits" Nullable="false" />
+    <Property Type="String" Name="SeriesImagePath" Nullable="true" MaxLength="500" />
+  </ComplexType>
+  <ComplexType Name="prTVSeriesUpdate_Result">
+    <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
+    <Property Type="String" Name="Name" Nullable="false" MaxLength="500" />
+    <Property Type="Int32" Name="Hits" Nullable="false" />
+    <Property Type="String" Name="SeriesImagePath" Nullable="true" MaxLength="500" />
+  </ComplexType>
+  <ComplexType Name="prUserInsert_Result">
+    <Property Type="Int32" Name="Id" Nullable="false" />
+    <Property Type="String" Name="Email" Nullable="false" MaxLength="100" />
+    <Property Type="Int32" Name="Activity" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="prUserSelect_Result">
+    <Property Type="Int32" Name="Id" Nullable="false" />
+    <Property Type="String" Name="Email" Nullable="false" MaxLength="100" />
+    <Property Type="Int32" Name="Activity" Nullable="true" />
+  </ComplexType>
+  <ComplexType Name="prUserUpdate_Result">
+    <Property Type="Int32" Name="Id" Nullable="false" />
+    <Property Type="String" Name="Email" Nullable="false" MaxLength="100" />
+    <Property Type="Int32" Name="Activity" Nullable="true" />
+  </ComplexType>
+  <EntityType Name="Episode">
+    <Key>
+      <PropertyRef Name="EpisodeID" />
+    </Key>
+    <Property Name="EpisodeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TvSeriesID" Type="Int32" Nullable="false" />
+    <Property Name="EpisodeNumber" Type="Int32" Nullable="false" />
+    <Property Name="URLPath" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="SeriesNumber" Type="Int32" />
+    <NavigationProperty Name="TV_Series" Relationship="ChildTubeMainDBModel.FK_Episode_TV_Series" FromRole="Episode" ToRole="TV_Series" />
+  </EntityType>
+  <EntityType Name="TV_Series">
+    <Key>
+      <PropertyRef Name="TvSeriesID" />
+    </Key>
+    <Property Name="TvSeriesID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="Hits" Type="Int32" Nullable="false" />
+    <Property Name="SeriesImagePath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Episodes" Relationship="ChildTubeMainDBModel.FK_Episode_TV_Series" FromRole="TV_Series" ToRole="Episode" />
+  </EntityType>
+  <EntityType Name="User">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Email" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="Activity" Type="Int32" />
+  </EntityType>
+  <Association Name="FK_Episode_TV_Series">
+    <End Type="ChildTubeMainDBModel.TV_Series" Role="TV_Series" Multiplicity="1" />
+    <End Type="ChildTubeMainDBModel.Episode" Role="Episode" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TV_Series">
+        <PropertyRef Name="TvSeriesID" />
+      </Principal>
+      <Dependent Role="Episode">
+        <PropertyRef Name="TvSeriesID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>
