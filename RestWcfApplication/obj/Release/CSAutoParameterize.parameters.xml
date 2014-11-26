@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="RestWcfApplication.DB.Entities-Web.config Connection String" description="RestWcfApplication.DB.Entities Connection String used in web.config by the application to access the database." defaultValue="Data Source=.;Initial Catalog=IAmInDB;Integrated Security=True" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="D:\\Dropbox\\Projects\\IAmIn2Code\\Server\\IAmIn2Service\\RestWcfApplication\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='RestWcfApplication.DB.Entities']/@connectionString" />
+  </parameter>
+</parameters>

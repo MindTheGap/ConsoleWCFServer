@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="ChildTubeMainDBModelStoreContainer" CdmEntityContainer="Entities">
+    <FunctionImportMapping FunctionImportName="prEpisodeDelete" FunctionName="ChildTubeMainDBModel.Store.prEpisodeDelete" />
+    <FunctionImportMapping FunctionImportName="prEpisodeInsert" FunctionName="ChildTubeMainDBModel.Store.prEpisodeInsert">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prEpisodeInsert_Result">
+          <ScalarProperty Name="EpisodeID" ColumnName="EpisodeID" />
+          <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+          <ScalarProperty Name="EpisodeNumber" ColumnName="EpisodeNumber" />
+          <ScalarProperty Name="URLPath" ColumnName="URLPath" />
+          <ScalarProperty Name="SeriesNumber" ColumnName="SeriesNumber" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="prEpisodeSelect" FunctionName="ChildTubeMainDBModel.Store.prEpisodeSelect">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prEpisodeSelect_Result">
+          <ScalarProperty Name="EpisodeID" ColumnName="EpisodeID" />
+          <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+          <ScalarProperty Name="EpisodeNumber" ColumnName="EpisodeNumber" />
+          <ScalarProperty Name="URLPath" ColumnName="URLPath" />
+          <ScalarProperty Name="SeriesNumber" ColumnName="SeriesNumber" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="prEpisodeUpdate" FunctionName="ChildTubeMainDBModel.Store.prEpisodeUpdate">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prEpisodeUpdate_Result">
+          <ScalarProperty Name="EpisodeID" ColumnName="EpisodeID" />
+          <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+          <ScalarProperty Name="EpisodeNumber" ColumnName="EpisodeNumber" />
+          <ScalarProperty Name="URLPath" ColumnName="URLPath" />
+          <ScalarProperty Name="SeriesNumber" ColumnName="SeriesNumber" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="prTVSeriesDelete" FunctionName="ChildTubeMainDBModel.Store.prTVSeriesDelete" />
+    <FunctionImportMapping FunctionImportName="prTVSeriesInsert" FunctionName="ChildTubeMainDBModel.Store.prTVSeriesInsert">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prTVSeriesInsert_Result">
+          <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Hits" ColumnName="Hits" />
+          <ScalarProperty Name="SeriesImagePath" ColumnName="SeriesImagePath" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="prTVSeriesSelect" FunctionName="ChildTubeMainDBModel.Store.prTVSeriesSelect">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prTVSeriesSelect_Result">
+          <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Hits" ColumnName="Hits" />
+          <ScalarProperty Name="SeriesImagePath" ColumnName="SeriesImagePath" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="prTVSeriesUpdate" FunctionName="ChildTubeMainDBModel.Store.prTVSeriesUpdate">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prTVSeriesUpdate_Result">
+          <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Hits" ColumnName="Hits" />
+          <ScalarProperty Name="SeriesImagePath" ColumnName="SeriesImagePath" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="prUserDelete" FunctionName="ChildTubeMainDBModel.Store.prUserDelete" />
+    <FunctionImportMapping FunctionImportName="prUserInsert" FunctionName="ChildTubeMainDBModel.Store.prUserInsert">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prUserInsert_Result">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="Activity" ColumnName="Activity" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="prUserSelect" FunctionName="ChildTubeMainDBModel.Store.prUserSelect">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prUserSelect_Result">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="Activity" ColumnName="Activity" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <FunctionImportMapping FunctionImportName="prUserUpdate" FunctionName="ChildTubeMainDBModel.Store.prUserUpdate">
+      <ResultMapping>
+        <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prUserUpdate_Result">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="Activity" ColumnName="Activity" />
+        </ComplexTypeMapping>
+      </ResultMapping>
+    </FunctionImportMapping>
+    <EntitySetMapping Name="Episodes">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Episode">
+        <MappingFragment StoreEntitySet="Episode">
+          <ScalarProperty Name="SeriesNumber" ColumnName="SeriesNumber" />
+          <ScalarProperty Name="URLPath" ColumnName="URLPath" />
+          <ScalarProperty Name="EpisodeNumber" ColumnName="EpisodeNumber" />
+          <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+          <ScalarProperty Name="EpisodeID" ColumnName="EpisodeID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Purchases">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Purchase">
+        <MappingFragment StoreEntitySet="Purchases">
+          <ScalarProperty Name="TvSeriesId" ColumnName="TvSeriesId" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+          <ScalarProperty Name="PurchaseId" ColumnName="PurchaseId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TV_Series">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.TV_Series">
+        <MappingFragment StoreEntitySet="TV Series">
+          <ScalarProperty Name="SeriesImagePath" ColumnName="SeriesImagePath" />
+          <ScalarProperty Name="Hits" ColumnName="Hits" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Users">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
+        <MappingFragment StoreEntitySet="User">
+          <ScalarProperty Name="Activity" ColumnName="Activity" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>
