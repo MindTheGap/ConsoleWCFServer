@@ -14,23 +14,89 @@ namespace RestWcfApplication.Root.Register
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class RegisterContract : IRegisterContract
   {
-    public int Register(string userEmail)
+    public int RegisterViaEmail(string email)
     {
       try
       {
         using (var context = new Entities())
         {
-          var user = new User() {Email = userEmail};
+          var userList = context.Users.Where(u => u.Email == email);
+          if (userList.Any())
+          {
+            return userList.First().Id;
+          }
+
+          var user = new User() {Email = email};
           context.Users.Add(user);
           context.SaveChanges();
 
-          return 0;
+          return user.Id;
         }
       }
       catch
       {
         throw new FaultException("Something went wrong");
       }
+    }
+
+    public int RegisterViaPhoneNumber(string phoneNumber)
+    {
+      try
+      {
+        using (var context = new Entities())
+        {
+          var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber);
+          if (userList.Any())
+          {
+            return userList.First().Id;
+          }
+
+          var user = new User() {PhoneNumber = phoneNumber};
+          context.Users.Add(user);
+          context.SaveChanges();
+
+          return user.Id;
+        }
+      }
+      catch
+      {
+        throw new FaultException("Something went wrong");
+      }
+    }
+
+    public void RegisterUserDetails(string userId, string firstName, string lastName, string email)
+    {
+      try
+      {
+        int userIdParsed;
+        if (!int.TryParse(userId, out userIdParsed)) return;
+
+        using (var context = new Entities())
+        {
+          var userList = context.Users.Where(u => u.Id == userIdParsed);
+          if (userList.Any())
+          {
+            var user = userList.First();
+            user.FirstName = firstName;
+            user.LastName = lastName;
+            user.Email = email;
+          }
+
+          context.SaveChanges();
+        }
+      }
+      catch
+      {
+        throw new FaultException("Something went wrong");
+      }
+    }
+
+
+
+  public string Hello()
+    {
+      const string s = "hello";
+      return s;
     }
   }
 }

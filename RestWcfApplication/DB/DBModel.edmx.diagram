@@ -5,10 +5,15 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="36b75844cfb34750aad46758bb442ecb" Name="Diagram1">
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.Episode" Width="1.5" PointX="3" PointY="0.875" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.TV_Series" Width="1.5" PointX="0.75" PointY="1" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.User" Width="1.5" PointX="0.75" PointY="4.75" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_Episode_TV_Series" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.Hint" Width="1.5" PointX="0.75" PointY="7.125" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.Message" Width="1.5" PointX="3" PointY="1.125" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.MessageState" Width="1.5" PointX="0.75" PointY="4.75" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.Token" Width="1.5" PointX="2.75" PointY="4.75" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.User" Width="1.5" PointX="0.75" PointY="1" />
+        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_Hint" />
+        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_MessageState" />
+        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_User" />
+        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_User1" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

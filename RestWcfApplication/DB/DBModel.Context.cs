@@ -27,8 +27,10 @@ namespace RestWcfApplication.DB
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Episode> Episodes { get; set; }
-        public virtual DbSet<TV_Series> TV_Series { get; set; }
+        public virtual DbSet<Hint> Hints { get; set; }
+        public virtual DbSet<Message> Messages { get; set; }
+        public virtual DbSet<MessageState> MessageStates { get; set; }
+        public virtual DbSet<Token> Tokens { get; set; }
         public virtual DbSet<User> Users { get; set; }
     
         public virtual int prEpisodeDelete(Nullable<int> episodeID)

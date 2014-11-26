@@ -4,104 +4,122 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="ChildTubeMainDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="Episode">
+    <Schema Namespace="ChildTubeMainDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Hint">
           <Key>
-            <PropertyRef Name="EpisodeID" />
+            <PropertyRef Name="Id" />
           </Key>
-          <Property Name="EpisodeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="TvSeriesID" Type="int" Nullable="false" />
-          <Property Name="EpisodeNumber" Type="int" Nullable="false" />
-          <Property Name="URLPath" Type="nvarchar" MaxLength="500" Nullable="false" />
-          <Property Name="SeriesNumber" Type="int" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Text" Type="nvarchar" MaxLength="500" />
+          <Property Name="PictureLink" Type="nvarchar" MaxLength="500" />
+          <Property Name="VideoLink" Type="nvarchar" MaxLength="500" />
         </EntityType>
-        <EntityType Name="TV Series">
+        <EntityType Name="Message">
           <Key>
-            <PropertyRef Name="TvSeriesID" />
+            <PropertyRef Name="Id" />
           </Key>
-          <Property Name="TvSeriesID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="500" Nullable="false" />
-          <Property Name="Hits" Type="int" Nullable="false" />
-          <Property Name="SeriesImagePath" Type="nvarchar" MaxLength="500" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SourceUserId" Type="int" Nullable="false" />
+          <Property Name="TargetUserId" Type="int" Nullable="false" />
+          <Property Name="MessageStateId" Type="int" Nullable="false" />
+          <Property Name="HintId" Type="int" />
+        </EntityType>
+        <EntityType Name="MessageState">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Type" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Token">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Code" Type="nvarchar" MaxLength="500" Nullable="false" />
         </EntityType>
         <EntityType Name="User">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Email" Type="nvarchar" MaxLength="100" Nullable="false" />
-          <Property Name="Activity" Type="int" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar" MaxLength="500" />
+          <Property Name="Email" Type="nvarchar" MaxLength="100" />
+          <Property Name="EmailPasswordHash" Type="nvarchar" MaxLength="500" />
+          <Property Name="FacebookUserId" Type="int" />
+          <Property Name="GoogleUserId" Type="int" />
+          <Property Name="PhoneNumber" Type="nvarchar" MaxLength="100" />
         </EntityType>
-        <Association Name="FK_Episode_TV Series">
-          <End Role="TV Series" Type="Self.TV Series" Multiplicity="1" />
-          <End Role="Episode" Type="Self.Episode" Multiplicity="*" />
+        <Association Name="FK_Message_Hint">
+          <End Role="Hint" Type="Self.Hint" Multiplicity="0..1" />
+          <End Role="Message" Type="Self.Message" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="TV Series">
-              <PropertyRef Name="TvSeriesID" />
+            <Principal Role="Hint">
+              <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Episode">
-              <PropertyRef Name="TvSeriesID" />
+            <Dependent Role="Message">
+              <PropertyRef Name="HintId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Function Name="prEpisodeDelete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="EpisodeID" Type="int" Mode="In" />
-        </Function>
-        <Function Name="prEpisodeInsert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="TvSeriesID" Type="int" Mode="In" />
-          <Parameter Name="EpisodeNumber" Type="int" Mode="In" />
-          <Parameter Name="URLPath" Type="nvarchar" Mode="In" />
-          <Parameter Name="SeriesNumber" Type="int" Mode="In" />
-        </Function>
-        <Function Name="prEpisodeSelect" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="EpisodeID" Type="int" Mode="In" />
-        </Function>
-        <Function Name="prEpisodeUpdate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="EpisodeID" Type="int" Mode="In" />
-          <Parameter Name="TvSeriesID" Type="int" Mode="In" />
-          <Parameter Name="EpisodeNumber" Type="int" Mode="In" />
-          <Parameter Name="URLPath" Type="nvarchar" Mode="In" />
-          <Parameter Name="SeriesNumber" Type="int" Mode="In" />
-        </Function>
-        <Function Name="prTVSeriesDelete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="TvSeriesID" Type="int" Mode="In" />
-        </Function>
-        <Function Name="prTVSeriesInsert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="Name" Type="nvarchar" Mode="In" />
-          <Parameter Name="Hits" Type="int" Mode="In" />
-          <Parameter Name="SeriesImagePath" Type="nvarchar" Mode="In" />
-        </Function>
-        <Function Name="prTVSeriesSelect" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="TvSeriesID" Type="int" Mode="In" />
-        </Function>
-        <Function Name="prTVSeriesUpdate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="TvSeriesID" Type="int" Mode="In" />
-          <Parameter Name="Name" Type="nvarchar" Mode="In" />
-          <Parameter Name="Hits" Type="int" Mode="In" />
-          <Parameter Name="SeriesImagePath" Type="nvarchar" Mode="In" />
-        </Function>
-        <Function Name="prUserDelete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="Id" Type="int" Mode="In" />
-        </Function>
-        <Function Name="prUserInsert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="Email" Type="nvarchar" Mode="In" />
-          <Parameter Name="Activity" Type="int" Mode="In" />
-        </Function>
-        <Function Name="prUserSelect" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="Id" Type="int" Mode="In" />
-        </Function>
-        <Function Name="prUserUpdate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-          <Parameter Name="Id" Type="int" Mode="In" />
-          <Parameter Name="Email" Type="nvarchar" Mode="In" />
-          <Parameter Name="Activity" Type="int" Mode="In" />
-        </Function>
+        <Association Name="FK_Message_MessageState">
+          <End Role="MessageState" Type="Self.MessageState" Multiplicity="1" />
+          <End Role="Message" Type="Self.Message" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MessageState">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Message">
+              <PropertyRef Name="MessageStateId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Message_User">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="Message" Type="Self.Message" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Message">
+              <PropertyRef Name="SourceUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Message_User1">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="Message" Type="Self.Message" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Message">
+              <PropertyRef Name="TargetUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="ChildTubeMainDBModelStoreContainer">
-          <EntitySet Name="Episode" EntityType="Self.Episode" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="TV Series" EntityType="Self.TV Series" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Hint" EntityType="Self.Hint" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Message" EntityType="Self.Message" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MessageState" EntityType="Self.MessageState" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Token" EntityType="Self.Token" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_Episode_TV Series" Association="Self.FK_Episode_TV Series">
-            <End Role="TV Series" EntitySet="TV Series" />
-            <End Role="Episode" EntitySet="Episode" />
+          <AssociationSet Name="FK_Message_Hint" Association="Self.FK_Message_Hint">
+            <End Role="Hint" EntitySet="Hint" />
+            <End Role="Message" EntitySet="Message" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Message_MessageState" Association="Self.FK_Message_MessageState">
+            <End Role="MessageState" EntitySet="MessageState" />
+            <End Role="Message" EntitySet="Message" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Message_User" Association="Self.FK_Message_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Message" EntitySet="Message" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Message_User1" Association="Self.FK_Message_User1">
+            <End Role="User" EntitySet="User" />
+            <End Role="Message" EntitySet="Message" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -160,14 +178,28 @@
             <Parameter Name="Email" Mode="In" Type="String" />
             <Parameter Name="Activity" Mode="In" Type="Int32" />
           </FunctionImport>
-          <EntitySet Name="Episodes" EntityType="ChildTubeMainDBModel.Episode" />
-          <EntitySet Name="TV_Series" EntityType="ChildTubeMainDBModel.TV_Series" />
+          <EntitySet Name="Hints" EntityType="ChildTubeMainDBModel.Hint" />
+          <EntitySet Name="Messages" EntityType="ChildTubeMainDBModel.Message" />
+          <EntitySet Name="MessageStates" EntityType="ChildTubeMainDBModel.MessageState" />
+          <EntitySet Name="Tokens" EntityType="ChildTubeMainDBModel.Token" />
           <EntitySet Name="Users" EntityType="ChildTubeMainDBModel.User" />
-          <AssociationSet Name="FK_Episode_TV_Series" Association="ChildTubeMainDBModel.FK_Episode_TV_Series">
-            <End Role="TV_Series" EntitySet="TV_Series" />
-            <End Role="Episode" EntitySet="Episodes" />
+          <AssociationSet Name="FK_Message_Hint" Association="ChildTubeMainDBModel.FK_Message_Hint">
+            <End Role="Hint" EntitySet="Hints" />
+            <End Role="Message" EntitySet="Messages" />
           </AssociationSet>
-        </EntityContainer>
+          <AssociationSet Name="FK_Message_MessageState" Association="ChildTubeMainDBModel.FK_Message_MessageState">
+            <End Role="MessageState" EntitySet="MessageStates" />
+            <End Role="Message" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Message_User" Association="ChildTubeMainDBModel.FK_Message_User">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Message" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Message_User1" Association="ChildTubeMainDBModel.FK_Message_User1">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Message" EntitySet="Messages" />
+          </AssociationSet>
+          </EntityContainer>
         <ComplexType Name="prEpisodeInsert_Result">
           <Property Type="Int32" Name="EpisodeID" Nullable="false" />
           <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
@@ -222,172 +254,161 @@
           <Property Type="String" Name="Email" Nullable="false" MaxLength="100" />
           <Property Type="Int32" Name="Activity" Nullable="true" />
         </ComplexType>
-        <EntityType Name="Episode">
+        <EntityType Name="Hint">
           <Key>
-            <PropertyRef Name="EpisodeID" />
+            <PropertyRef Name="Id" />
           </Key>
-          <Property Name="EpisodeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TvSeriesID" Type="Int32" Nullable="false" />
-          <Property Name="EpisodeNumber" Type="Int32" Nullable="false" />
-          <Property Name="URLPath" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="SeriesNumber" Type="Int32" />
-          <NavigationProperty Name="TV_Series" Relationship="ChildTubeMainDBModel.FK_Episode_TV_Series" FromRole="Episode" ToRole="TV_Series" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Text" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="PictureLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="VideoLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
         </EntityType>
-        <EntityType Name="TV_Series">
+        <EntityType Name="Message">
           <Key>
-            <PropertyRef Name="TvSeriesID" />
+            <PropertyRef Name="Id" />
           </Key>
-          <Property Name="TvSeriesID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="Hits" Type="Int32" Nullable="false" />
-          <Property Name="SeriesImagePath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Episodes" Relationship="ChildTubeMainDBModel.FK_Episode_TV_Series" FromRole="TV_Series" ToRole="Episode" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SourceUserId" Type="Int32" Nullable="false" />
+          <Property Name="TargetUserId" Type="Int32" Nullable="false" />
+          <Property Name="MessageStateId" Type="Int32" Nullable="false" />
+          <Property Name="HintId" Type="Int32" />
+          <NavigationProperty Name="Hint" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
+          <NavigationProperty Name="MessageState" Relationship="ChildTubeMainDBModel.FK_Message_MessageState" FromRole="Message" ToRole="MessageState" />
+          <NavigationProperty Name="User" Relationship="ChildTubeMainDBModel.FK_Message_User" FromRole="Message" ToRole="User" />
+          <NavigationProperty Name="User1" Relationship="ChildTubeMainDBModel.FK_Message_User1" FromRole="Message" ToRole="User" />
+        </EntityType>
+        <EntityType Name="MessageState">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Type" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_MessageState" FromRole="MessageState" ToRole="Message" />
+        </EntityType>
+        <EntityType Name="Token">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Code" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="User">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Email" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="Activity" Type="Int32" />
+          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="LastName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="EmailPasswordHash" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="FacebookUserId" Type="Int32" />
+          <Property Name="GoogleUserId" Type="Int32" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_User" FromRole="User" ToRole="Message" />
+          <NavigationProperty Name="Messages1" Relationship="ChildTubeMainDBModel.FK_Message_User1" FromRole="User" ToRole="Message" />
         </EntityType>
-        <Association Name="FK_Episode_TV_Series">
-          <End Type="ChildTubeMainDBModel.TV_Series" Role="TV_Series" Multiplicity="1" />
-          <End Type="ChildTubeMainDBModel.Episode" Role="Episode" Multiplicity="*" />
+        <Association Name="FK_Message_Hint">
+          <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
+          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="TV_Series">
-              <PropertyRef Name="TvSeriesID" />
+            <Principal Role="Hint">
+              <PropertyRef Name="Id" />
             </Principal>
-            <Dependent Role="Episode">
-              <PropertyRef Name="TvSeriesID" />
+            <Dependent Role="Message">
+              <PropertyRef Name="HintId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        <Association Name="FK_Message_MessageState">
+          <End Type="ChildTubeMainDBModel.MessageState" Role="MessageState" Multiplicity="1" />
+          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MessageState">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Message">
+              <PropertyRef Name="MessageStateId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Message_User">
+          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Message">
+              <PropertyRef Name="SourceUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Message_User1">
+          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Message">
+              <PropertyRef Name="TargetUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="ChildTubeMainDBModelStoreContainer" CdmEntityContainer="Entities">
-          <FunctionImportMapping FunctionImportName="prEpisodeDelete" FunctionName="ChildTubeMainDBModel.Store.prEpisodeDelete" />
-          <FunctionImportMapping FunctionImportName="prEpisodeInsert" FunctionName="ChildTubeMainDBModel.Store.prEpisodeInsert">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prEpisodeInsert_Result">
-                <ScalarProperty Name="EpisodeID" ColumnName="EpisodeID" />
-                <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
-                <ScalarProperty Name="EpisodeNumber" ColumnName="EpisodeNumber" />
-                <ScalarProperty Name="URLPath" ColumnName="URLPath" />
-                <ScalarProperty Name="SeriesNumber" ColumnName="SeriesNumber" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="prEpisodeSelect" FunctionName="ChildTubeMainDBModel.Store.prEpisodeSelect">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prEpisodeSelect_Result">
-                <ScalarProperty Name="EpisodeID" ColumnName="EpisodeID" />
-                <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
-                <ScalarProperty Name="EpisodeNumber" ColumnName="EpisodeNumber" />
-                <ScalarProperty Name="URLPath" ColumnName="URLPath" />
-                <ScalarProperty Name="SeriesNumber" ColumnName="SeriesNumber" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="prEpisodeUpdate" FunctionName="ChildTubeMainDBModel.Store.prEpisodeUpdate">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prEpisodeUpdate_Result">
-                <ScalarProperty Name="EpisodeID" ColumnName="EpisodeID" />
-                <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
-                <ScalarProperty Name="EpisodeNumber" ColumnName="EpisodeNumber" />
-                <ScalarProperty Name="URLPath" ColumnName="URLPath" />
-                <ScalarProperty Name="SeriesNumber" ColumnName="SeriesNumber" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="prTVSeriesDelete" FunctionName="ChildTubeMainDBModel.Store.prTVSeriesDelete" />
-          <FunctionImportMapping FunctionImportName="prTVSeriesInsert" FunctionName="ChildTubeMainDBModel.Store.prTVSeriesInsert">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prTVSeriesInsert_Result">
-                <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Hits" ColumnName="Hits" />
-                <ScalarProperty Name="SeriesImagePath" ColumnName="SeriesImagePath" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="prTVSeriesSelect" FunctionName="ChildTubeMainDBModel.Store.prTVSeriesSelect">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prTVSeriesSelect_Result">
-                <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Hits" ColumnName="Hits" />
-                <ScalarProperty Name="SeriesImagePath" ColumnName="SeriesImagePath" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="prTVSeriesUpdate" FunctionName="ChildTubeMainDBModel.Store.prTVSeriesUpdate">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prTVSeriesUpdate_Result">
-                <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Hits" ColumnName="Hits" />
-                <ScalarProperty Name="SeriesImagePath" ColumnName="SeriesImagePath" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="prUserDelete" FunctionName="ChildTubeMainDBModel.Store.prUserDelete" />
-          <FunctionImportMapping FunctionImportName="prUserInsert" FunctionName="ChildTubeMainDBModel.Store.prUserInsert">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prUserInsert_Result">
+          <EntitySetMapping Name="Hints">
+            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
+              <MappingFragment StoreEntitySet="Hint">
+                <ScalarProperty Name="VideoLink" ColumnName="VideoLink" />
+                <ScalarProperty Name="PictureLink" ColumnName="PictureLink" />
+                <ScalarProperty Name="Text" ColumnName="Text" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="Activity" ColumnName="Activity" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="prUserSelect" FunctionName="ChildTubeMainDBModel.Store.prUserSelect">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prUserSelect_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="Activity" ColumnName="Activity" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <FunctionImportMapping FunctionImportName="prUserUpdate" FunctionName="ChildTubeMainDBModel.Store.prUserUpdate">
-            <ResultMapping>
-              <ComplexTypeMapping TypeName="ChildTubeMainDBModel.prUserUpdate_Result">
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="Email" ColumnName="Email" />
-                <ScalarProperty Name="Activity" ColumnName="Activity" />
-              </ComplexTypeMapping>
-            </ResultMapping>
-          </FunctionImportMapping>
-          <EntitySetMapping Name="Episodes">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Episode">
-              <MappingFragment StoreEntitySet="Episode">
-                <ScalarProperty Name="SeriesNumber" ColumnName="SeriesNumber" />
-                <ScalarProperty Name="URLPath" ColumnName="URLPath" />
-                <ScalarProperty Name="EpisodeNumber" ColumnName="EpisodeNumber" />
-                <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
-                <ScalarProperty Name="EpisodeID" ColumnName="EpisodeID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="TV_Series">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.TV_Series">
-              <MappingFragment StoreEntitySet="TV Series">
-                <ScalarProperty Name="SeriesImagePath" ColumnName="SeriesImagePath" />
-                <ScalarProperty Name="Hits" ColumnName="Hits" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="TvSeriesID" ColumnName="TvSeriesID" />
+          <EntitySetMapping Name="Messages">
+            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
+              <MappingFragment StoreEntitySet="Message">
+                <ScalarProperty Name="HintId" ColumnName="HintId" />
+                <ScalarProperty Name="MessageStateId" ColumnName="MessageStateId" />
+                <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
+                <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MessageStates">
+            <EntityTypeMapping TypeName="ChildTubeMainDBModel.MessageState">
+              <MappingFragment StoreEntitySet="MessageState">
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tokens">
+            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Token">
+              <MappingFragment StoreEntitySet="Token">
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
               <MappingFragment StoreEntitySet="User">
-                <ScalarProperty Name="Activity" ColumnName="Activity" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="GoogleUserId" ColumnName="GoogleUserId" />
+                <ScalarProperty Name="FacebookUserId" ColumnName="FacebookUserId" />
+                <ScalarProperty Name="EmailPasswordHash" ColumnName="EmailPasswordHash" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

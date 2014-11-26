@@ -53,11 +53,20 @@
       <Parameter Name="Activity" Mode="In" Type="Int32" />
     </FunctionImport>
     <EntitySet Name="Episodes" EntityType="ChildTubeMainDBModel.Episode" />
+    <EntitySet Name="Purchases" EntityType="ChildTubeMainDBModel.Purchase" />
     <EntitySet Name="TV_Series" EntityType="ChildTubeMainDBModel.TV_Series" />
     <EntitySet Name="Users" EntityType="ChildTubeMainDBModel.User" />
     <AssociationSet Name="FK_Episode_TV_Series" Association="ChildTubeMainDBModel.FK_Episode_TV_Series">
       <End Role="TV_Series" EntitySet="TV_Series" />
       <End Role="Episode" EntitySet="Episodes" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Purchases_TV_Series" Association="ChildTubeMainDBModel.FK_Purchases_TV_Series">
+      <End Role="TV_Series" EntitySet="TV_Series" />
+      <End Role="Purchase" EntitySet="Purchases" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Purchases_User" Association="ChildTubeMainDBModel.FK_Purchases_User">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Purchase" EntitySet="Purchases" />
     </AssociationSet>
   </EntityContainer>
   <ComplexType Name="prEpisodeInsert_Result">
@@ -125,6 +134,16 @@
     <Property Name="SeriesNumber" Type="Int32" />
     <NavigationProperty Name="TV_Series" Relationship="ChildTubeMainDBModel.FK_Episode_TV_Series" FromRole="Episode" ToRole="TV_Series" />
   </EntityType>
+  <EntityType Name="Purchase">
+    <Key>
+      <PropertyRef Name="PurchaseId" />
+    </Key>
+    <Property Name="PurchaseId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="UserId" Type="Int32" Nullable="false" />
+    <Property Name="TvSeriesId" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="TV_Series" Relationship="ChildTubeMainDBModel.FK_Purchases_TV_Series" FromRole="Purchase" ToRole="TV_Series" />
+    <NavigationProperty Name="User" Relationship="ChildTubeMainDBModel.FK_Purchases_User" FromRole="Purchase" ToRole="User" />
+  </EntityType>
   <EntityType Name="TV_Series">
     <Key>
       <PropertyRef Name="TvSeriesID" />
@@ -134,6 +153,7 @@
     <Property Name="Hits" Type="Int32" Nullable="false" />
     <Property Name="SeriesImagePath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
     <NavigationProperty Name="Episodes" Relationship="ChildTubeMainDBModel.FK_Episode_TV_Series" FromRole="TV_Series" ToRole="Episode" />
+    <NavigationProperty Name="Purchases" Relationship="ChildTubeMainDBModel.FK_Purchases_TV_Series" FromRole="TV_Series" ToRole="Purchase" />
   </EntityType>
   <EntityType Name="User">
     <Key>
@@ -142,6 +162,7 @@
     <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="Email" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
     <Property Name="Activity" Type="Int32" />
+    <NavigationProperty Name="Purchases" Relationship="ChildTubeMainDBModel.FK_Purchases_User" FromRole="User" ToRole="Purchase" />
   </EntityType>
   <Association Name="FK_Episode_TV_Series">
     <End Type="ChildTubeMainDBModel.TV_Series" Role="TV_Series" Multiplicity="1" />
@@ -152,6 +173,30 @@
       </Principal>
       <Dependent Role="Episode">
         <PropertyRef Name="TvSeriesID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Purchases_TV_Series">
+    <End Type="ChildTubeMainDBModel.TV_Series" Role="TV_Series" Multiplicity="1" />
+    <End Type="ChildTubeMainDBModel.Purchase" Role="Purchase" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TV_Series">
+        <PropertyRef Name="TvSeriesID" />
+      </Principal>
+      <Dependent Role="Purchase">
+        <PropertyRef Name="TvSeriesId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Purchases_User">
+    <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
+    <End Type="ChildTubeMainDBModel.Purchase" Role="Purchase" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Purchase">
+        <PropertyRef Name="UserId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>

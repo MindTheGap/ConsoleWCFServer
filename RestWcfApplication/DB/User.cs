@@ -14,8 +14,22 @@ namespace RestWcfApplication.DB
     
     public partial class User
     {
+        public User()
+        {
+            this.Messages = new HashSet<Message>();
+            this.Messages1 = new HashSet<Message>();
+        }
+    
         public int Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Email { get; set; }
-        public Nullable<int> Activity { get; set; }
+        public string EmailPasswordHash { get; set; }
+        public Nullable<int> FacebookUserId { get; set; }
+        public Nullable<int> GoogleUserId { get; set; }
+        public string PhoneNumber { get; set; }
+    
+        public virtual ICollection<Message> Messages { get; set; }
+        public virtual ICollection<Message> Messages1 { get; set; }
     }
 }

@@ -10,6 +10,14 @@
     <Property Name="URLPath" Type="nvarchar" MaxLength="500" Nullable="false" />
     <Property Name="SeriesNumber" Type="int" />
   </EntityType>
+  <EntityType Name="Purchases">
+    <Key>
+      <PropertyRef Name="PurchaseId" />
+    </Key>
+    <Property Name="PurchaseId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="UserId" Type="int" Nullable="false" />
+    <Property Name="TvSeriesId" Type="int" Nullable="false" />
+  </EntityType>
   <EntityType Name="TV Series">
     <Key>
       <PropertyRef Name="TvSeriesID" />
@@ -36,6 +44,30 @@
       </Principal>
       <Dependent Role="Episode">
         <PropertyRef Name="TvSeriesID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Purchases_TV Series">
+    <End Role="TV Series" Type="Self.TV Series" Multiplicity="1" />
+    <End Role="Purchases" Type="Self.Purchases" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="TV Series">
+        <PropertyRef Name="TvSeriesID" />
+      </Principal>
+      <Dependent Role="Purchases">
+        <PropertyRef Name="TvSeriesId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Purchases_User">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="Purchases" Type="Self.Purchases" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Purchases">
+        <PropertyRef Name="UserId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -92,11 +124,20 @@
   </Function>
   <EntityContainer Name="ChildTubeMainDBModelStoreContainer">
     <EntitySet Name="Episode" EntityType="Self.Episode" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Purchases" EntityType="Self.Purchases" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="TV Series" EntityType="Self.TV Series" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
     <AssociationSet Name="FK_Episode_TV Series" Association="Self.FK_Episode_TV Series">
       <End Role="TV Series" EntitySet="TV Series" />
       <End Role="Episode" EntitySet="Episode" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Purchases_TV Series" Association="Self.FK_Purchases_TV Series">
+      <End Role="TV Series" EntitySet="TV Series" />
+      <End Role="Purchases" EntitySet="Purchases" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Purchases_User" Association="Self.FK_Purchases_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Purchases" EntitySet="Purchases" />
     </AssociationSet>
   </EntityContainer>
 </Schema>

@@ -14,8 +14,8 @@ namespace RestWcfApplication.Root.TvSeries
   public interface ITvSeriesContract
   {
     [OperationContract]
-    [WebGet(UriTemplate = "search/{toSearch}")]
-    List<TV_Series> SearchEpisodeByKeyphrase(string toSearch);
+    [WebGet(UriTemplate = "search?userId={userId}&search={toSearch}")]
+    List<TV_Series> SearchTvSeriesByKeyphrase(string toSearch, string userId);
 
     [OperationContract]
     [WebGet(UriTemplate = "top?userId={userId}")]
