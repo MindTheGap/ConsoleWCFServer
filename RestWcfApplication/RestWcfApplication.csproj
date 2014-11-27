@@ -135,13 +135,12 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="DB\EMessageState.cs" />
+    <Compile Include="DB\ErrorInfo.cs" />
     <Compile Include="DB\Hint.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DB\Message.cs">
-      <DependentUpon>DBModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DB\MessageState.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DB\prEpisodeInsert_Result.cs">

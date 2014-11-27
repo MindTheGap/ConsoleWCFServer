@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
 using System.ServiceModel.Web;
+using RestWcfApplication.DB;
 
 namespace RestWcfApplication.Root.Want
 {
@@ -9,8 +10,9 @@ namespace RestWcfApplication.Root.Want
   public interface IWantContract
   {
     [OperationContract]
-    [WebGet(UriTemplate = "want?userId={userId}&token={token}&phone={phoneNumber}&hint={hint}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
-    DB.MessageState UpdateIWantUser(string userId, string token, string phoneNumber, string hint, string hintImageLink, string hintVideoLink);
+    [WebGet(UriTemplate = "want?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetPhoneNumber={targetPhoneNumber}&hint={hint}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
+    string UpdateIWantUser(string userId, string sourcePhoneNumber, string targetPhoneNumber, 
+      string hint, string hintImageLink, string hintVideoLink);
 
     [OperationContract]
     [WebGet(UriTemplate = "episodes/{tvSeriesId}")]

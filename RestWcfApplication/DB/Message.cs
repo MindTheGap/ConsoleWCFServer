@@ -17,11 +17,10 @@ namespace RestWcfApplication.DB
         public int Id { get; set; }
         public int SourceUserId { get; set; }
         public int TargetUserId { get; set; }
-        public int MessageStateId { get; set; }
+        public int MessageState { get; set; }
         public Nullable<int> HintId { get; set; }
     
         public virtual Hint Hint { get; set; }
-        public virtual MessageState MessageState { get; set; }
         public virtual User User { get; set; }
         public virtual User User1 { get; set; }
     }

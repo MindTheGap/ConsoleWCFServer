@@ -21,15 +21,8 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="SourceUserId" Type="int" Nullable="false" />
           <Property Name="TargetUserId" Type="int" Nullable="false" />
-          <Property Name="MessageStateId" Type="int" Nullable="false" />
+          <Property Name="MessageState" Type="int" Nullable="false" />
           <Property Name="HintId" Type="int" />
-        </EntityType>
-        <EntityType Name="MessageState">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Type" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <EntityType Name="Token">
           <Key>
@@ -63,18 +56,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Message_MessageState">
-          <End Role="MessageState" Type="Self.MessageState" Multiplicity="1" />
-          <End Role="Message" Type="Self.Message" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MessageState">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Message">
-              <PropertyRef Name="MessageStateId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Message_User">
           <End Role="User" Type="Self.User" Multiplicity="1" />
           <End Role="Message" Type="Self.Message" Multiplicity="*" />
@@ -102,15 +83,10 @@
         <EntityContainer Name="ChildTubeMainDBModelStoreContainer">
           <EntitySet Name="Hint" EntityType="Self.Hint" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Message" EntityType="Self.Message" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="MessageState" EntityType="Self.MessageState" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Token" EntityType="Self.Token" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_Message_Hint" Association="Self.FK_Message_Hint">
             <End Role="Hint" EntitySet="Hint" />
-            <End Role="Message" EntitySet="Message" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Message_MessageState" Association="Self.FK_Message_MessageState">
-            <End Role="MessageState" EntitySet="MessageState" />
             <End Role="Message" EntitySet="Message" />
           </AssociationSet>
           <AssociationSet Name="FK_Message_User" Association="Self.FK_Message_User">
@@ -180,15 +156,10 @@
           </FunctionImport>
           <EntitySet Name="Hints" EntityType="ChildTubeMainDBModel.Hint" />
           <EntitySet Name="Messages" EntityType="ChildTubeMainDBModel.Message" />
-          <EntitySet Name="MessageStates" EntityType="ChildTubeMainDBModel.MessageState" />
           <EntitySet Name="Tokens" EntityType="ChildTubeMainDBModel.Token" />
           <EntitySet Name="Users" EntityType="ChildTubeMainDBModel.User" />
           <AssociationSet Name="FK_Message_Hint" Association="ChildTubeMainDBModel.FK_Message_Hint">
             <End Role="Hint" EntitySet="Hints" />
-            <End Role="Message" EntitySet="Messages" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Message_MessageState" Association="ChildTubeMainDBModel.FK_Message_MessageState">
-            <End Role="MessageState" EntitySet="MessageStates" />
             <End Role="Message" EntitySet="Messages" />
           </AssociationSet>
           <AssociationSet Name="FK_Message_User" Association="ChildTubeMainDBModel.FK_Message_User">
@@ -271,20 +242,11 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="SourceUserId" Type="Int32" Nullable="false" />
           <Property Name="TargetUserId" Type="Int32" Nullable="false" />
-          <Property Name="MessageStateId" Type="Int32" Nullable="false" />
+          <Property Name="MessageState" Type="Int32" Nullable="false" />
           <Property Name="HintId" Type="Int32" />
           <NavigationProperty Name="Hint" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
-          <NavigationProperty Name="MessageState" Relationship="ChildTubeMainDBModel.FK_Message_MessageState" FromRole="Message" ToRole="MessageState" />
           <NavigationProperty Name="User" Relationship="ChildTubeMainDBModel.FK_Message_User" FromRole="Message" ToRole="User" />
           <NavigationProperty Name="User1" Relationship="ChildTubeMainDBModel.FK_Message_User1" FromRole="Message" ToRole="User" />
-        </EntityType>
-        <EntityType Name="MessageState">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Type" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_MessageState" FromRole="MessageState" ToRole="Message" />
         </EntityType>
         <EntityType Name="Token">
           <Key>
@@ -317,18 +279,6 @@
             </Principal>
             <Dependent Role="Message">
               <PropertyRef Name="HintId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Message_MessageState">
-          <End Type="ChildTubeMainDBModel.MessageState" Role="MessageState" Multiplicity="1" />
-          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MessageState">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Message">
-              <PropertyRef Name="MessageStateId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -376,17 +326,9 @@
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
               <MappingFragment StoreEntitySet="Message">
                 <ScalarProperty Name="HintId" ColumnName="HintId" />
-                <ScalarProperty Name="MessageStateId" ColumnName="MessageStateId" />
+                <ScalarProperty Name="MessageState" ColumnName="MessageState" />
                 <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
                 <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="MessageStates">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.MessageState">
-              <MappingFragment StoreEntitySet="MessageState">
-                <ScalarProperty Name="Type" ColumnName="Type" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
