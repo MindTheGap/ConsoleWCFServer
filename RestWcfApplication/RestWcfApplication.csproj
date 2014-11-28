@@ -112,14 +112,12 @@
     <Content Include="Global.asax" />
     <Content Include="Root\Want\WantContract.svc" />
     <Content Include="Root\Register\RegisterContract.svc" />
-    <Content Include="Root\Token\TokenService.svc" />
-    <Content Include="Root\TvSeries\TvSeriesContract.svc" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CustomSecurityTokenHandler.cs" />
+    <Compile Include="Communications\EMessagesTypesToClient.cs" />
     <Compile Include="DB\DBModel.Context.cs">
       <DependentUpon>DBModel.Context.tt</DependentUpon>
       <AutoGen>True</AutoGen>
@@ -135,7 +133,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="DB\EMessageState.cs" />
+    <Compile Include="DB\ESystemMessageState.cs" />
     <Compile Include="DB\ErrorInfo.cs" />
     <Compile Include="DB\Hint.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
@@ -170,6 +168,9 @@
     <Compile Include="DB\prUserUpdate_Result.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="DB\SystemMessage.cs">
+      <DependentUpon>DBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="DB\Token.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
@@ -187,14 +188,6 @@
     <Compile Include="Root\Register\IRegisterContract.cs" />
     <Compile Include="Root\Register\RegisterContract.svc.cs">
       <DependentUpon>RegisterContract.svc</DependentUpon>
-    </Compile>
-    <Compile Include="Root\Token\ITokenService.cs" />
-    <Compile Include="Root\Token\TokenService.svc.cs">
-      <DependentUpon>TokenService.svc</DependentUpon>
-    </Compile>
-    <Compile Include="Root\TvSeries\ITvSeriesContract.cs" />
-    <Compile Include="Root\TvSeries\TvSeriesContract.svc.cs">
-      <DependentUpon>TvSeriesContract.svc</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

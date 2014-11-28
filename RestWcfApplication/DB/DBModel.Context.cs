@@ -29,6 +29,7 @@ namespace RestWcfApplication.DB
     
         public virtual DbSet<Hint> Hints { get; set; }
         public virtual DbSet<Message> Messages { get; set; }
+        public virtual DbSet<SystemMessage> SystemMessages { get; set; }
         public virtual DbSet<Token> Tokens { get; set; }
         public virtual DbSet<User> Users { get; set; }
     

@@ -21,8 +21,18 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="SourceUserId" Type="int" Nullable="false" />
           <Property Name="TargetUserId" Type="int" Nullable="false" />
-          <Property Name="MessageState" Type="int" Nullable="false" />
+          <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="HintId" Type="int" />
+        </EntityType>
+        <EntityType Name="SystemMessage">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="SourceUserId" Type="int" Nullable="false" />
+          <Property Name="TargetUserId" Type="int" />
+          <Property Name="MessageState" Type="int" Nullable="false" />
+          <Property Name="Date" Type="nchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <EntityType Name="Token">
           <Key>
@@ -56,7 +66,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Message_User">
+        <Association Name="FK_Message_SourceUser">
           <End Role="User" Type="Self.User" Multiplicity="1" />
           <End Role="Message" Type="Self.Message" Multiplicity="*" />
           <ReferentialConstraint>
@@ -68,7 +78,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Message_User1">
+        <Association Name="FK_Message_TargetUser">
           <End Role="User" Type="Self.User" Multiplicity="1" />
           <End Role="Message" Type="Self.Message" Multiplicity="*" />
           <ReferentialConstraint>
@@ -80,22 +90,55 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_SystemMessage_SourceUser">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="SystemMessage" Type="Self.SystemMessage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SystemMessage">
+              <PropertyRef Name="SourceUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SystemMessage_TargetUser">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="SystemMessage" Type="Self.SystemMessage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SystemMessage">
+              <PropertyRef Name="TargetUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="ChildTubeMainDBModelStoreContainer">
           <EntitySet Name="Hint" EntityType="Self.Hint" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Message" EntityType="Self.Message" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SystemMessage" EntityType="Self.SystemMessage" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Token" EntityType="Self.Token" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_Message_Hint" Association="Self.FK_Message_Hint">
             <End Role="Hint" EntitySet="Hint" />
             <End Role="Message" EntitySet="Message" />
           </AssociationSet>
-          <AssociationSet Name="FK_Message_User" Association="Self.FK_Message_User">
+          <AssociationSet Name="FK_Message_SourceUser" Association="Self.FK_Message_SourceUser">
             <End Role="User" EntitySet="User" />
             <End Role="Message" EntitySet="Message" />
           </AssociationSet>
-          <AssociationSet Name="FK_Message_User1" Association="Self.FK_Message_User1">
+          <AssociationSet Name="FK_Message_TargetUser" Association="Self.FK_Message_TargetUser">
             <End Role="User" EntitySet="User" />
             <End Role="Message" EntitySet="Message" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SystemMessage_SourceUser" Association="Self.FK_SystemMessage_SourceUser">
+            <End Role="User" EntitySet="User" />
+            <End Role="SystemMessage" EntitySet="SystemMessage" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SystemMessage_TargetUser" Association="Self.FK_SystemMessage_TargetUser">
+            <End Role="User" EntitySet="User" />
+            <End Role="SystemMessage" EntitySet="SystemMessage" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -156,19 +199,28 @@
           </FunctionImport>
           <EntitySet Name="Hints" EntityType="ChildTubeMainDBModel.Hint" />
           <EntitySet Name="Messages" EntityType="ChildTubeMainDBModel.Message" />
+          <EntitySet Name="SystemMessages" EntityType="ChildTubeMainDBModel.SystemMessage" />
           <EntitySet Name="Tokens" EntityType="ChildTubeMainDBModel.Token" />
           <EntitySet Name="Users" EntityType="ChildTubeMainDBModel.User" />
           <AssociationSet Name="FK_Message_Hint" Association="ChildTubeMainDBModel.FK_Message_Hint">
             <End Role="Hint" EntitySet="Hints" />
             <End Role="Message" EntitySet="Messages" />
           </AssociationSet>
-          <AssociationSet Name="FK_Message_User" Association="ChildTubeMainDBModel.FK_Message_User">
+          <AssociationSet Name="FK_Message_SourceUser" Association="ChildTubeMainDBModel.FK_Message_SourceUser">
             <End Role="User" EntitySet="Users" />
             <End Role="Message" EntitySet="Messages" />
           </AssociationSet>
-          <AssociationSet Name="FK_Message_User1" Association="ChildTubeMainDBModel.FK_Message_User1">
+          <AssociationSet Name="FK_Message_TargetUser" Association="ChildTubeMainDBModel.FK_Message_TargetUser">
             <End Role="User" EntitySet="Users" />
             <End Role="Message" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SystemMessage_SourceUser" Association="ChildTubeMainDBModel.FK_SystemMessage_SourceUser">
+            <End Role="User" EntitySet="Users" />
+            <End Role="SystemMessage" EntitySet="SystemMessages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SystemMessage_TargetUser" Association="ChildTubeMainDBModel.FK_SystemMessage_TargetUser">
+            <End Role="User" EntitySet="Users" />
+            <End Role="SystemMessage" EntitySet="SystemMessages" />
           </AssociationSet>
           </EntityContainer>
         <ComplexType Name="prEpisodeInsert_Result">
@@ -242,11 +294,23 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="SourceUserId" Type="Int32" Nullable="false" />
           <Property Name="TargetUserId" Type="Int32" Nullable="false" />
-          <Property Name="MessageState" Type="Int32" Nullable="false" />
+          <Property Name="Date" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="HintId" Type="Int32" />
           <NavigationProperty Name="Hint" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
-          <NavigationProperty Name="User" Relationship="ChildTubeMainDBModel.FK_Message_User" FromRole="Message" ToRole="User" />
-          <NavigationProperty Name="User1" Relationship="ChildTubeMainDBModel.FK_Message_User1" FromRole="Message" ToRole="User" />
+          <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="Message" ToRole="User" />
+          <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="Message" ToRole="User" />
+        </EntityType>
+        <EntityType Name="SystemMessage">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SourceUserId" Type="Int32" Nullable="false" />
+          <Property Name="TargetUserId" Type="Int32" />
+          <Property Name="MessageState" Type="Int32" Nullable="false" />
+          <Property Name="Date" Type="String" Nullable="false" MaxLength="50" FixedLength="true" Unicode="true" />
+          <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_SourceUser" FromRole="SystemMessage" ToRole="User" />
+          <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_TargetUser" FromRole="SystemMessage" ToRole="User" />
         </EntityType>
         <EntityType Name="Token">
           <Key>
@@ -267,8 +331,10 @@
           <Property Name="FacebookUserId" Type="Int32" />
           <Property Name="GoogleUserId" Type="Int32" />
           <Property Name="PhoneNumber" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_User" FromRole="User" ToRole="Message" />
-          <NavigationProperty Name="Messages1" Relationship="ChildTubeMainDBModel.FK_Message_User1" FromRole="User" ToRole="Message" />
+          <NavigationProperty Name="MessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
+          <NavigationProperty Name="MessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
+          <NavigationProperty Name="SystemMessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_SourceUser" FromRole="User" ToRole="SystemMessage" />
+          <NavigationProperty Name="SystemMessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_TargetUser" FromRole="User" ToRole="SystemMessage" />
         </EntityType>
         <Association Name="FK_Message_Hint">
           <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
@@ -282,7 +348,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Message_User">
+        <Association Name="FK_Message_SourceUser">
           <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
           <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
           <ReferentialConstraint>
@@ -294,7 +360,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Message_User1">
+        <Association Name="FK_Message_TargetUser">
           <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
           <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
           <ReferentialConstraint>
@@ -302,6 +368,30 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="Message">
+              <PropertyRef Name="TargetUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SystemMessage_SourceUser">
+          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="ChildTubeMainDBModel.SystemMessage" Role="SystemMessage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SystemMessage">
+              <PropertyRef Name="SourceUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SystemMessage_TargetUser">
+          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="ChildTubeMainDBModel.SystemMessage" Role="SystemMessage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="SystemMessage">
               <PropertyRef Name="TargetUserId" />
             </Dependent>
           </ReferentialConstraint>
@@ -326,6 +416,17 @@
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
               <MappingFragment StoreEntitySet="Message">
                 <ScalarProperty Name="HintId" ColumnName="HintId" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
+                <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SystemMessages">
+            <EntityTypeMapping TypeName="ChildTubeMainDBModel.SystemMessage">
+              <MappingFragment StoreEntitySet="SystemMessage">
+                <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="MessageState" ColumnName="MessageState" />
                 <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
                 <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />

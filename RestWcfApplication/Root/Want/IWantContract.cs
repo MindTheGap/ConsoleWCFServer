@@ -10,16 +10,8 @@ namespace RestWcfApplication.Root.Want
   public interface IWantContract
   {
     [OperationContract]
-    [WebGet(UriTemplate = "want?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetPhoneNumber={targetPhoneNumber}&hint={hint}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
-    string UpdateIWantUser(string userId, string sourcePhoneNumber, string targetPhoneNumber, 
+    [WebGet(UriTemplate = "iamin?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetPhoneNumber={targetPhoneNumber}&hint={hint}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
+    string UpdateIWantUserByPhoneNumber(string userId, string sourcePhoneNumber, string targetPhoneNumber, 
       string hint, string hintImageLink, string hintVideoLink);
-
-    [OperationContract]
-    [WebGet(UriTemplate = "episodes/{tvSeriesId}")]
-    List<DB.Episode> GetEpisodesByTvSeriesId(string tvSeriesId);
-
-    [OperationContract]
-    [WebGet(UriTemplate = "hel")]
-    string Hello();
   }
 }

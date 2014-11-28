@@ -16,8 +16,10 @@ namespace RestWcfApplication.DB
     {
         public User()
         {
-            this.Messages = new HashSet<Message>();
-            this.Messages1 = new HashSet<Message>();
+            this.MessagesAsSourceUser = new HashSet<Message>();
+            this.MessagesAsTargetUser = new HashSet<Message>();
+            this.SystemMessagesAsSourceUser = new HashSet<SystemMessage>();
+            this.SystemMessagesAsTargetUser = new HashSet<SystemMessage>();
         }
     
         public int Id { get; set; }
@@ -29,7 +31,9 @@ namespace RestWcfApplication.DB
         public Nullable<int> GoogleUserId { get; set; }
         public string PhoneNumber { get; set; }
     
-        public virtual ICollection<Message> Messages { get; set; }
-        public virtual ICollection<Message> Messages1 { get; set; }
+        public virtual ICollection<Message> MessagesAsSourceUser { get; set; }
+        public virtual ICollection<Message> MessagesAsTargetUser { get; set; }
+        public virtual ICollection<SystemMessage> SystemMessagesAsSourceUser { get; set; }
+        public virtual ICollection<SystemMessage> SystemMessagesAsTargetUser { get; set; }
     }
 }

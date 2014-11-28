@@ -15,17 +15,7 @@ namespace RestWcfApplication.Root.Register
     /// <summary>
     /// registers the user to the system and returns his new userId
     /// </summary>
-    /// <param name="email"></param>
-    /// <returns>userId</returns>
-    [OperationContract]
-    [WebInvoke(Method = "GET", UriTemplate = "getUserId?email={email}")]
-    int RegisterViaEmail(string email);
-
-    /// <summary>
-    /// registers the user to the system and returns his new userId
-    /// </summary>
     /// <param name="phoneNumber"></param>
-    /// <returns>userId</returns>
     [OperationContract]
     [WebInvoke(Method = "GET", UriTemplate = "getUserId?phoneNumber={phoneNumber}")]
     int RegisterViaPhoneNumber(string phoneNumber);
@@ -34,13 +24,13 @@ namespace RestWcfApplication.Root.Register
     /// registers the user to the system and returns his new userId
     /// </summary>
     /// <param name="userId"></param>
+    /// <param name="phoneNumber"></param>
     /// <param name="firstName"></param>
     /// <param name="lastName"></param>
     /// <param name="email"></param>
-    /// <returns>userId</returns>
     [OperationContract]
     [WebInvoke(Method = "POST", UriTemplate = "updateUser?userId={userId}&firstName={firstName}&lastName={lastName}&email={email}")]
-    void RegisterUserDetails(string userId, string firstName, string lastName, string email);
+    string RegisterUserDetails(string userId, string phoneNumber, string firstName, string lastName, string email);
 
     /// <summary>
     /// returns "hello" string for testing

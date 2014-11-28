@@ -1,4 +1,6 @@
-﻿using System.ServiceModel.Activation;
+﻿using System.Dynamic;
+using System.ServiceModel.Activation;
+using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using System;
 using System.Collections.Generic;
@@ -9,36 +11,9 @@ using System.Text;
 
 namespace RestWcfApplication.Root.Register
 {
-  // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "RegisterContract" in code, svc and config file together.
-  // NOTE: In order to launch WCF Test Client for testing this service, please select RegisterContract.svc or RegisterContract.svc.cs at the Solution Explorer and start debugging.
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class RegisterContract : IRegisterContract
   {
-    public int RegisterViaEmail(string email)
-    {
-      try
-      {
-        using (var context = new Entities())
-        {
-          var userList = context.Users.Where(u => u.Email == email);
-          if (userList.Any())
-          {
-            return userList.First().Id;
-          }
-
-          var user = new User() {Email = email};
-          context.Users.Add(user);
-          context.SaveChanges();
-
-          return user.Id;
-        }
-      }
-      catch
-      {
-        throw new FaultException("Something went wrong");
-      }
-    }
-
     public int RegisterViaPhoneNumber(string phoneNumber)
     {
       try
@@ -50,6 +25,8 @@ namespace RestWcfApplication.Root.Register
           {
             return userList.First().Id;
           }
+
+          // TODO: send SMS verification code
 
           var user = new User() {PhoneNumber = phoneNumber};
           context.Users.Add(user);
@@ -64,15 +41,24 @@ namespace RestWcfApplication.Root.Register
       }
     }
 
-    public void RegisterUserDetails(string userId, string firstName, string lastName, string email)
+    public string RegisterUserDetails(string userId, string phoneNumber, string firstName, string lastName, string email)
     {
       try
       {
-        int userIdParsed;
-        if (!int.TryParse(userId, out userIdParsed)) return;
+        dynamic toSend = new ExpandoObject();
 
         using (var context = new Entities())
         {
+          // check if userId corresponds to phoneNumber
+          var userIdParsed = Convert.ToInt32(userId);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed && u.PhoneNumber == phoneNumber);
+          if (sourceUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.SourceUserIdDoesNotExist.ToString("d");
+            return toSend;
+          }
+
           var userList = context.Users.Where(u => u.Id == userIdParsed);
           if (userList.Any())
           {
@@ -83,6 +69,9 @@ namespace RestWcfApplication.Root.Register
           }
 
           context.SaveChanges();
+
+          toSend.Type = EMessagesTypesToClient.Ok;
+          return toSend;
         }
       }
       catch
@@ -91,9 +80,7 @@ namespace RestWcfApplication.Root.Register
       }
     }
 
-
-
-  public string Hello()
+    public string Hello()
     {
       const string s = "hello";
       return s;

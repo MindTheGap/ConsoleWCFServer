@@ -9,6 +9,7 @@ using System.Web.SessionState;
 using RestWcfApplication.Root.Episode;
 using RestWcfApplication.Root.Register;
 using RestWcfApplication.Root.TvSeries;
+using RestWcfApplication.Root.Want;
 
 namespace RestWcfApplication
 {
@@ -17,8 +18,7 @@ namespace RestWcfApplication
 
     protected void Application_Start(object sender, EventArgs e)
     {
-      RouteTable.Routes.Add(new ServiceRoute("episode", new WebServiceHostFactory(), typeof(EpisodeContract)));
-      RouteTable.Routes.Add(new ServiceRoute("tvSeries", new WebServiceHostFactory(), typeof(TvSeriesContract)));
+      RouteTable.Routes.Add(new ServiceRoute("want", new WebServiceHostFactory(), typeof(WantContract)));
       RouteTable.Routes.Add(new ServiceRoute("register", new WebServiceHostFactory(), typeof(RegisterContract)));
 
     }

@@ -7,12 +7,11 @@ using System.Web;
 namespace RestWcfApplication.DB
 {
   [DataContract]
-  public enum EMessageState
+  public enum ESystemMessageState
   {
-    Ok,
-    Error,
     SentSms, // server sent sms
-    BothSidesAreIn // both sides are in
+    BothSidesAreIn, // both sides are in
+    OneSideIsIn // only source user is in
 
   }
 }

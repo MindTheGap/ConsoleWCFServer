@@ -12,15 +12,14 @@ namespace RestWcfApplication.DB
     using System;
     using System.Collections.Generic;
     
-    public partial class Message
+    public partial class SystemMessage
     {
         public int Id { get; set; }
         public int SourceUserId { get; set; }
-        public int TargetUserId { get; set; }
+        public Nullable<int> TargetUserId { get; set; }
+        public int MessageState { get; set; }
         public string Date { get; set; }
-        public Nullable<int> HintId { get; set; }
     
-        public virtual Hint Hint { get; set; }
         public virtual User SourceUser { get; set; }
         public virtual User TargetUser { get; set; }
     }
