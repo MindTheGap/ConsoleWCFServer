@@ -46,13 +46,13 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="FirstName" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar" MaxLength="500" />
           <Property Name="LastName" Type="nvarchar" MaxLength="500" />
           <Property Name="Email" Type="nvarchar" MaxLength="100" />
-          <Property Name="EmailPasswordHash" Type="nvarchar" MaxLength="500" />
           <Property Name="FacebookUserId" Type="int" />
           <Property Name="GoogleUserId" Type="int" />
           <Property Name="PhoneNumber" Type="nvarchar" MaxLength="100" />
+          <Property Name="VerificationCode" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <Association Name="FK_Message_Hint">
           <End Role="Hint" Type="Self.Hint" Multiplicity="0..1" />
@@ -324,13 +324,13 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="FirstName" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="FirstName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="LastName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="EmailPasswordHash" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="FacebookUserId" Type="Int32" />
           <Property Name="GoogleUserId" Type="Int32" />
           <Property Name="PhoneNumber" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="VerificationCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="MessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
           <NavigationProperty Name="MessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
           <NavigationProperty Name="SystemMessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_SourceUser" FromRole="User" ToRole="SystemMessage" />
@@ -445,10 +445,10 @@
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
               <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="VerificationCode" ColumnName="VerificationCode" />
                 <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
                 <ScalarProperty Name="GoogleUserId" ColumnName="GoogleUserId" />
                 <ScalarProperty Name="FacebookUserId" ColumnName="FacebookUserId" />
-                <ScalarProperty Name="EmailPasswordHash" ColumnName="EmailPasswordHash" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="LastName" ColumnName="LastName" />
                 <ScalarProperty Name="FirstName" ColumnName="FirstName" />

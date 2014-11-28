@@ -18,7 +18,7 @@ namespace RestWcfApplication.Root.Register
     /// <param name="phoneNumber"></param>
     [OperationContract]
     [WebInvoke(Method = "GET", UriTemplate = "getUserId?phoneNumber={phoneNumber}")]
-    int RegisterViaPhoneNumber(string phoneNumber);
+    string RegisterViaPhoneNumber(string phoneNumber);
 
     /// <summary>
     /// registers the user to the system and returns his new userId

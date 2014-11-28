@@ -1,5 +1,9 @@
 ﻿using System.Dynamic;
+using System.IO;
+using System.Net;
 using System.ServiceModel.Activation;
+using System.Web;
+using Newtonsoft.Json;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using System;
@@ -14,7 +18,7 @@ namespace RestWcfApplication.Root.Register
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class RegisterContract : IRegisterContract
   {
-    public int RegisterViaPhoneNumber(string phoneNumber)
+    public string RegisterViaPhoneNumber(string phoneNumber)
     {
       try
       {
@@ -23,7 +27,7 @@ namespace RestWcfApplication.Root.Register
           var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber);
           if (userList.Any())
           {
-            return userList.First().Id;
+            return userList.First().Id.ToString("d");
           }
 
           // TODO: send SMS verification code
@@ -32,12 +36,12 @@ namespace RestWcfApplication.Root.Register
           context.Users.Add(user);
           context.SaveChanges();
 
-          return user.Id;
+          return user.Id.ToString("d");
         }
       }
-      catch
+      catch (Exception e)
       {
-        throw new FaultException("Something went wrong");
+        throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
       }
     }
 

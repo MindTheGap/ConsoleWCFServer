@@ -1,143 +1,139 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Schema Namespace="ChildTubeMainDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-  <EntityType Name="Episode">
+<Schema Namespace="ChildTubeMainDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Hint">
     <Key>
-      <PropertyRef Name="EpisodeID" />
+      <PropertyRef Name="Id" />
     </Key>
-    <Property Name="EpisodeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="TvSeriesID" Type="int" Nullable="false" />
-    <Property Name="EpisodeNumber" Type="int" Nullable="false" />
-    <Property Name="URLPath" Type="nvarchar" MaxLength="500" Nullable="false" />
-    <Property Name="SeriesNumber" Type="int" />
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Text" Type="nvarchar" MaxLength="500" />
+    <Property Name="PictureLink" Type="nvarchar" MaxLength="500" />
+    <Property Name="VideoLink" Type="nvarchar" MaxLength="500" />
   </EntityType>
-  <EntityType Name="Purchases">
+  <EntityType Name="Message">
     <Key>
-      <PropertyRef Name="PurchaseId" />
+      <PropertyRef Name="Id" />
     </Key>
-    <Property Name="PurchaseId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SourceUserId" Type="int" Nullable="false" />
+    <Property Name="TargetUserId" Type="int" Nullable="false" />
+    <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="HintId" Type="int" />
+  </EntityType>
+  <EntityType Name="SystemMessage">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SourceUserId" Type="int" Nullable="false" />
+    <Property Name="TargetUserId" Type="int" />
+    <Property Name="MessageState" Type="int" Nullable="false" />
+    <Property Name="Date" Type="nchar" MaxLength="50" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Token">
+    <Key>
+      <PropertyRef Name="UserId" />
+    </Key>
     <Property Name="UserId" Type="int" Nullable="false" />
-    <Property Name="TvSeriesId" Type="int" Nullable="false" />
-  </EntityType>
-  <EntityType Name="TV Series">
-    <Key>
-      <PropertyRef Name="TvSeriesID" />
-    </Key>
-    <Property Name="TvSeriesID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="Name" Type="nvarchar" MaxLength="500" Nullable="false" />
-    <Property Name="Hits" Type="int" Nullable="false" />
-    <Property Name="SeriesImagePath" Type="nvarchar" MaxLength="500" />
+    <Property Name="Code" Type="nvarchar" MaxLength="500" Nullable="false" />
   </EntityType>
   <EntityType Name="User">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="Email" Type="nvarchar" MaxLength="100" Nullable="false" />
-    <Property Name="Activity" Type="int" />
+    <Property Name="FirstName" Type="nvarchar" MaxLength="500" Nullable="false" />
+    <Property Name="LastName" Type="nvarchar" MaxLength="500" />
+    <Property Name="Email" Type="nvarchar" MaxLength="100" />
+    <Property Name="EmailPasswordHash" Type="nvarchar" MaxLength="500" />
+    <Property Name="FacebookUserId" Type="int" />
+    <Property Name="GoogleUserId" Type="int" />
+    <Property Name="PhoneNumber" Type="nvarchar" MaxLength="100" />
   </EntityType>
-  <Association Name="FK_Episode_TV Series">
-    <End Role="TV Series" Type="Self.TV Series" Multiplicity="1" />
-    <End Role="Episode" Type="Self.Episode" Multiplicity="*" />
+  <Association Name="FK_Message_Hint">
+    <End Role="Hint" Type="Self.Hint" Multiplicity="0..1" />
+    <End Role="Message" Type="Self.Message" Multiplicity="*" />
     <ReferentialConstraint>
-      <Principal Role="TV Series">
-        <PropertyRef Name="TvSeriesID" />
+      <Principal Role="Hint">
+        <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="Episode">
-        <PropertyRef Name="TvSeriesID" />
+      <Dependent Role="Message">
+        <PropertyRef Name="HintId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_Purchases_TV Series">
-    <End Role="TV Series" Type="Self.TV Series" Multiplicity="1" />
-    <End Role="Purchases" Type="Self.Purchases" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="TV Series">
-        <PropertyRef Name="TvSeriesID" />
-      </Principal>
-      <Dependent Role="Purchases">
-        <PropertyRef Name="TvSeriesId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_Purchases_User">
+  <Association Name="FK_Message_SourceUser">
     <End Role="User" Type="Self.User" Multiplicity="1" />
-    <End Role="Purchases" Type="Self.Purchases" Multiplicity="*" />
+    <End Role="Message" Type="Self.Message" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="User">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="Purchases">
-        <PropertyRef Name="UserId" />
+      <Dependent Role="Message">
+        <PropertyRef Name="SourceUserId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Function Name="prEpisodeDelete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="EpisodeID" Type="int" Mode="In" />
-  </Function>
-  <Function Name="prEpisodeInsert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="TvSeriesID" Type="int" Mode="In" />
-    <Parameter Name="EpisodeNumber" Type="int" Mode="In" />
-    <Parameter Name="URLPath" Type="nvarchar" Mode="In" />
-    <Parameter Name="SeriesNumber" Type="int" Mode="In" />
-  </Function>
-  <Function Name="prEpisodeSelect" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="EpisodeID" Type="int" Mode="In" />
-  </Function>
-  <Function Name="prEpisodeUpdate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="EpisodeID" Type="int" Mode="In" />
-    <Parameter Name="TvSeriesID" Type="int" Mode="In" />
-    <Parameter Name="EpisodeNumber" Type="int" Mode="In" />
-    <Parameter Name="URLPath" Type="nvarchar" Mode="In" />
-    <Parameter Name="SeriesNumber" Type="int" Mode="In" />
-  </Function>
-  <Function Name="prTVSeriesDelete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="TvSeriesID" Type="int" Mode="In" />
-  </Function>
-  <Function Name="prTVSeriesInsert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="Name" Type="nvarchar" Mode="In" />
-    <Parameter Name="Hits" Type="int" Mode="In" />
-    <Parameter Name="SeriesImagePath" Type="nvarchar" Mode="In" />
-  </Function>
-  <Function Name="prTVSeriesSelect" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="TvSeriesID" Type="int" Mode="In" />
-  </Function>
-  <Function Name="prTVSeriesUpdate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="TvSeriesID" Type="int" Mode="In" />
-    <Parameter Name="Name" Type="nvarchar" Mode="In" />
-    <Parameter Name="Hits" Type="int" Mode="In" />
-    <Parameter Name="SeriesImagePath" Type="nvarchar" Mode="In" />
-  </Function>
-  <Function Name="prUserDelete" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="Id" Type="int" Mode="In" />
-  </Function>
-  <Function Name="prUserInsert" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="Email" Type="nvarchar" Mode="In" />
-    <Parameter Name="Activity" Type="int" Mode="In" />
-  </Function>
-  <Function Name="prUserSelect" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="Id" Type="int" Mode="In" />
-  </Function>
-  <Function Name="prUserUpdate" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
-    <Parameter Name="Id" Type="int" Mode="In" />
-    <Parameter Name="Email" Type="nvarchar" Mode="In" />
-    <Parameter Name="Activity" Type="int" Mode="In" />
-  </Function>
+  <Association Name="FK_Message_TargetUser">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="Message" Type="Self.Message" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Message">
+        <PropertyRef Name="TargetUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SystemMessage_SourceUser">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="SystemMessage" Type="Self.SystemMessage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="SystemMessage">
+        <PropertyRef Name="SourceUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SystemMessage_TargetUser">
+    <End Role="User" Type="Self.User" Multiplicity="0..1" />
+    <End Role="SystemMessage" Type="Self.SystemMessage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="SystemMessage">
+        <PropertyRef Name="TargetUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
   <EntityContainer Name="ChildTubeMainDBModelStoreContainer">
-    <EntitySet Name="Episode" EntityType="Self.Episode" Schema="dbo" store:Type="Tables" />
-    <EntitySet Name="Purchases" EntityType="Self.Purchases" Schema="dbo" store:Type="Tables" />
-    <EntitySet Name="TV Series" EntityType="Self.TV Series" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Hint" EntityType="Self.Hint" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Message" EntityType="Self.Message" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="SystemMessage" EntityType="Self.SystemMessage" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Token" EntityType="Self.Token" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
-    <AssociationSet Name="FK_Episode_TV Series" Association="Self.FK_Episode_TV Series">
-      <End Role="TV Series" EntitySet="TV Series" />
-      <End Role="Episode" EntitySet="Episode" />
+    <AssociationSet Name="FK_Message_Hint" Association="Self.FK_Message_Hint">
+      <End Role="Hint" EntitySet="Hint" />
+      <End Role="Message" EntitySet="Message" />
     </AssociationSet>
-    <AssociationSet Name="FK_Purchases_TV Series" Association="Self.FK_Purchases_TV Series">
-      <End Role="TV Series" EntitySet="TV Series" />
-      <End Role="Purchases" EntitySet="Purchases" />
-    </AssociationSet>
-    <AssociationSet Name="FK_Purchases_User" Association="Self.FK_Purchases_User">
+    <AssociationSet Name="FK_Message_SourceUser" Association="Self.FK_Message_SourceUser">
       <End Role="User" EntitySet="User" />
-      <End Role="Purchases" EntitySet="Purchases" />
+      <End Role="Message" EntitySet="Message" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Message_TargetUser" Association="Self.FK_Message_TargetUser">
+      <End Role="User" EntitySet="User" />
+      <End Role="Message" EntitySet="Message" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SystemMessage_SourceUser" Association="Self.FK_SystemMessage_SourceUser">
+      <End Role="User" EntitySet="User" />
+      <End Role="SystemMessage" EntitySet="SystemMessage" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SystemMessage_TargetUser" Association="Self.FK_SystemMessage_TargetUser">
+      <End Role="User" EntitySet="User" />
+      <End Role="SystemMessage" EntitySet="SystemMessage" />
     </AssociationSet>
   </EntityContainer>
 </Schema>

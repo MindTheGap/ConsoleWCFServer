@@ -179,13 +179,13 @@
       <PropertyRef Name="Id" />
     </Key>
     <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="FirstName" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="FirstName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
     <Property Name="LastName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
     <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-    <Property Name="EmailPasswordHash" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
     <Property Name="FacebookUserId" Type="Int32" />
     <Property Name="GoogleUserId" Type="Int32" />
     <Property Name="PhoneNumber" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="VerificationCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
     <NavigationProperty Name="MessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
     <NavigationProperty Name="MessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
     <NavigationProperty Name="SystemMessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_SourceUser" FromRole="User" ToRole="SystemMessage" />

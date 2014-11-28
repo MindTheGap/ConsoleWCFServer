@@ -52,21 +52,30 @@
       <Parameter Name="Email" Mode="In" Type="String" />
       <Parameter Name="Activity" Mode="In" Type="Int32" />
     </FunctionImport>
-    <EntitySet Name="Episodes" EntityType="ChildTubeMainDBModel.Episode" />
-    <EntitySet Name="Purchases" EntityType="ChildTubeMainDBModel.Purchase" />
-    <EntitySet Name="TV_Series" EntityType="ChildTubeMainDBModel.TV_Series" />
+    <EntitySet Name="Hints" EntityType="ChildTubeMainDBModel.Hint" />
+    <EntitySet Name="Messages" EntityType="ChildTubeMainDBModel.Message" />
+    <EntitySet Name="SystemMessages" EntityType="ChildTubeMainDBModel.SystemMessage" />
+    <EntitySet Name="Tokens" EntityType="ChildTubeMainDBModel.Token" />
     <EntitySet Name="Users" EntityType="ChildTubeMainDBModel.User" />
-    <AssociationSet Name="FK_Episode_TV_Series" Association="ChildTubeMainDBModel.FK_Episode_TV_Series">
-      <End Role="TV_Series" EntitySet="TV_Series" />
-      <End Role="Episode" EntitySet="Episodes" />
+    <AssociationSet Name="FK_Message_Hint" Association="ChildTubeMainDBModel.FK_Message_Hint">
+      <End Role="Hint" EntitySet="Hints" />
+      <End Role="Message" EntitySet="Messages" />
     </AssociationSet>
-    <AssociationSet Name="FK_Purchases_TV_Series" Association="ChildTubeMainDBModel.FK_Purchases_TV_Series">
-      <End Role="TV_Series" EntitySet="TV_Series" />
-      <End Role="Purchase" EntitySet="Purchases" />
-    </AssociationSet>
-    <AssociationSet Name="FK_Purchases_User" Association="ChildTubeMainDBModel.FK_Purchases_User">
+    <AssociationSet Name="FK_Message_SourceUser" Association="ChildTubeMainDBModel.FK_Message_SourceUser">
       <End Role="User" EntitySet="Users" />
-      <End Role="Purchase" EntitySet="Purchases" />
+      <End Role="Message" EntitySet="Messages" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Message_TargetUser" Association="ChildTubeMainDBModel.FK_Message_TargetUser">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Message" EntitySet="Messages" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SystemMessage_SourceUser" Association="ChildTubeMainDBModel.FK_SystemMessage_SourceUser">
+      <End Role="User" EntitySet="Users" />
+      <End Role="SystemMessage" EntitySet="SystemMessages" />
+    </AssociationSet>
+    <AssociationSet Name="FK_SystemMessage_TargetUser" Association="ChildTubeMainDBModel.FK_SystemMessage_TargetUser">
+      <End Role="User" EntitySet="Users" />
+      <End Role="SystemMessage" EntitySet="SystemMessages" />
     </AssociationSet>
   </EntityContainer>
   <ComplexType Name="prEpisodeInsert_Result">
@@ -123,80 +132,122 @@
     <Property Type="String" Name="Email" Nullable="false" MaxLength="100" />
     <Property Type="Int32" Name="Activity" Nullable="true" />
   </ComplexType>
-  <EntityType Name="Episode">
+  <EntityType Name="Hint">
     <Key>
-      <PropertyRef Name="EpisodeID" />
+      <PropertyRef Name="Id" />
     </Key>
-    <Property Name="EpisodeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="TvSeriesID" Type="Int32" Nullable="false" />
-    <Property Name="EpisodeNumber" Type="Int32" Nullable="false" />
-    <Property Name="URLPath" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
-    <Property Name="SeriesNumber" Type="Int32" />
-    <NavigationProperty Name="TV_Series" Relationship="ChildTubeMainDBModel.FK_Episode_TV_Series" FromRole="Episode" ToRole="TV_Series" />
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Text" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="PictureLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="VideoLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
   </EntityType>
-  <EntityType Name="Purchase">
+  <EntityType Name="Message">
     <Key>
-      <PropertyRef Name="PurchaseId" />
+      <PropertyRef Name="Id" />
     </Key>
-    <Property Name="PurchaseId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="SourceUserId" Type="Int32" Nullable="false" />
+    <Property Name="TargetUserId" Type="Int32" Nullable="false" />
+    <Property Name="Date" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="HintId" Type="Int32" />
+    <NavigationProperty Name="Hint" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
+    <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="Message" ToRole="User" />
+    <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="Message" ToRole="User" />
+  </EntityType>
+  <EntityType Name="SystemMessage">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="SourceUserId" Type="Int32" Nullable="false" />
+    <Property Name="TargetUserId" Type="Int32" />
+    <Property Name="MessageState" Type="Int32" Nullable="false" />
+    <Property Name="Date" Type="String" Nullable="false" MaxLength="50" FixedLength="true" Unicode="true" />
+    <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_SourceUser" FromRole="SystemMessage" ToRole="User" />
+    <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_TargetUser" FromRole="SystemMessage" ToRole="User" />
+  </EntityType>
+  <EntityType Name="Token">
+    <Key>
+      <PropertyRef Name="UserId" />
+    </Key>
     <Property Name="UserId" Type="Int32" Nullable="false" />
-    <Property Name="TvSeriesId" Type="Int32" Nullable="false" />
-    <NavigationProperty Name="TV_Series" Relationship="ChildTubeMainDBModel.FK_Purchases_TV_Series" FromRole="Purchase" ToRole="TV_Series" />
-    <NavigationProperty Name="User" Relationship="ChildTubeMainDBModel.FK_Purchases_User" FromRole="Purchase" ToRole="User" />
-  </EntityType>
-  <EntityType Name="TV_Series">
-    <Key>
-      <PropertyRef Name="TvSeriesID" />
-    </Key>
-    <Property Name="TvSeriesID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="Name" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
-    <Property Name="Hits" Type="Int32" Nullable="false" />
-    <Property Name="SeriesImagePath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-    <NavigationProperty Name="Episodes" Relationship="ChildTubeMainDBModel.FK_Episode_TV_Series" FromRole="TV_Series" ToRole="Episode" />
-    <NavigationProperty Name="Purchases" Relationship="ChildTubeMainDBModel.FK_Purchases_TV_Series" FromRole="TV_Series" ToRole="Purchase" />
+    <Property Name="Code" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
   </EntityType>
   <EntityType Name="User">
     <Key>
       <PropertyRef Name="Id" />
     </Key>
     <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="Email" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
-    <Property Name="Activity" Type="Int32" />
-    <NavigationProperty Name="Purchases" Relationship="ChildTubeMainDBModel.FK_Purchases_User" FromRole="User" ToRole="Purchase" />
+    <Property Name="FirstName" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="LastName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <Property Name="EmailPasswordHash" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="FacebookUserId" Type="Int32" />
+    <Property Name="GoogleUserId" Type="Int32" />
+    <Property Name="PhoneNumber" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="MessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
+    <NavigationProperty Name="MessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
+    <NavigationProperty Name="SystemMessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_SourceUser" FromRole="User" ToRole="SystemMessage" />
+    <NavigationProperty Name="SystemMessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_TargetUser" FromRole="User" ToRole="SystemMessage" />
   </EntityType>
-  <Association Name="FK_Episode_TV_Series">
-    <End Type="ChildTubeMainDBModel.TV_Series" Role="TV_Series" Multiplicity="1" />
-    <End Type="ChildTubeMainDBModel.Episode" Role="Episode" Multiplicity="*" />
+  <Association Name="FK_Message_Hint">
+    <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
+    <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
     <ReferentialConstraint>
-      <Principal Role="TV_Series">
-        <PropertyRef Name="TvSeriesID" />
+      <Principal Role="Hint">
+        <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="Episode">
-        <PropertyRef Name="TvSeriesID" />
+      <Dependent Role="Message">
+        <PropertyRef Name="HintId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_Purchases_TV_Series">
-    <End Type="ChildTubeMainDBModel.TV_Series" Role="TV_Series" Multiplicity="1" />
-    <End Type="ChildTubeMainDBModel.Purchase" Role="Purchase" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="TV_Series">
-        <PropertyRef Name="TvSeriesID" />
-      </Principal>
-      <Dependent Role="Purchase">
-        <PropertyRef Name="TvSeriesId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_Purchases_User">
+  <Association Name="FK_Message_SourceUser">
     <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
-    <End Type="ChildTubeMainDBModel.Purchase" Role="Purchase" Multiplicity="*" />
+    <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
     <ReferentialConstraint>
       <Principal Role="User">
         <PropertyRef Name="Id" />
       </Principal>
-      <Dependent Role="Purchase">
-        <PropertyRef Name="UserId" />
+      <Dependent Role="Message">
+        <PropertyRef Name="SourceUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Message_TargetUser">
+    <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
+    <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Message">
+        <PropertyRef Name="TargetUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SystemMessage_SourceUser">
+    <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
+    <End Type="ChildTubeMainDBModel.SystemMessage" Role="SystemMessage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="SystemMessage">
+        <PropertyRef Name="SourceUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_SystemMessage_TargetUser">
+    <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="0..1" />
+    <End Type="ChildTubeMainDBModel.SystemMessage" Role="SystemMessage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="SystemMessage">
+        <PropertyRef Name="TargetUserId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>

@@ -134,3 +134,5 @@ D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\zh-Ha
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.csprojResolveAssemblyReference.cache
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.pdb
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Newtonsoft.Json.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Newtonsoft.Json.xml

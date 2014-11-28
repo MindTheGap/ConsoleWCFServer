@@ -26,10 +26,10 @@ namespace RestWcfApplication.DB
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public string EmailPasswordHash { get; set; }
         public Nullable<int> FacebookUserId { get; set; }
         public Nullable<int> GoogleUserId { get; set; }
         public string PhoneNumber { get; set; }
+        public string VerificationCode { get; set; }
     
         public virtual ICollection<Message> MessagesAsSourceUser { get; set; }
         public virtual ICollection<Message> MessagesAsTargetUser { get; set; }

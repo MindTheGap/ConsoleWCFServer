@@ -8,8 +8,6 @@ using System.ServiceModel.Channels;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using System.ServiceModel.Activation;
-using RestWcfApplication.Root.Token;
-using RestWcfApplication.Root.Want;
 
 namespace RestWcfApplication.Root.Want
 {

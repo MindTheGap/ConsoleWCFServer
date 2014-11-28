@@ -4,7 +4,7 @@
     <parameterEntry kind="ProviderPath" scope="IisApp" match="^D:\\Dropbox\\Projects\\IAmIn2Code\\Server\\IAmIn2Service\\RestWcfApplication\\obj\\Release\\Package\\PackageTmp$" />
     <parameterEntry kind="ProviderPath" scope="setAcl" match="^D:\\Dropbox\\Projects\\IAmIn2Code\\Server\\IAmIn2Service\\RestWcfApplication\\obj\\Release\\Package\\PackageTmp$" />
   </parameter>
-  <parameter name="RestWcfApplication.DB.Entities-Web.config Connection String" description="" value="Data Source=.;Initial Catalog=IAmInDB;Integrated Security=True" tags="">
-    <parameterEntry kind="XmlFile" scope="D:\\Dropbox\\Projects\\IAmIn2Code\\Server\\IAmIn2Service\\RestWcfApplication\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='RestWcfApplication.DB.Entities']/@connectionString" />
+  <parameter name="Entities-Web.config Connection String" description="" value="metadata=res://*/DB.DBModel.csdl|res://*/DB.DBModel.ssdl|res://*/DB.DBModel.msl;provider=System.Data.SqlClient;provider connection string=&quot;Data Source=.;Initial Catalog=IAmInDB;Integrated Security=True&quot;" tags="">
+    <parameterEntry kind="XmlFile" scope="D:\\Dropbox\\Projects\\IAmIn2Code\\Server\\IAmIn2Service\\RestWcfApplication\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='Entities']/@connectionString" />
   </parameter>
 </parameters>

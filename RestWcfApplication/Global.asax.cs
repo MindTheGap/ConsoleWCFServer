@@ -6,9 +6,7 @@ using System.Web;
 using System.Web.Routing;
 using System.Web.Security;
 using System.Web.SessionState;
-using RestWcfApplication.Root.Episode;
 using RestWcfApplication.Root.Register;
-using RestWcfApplication.Root.TvSeries;
 using RestWcfApplication.Root.Want;
 
 namespace RestWcfApplication

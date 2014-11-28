@@ -5,13 +5,16 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="36b75844cfb34750aad46758bb442ecb" Name="Diagram1">
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.Episode" Width="1.5" PointX="3" PointY="6.25" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.Purchase" Width="1.5" PointX="3" PointY="2.625" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.TV_Series" Width="1.5" PointX="0.75" PointY="3.5" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.User" Width="1.5" PointX="0.75" PointY="0.75" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_Episode_TV_Series" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_Purchases_TV_Series" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_Purchases_User" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.Hint" Width="1.5" PointX="0.75" PointY="8" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.Message" Width="1.5" PointX="3" PointY="2.625" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.SystemMessage" Width="1.5" PointX="3" PointY="6.125" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.Token" Width="1.5" PointX="5.75" PointY="0.75" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.User" Width="1.5" PointX="0.75" PointY="2.25" />
+        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_Hint" />
+        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_SourceUser" />
+        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_TargetUser" />
+        <AssociationConnector Association="ChildTubeMainDBModel.FK_SystemMessage_SourceUser" />
+        <AssociationConnector Association="ChildTubeMainDBModel.FK_SystemMessage_TargetUser" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
