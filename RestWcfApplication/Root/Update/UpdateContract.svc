@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="RestWcfApplication.Root.Update.UpdateContract" CodeBehind="UpdateContract.svc.cs" %>

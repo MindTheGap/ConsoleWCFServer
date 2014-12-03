@@ -30,6 +30,7 @@ namespace RestWcfApplication.DB
         public Nullable<int> GoogleUserId { get; set; }
         public string PhoneNumber { get; set; }
         public string VerificationCode { get; set; }
+        public bool Verified { get; set; }
     
         public virtual ICollection<Message> MessagesAsSourceUser { get; set; }
         public virtual ICollection<Message> MessagesAsTargetUser { get; set; }

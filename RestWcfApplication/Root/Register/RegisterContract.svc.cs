@@ -3,7 +3,6 @@ using System.IO;
 using System.Net;
 using System.ServiceModel.Activation;
 using System.Web;
-using Newtonsoft.Json;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using System;
@@ -12,37 +11,117 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
+using Twilio;
 
 namespace RestWcfApplication.Root.Register
 {
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class RegisterContract : IRegisterContract
   {
-    public string RegisterViaPhoneNumber(string phoneNumber)
+    private const string AccountSid = "ACd63332ed17dd316250547fa9906174b3";
+    private const string AuthToken = "8c0e45ea5def9d3f69da04b9c6e7b905";
+
+    public string VerifyValidationCode(string phoneNumber, string validationCode)
     {
       try
       {
+        dynamic toSend = new ExpandoObject();
+
         using (var context = new Entities())
         {
           var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber);
-          if (userList.Any())
+          if (!userList.Any())
           {
-            return userList.First().Id.ToString("d");
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserPhoneNumberDoesNotExist.ToString("d");
+            return toSend;
           }
 
-          // TODO: send SMS verification code
+          var user = userList.First();
 
-          var user = new User() {PhoneNumber = phoneNumber};
-          context.Users.Add(user);
+          if (user.VerificationCode == validationCode)
+          {
+            user.Verified = true;
+          }
           context.SaveChanges();
 
-          return user.Id.ToString("d");
+          toSend.Type = EMessagesTypesToClient.Ok;
+          return toSend;
         }
       }
       catch (Exception e)
       {
         throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
       }
+    }
+
+    public string RegisterViaPhoneNumber(string phoneNumber)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        using (var context = new Entities())
+        {
+          int verificationCode = -1;
+          var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber);
+          var user = userList.FirstOrDefault();
+          if (user != null)
+          {
+            if (user.Verified)
+            {
+              toSend.Type = EMessagesTypesToClient.SystemMessage;
+              toSend.SystemMessage = ESystemMessageState.AlreadyRegisteredAndVerified;
+              toSend.UserId = user.Id.ToString("d");
+              return CommManager.SendMessage(toSend);
+            }
+            else
+            {
+              verificationCode = SendVerificationCode(phoneNumber);
+
+              user.VerificationCode = verificationCode.ToString("d");
+              context.SaveChanges();
+
+              toSend.Type = EMessagesTypesToClient.SystemMessage;
+              toSend.SystemMessage = ESystemMessageState.VerificationCodeSent;
+              return CommManager.SendMessage(toSend);
+            }
+          }
+
+          verificationCode = SendVerificationCode(phoneNumber);
+
+          var newUser = new User()
+          {
+            PhoneNumber = phoneNumber, 
+            Verified = false, 
+            VerificationCode = verificationCode.ToString("d")
+          };
+          context.Users.Add(newUser);
+          context.SaveChanges();
+
+          toSend.Type = EMessagesTypesToClient.SystemMessage;
+          toSend.SystemMessage = ESystemMessageState.RegisterSuccessfully | ESystemMessageState.VerificationCodeSent;
+          toSend.UserId = newUser.Id.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
+      }
+    }
+
+    private static int SendVerificationCode(string phoneNumber)
+    {
+      var twilio = new TwilioRestClient(AccountSid, AuthToken);
+      var random = new Random();
+      var verificationCode = random.Next(100000, 999999);
+      var message = twilio.SendMessage("+15098226878", "+" + phoneNumber, "Verification Code: " + verificationCode);
+      if (message.ErrorCode != null)
+      {
+        throw new Exception(message.ErrorMessage);
+      }
+      return verificationCode;
     }
 
     public string RegisterUserDetails(string userId, string phoneNumber, string firstName, string lastName, string email)
@@ -59,7 +138,7 @@ namespace RestWcfApplication.Root.Register
           if (sourceUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.SourceUserIdDoesNotExist.ToString("d");
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
             return toSend;
           }
 

@@ -53,6 +53,7 @@
           <Property Name="GoogleUserId" Type="int" />
           <Property Name="PhoneNumber" Type="nvarchar" MaxLength="100" />
           <Property Name="VerificationCode" Type="nvarchar" MaxLength="50" />
+          <Property Name="Verified" Type="bit" Nullable="false" />
         </EntityType>
         <Association Name="FK_Message_Hint">
           <End Role="Hint" Type="Self.Hint" Multiplicity="0..1" />
@@ -335,6 +336,7 @@
           <NavigationProperty Name="MessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
           <NavigationProperty Name="SystemMessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_SourceUser" FromRole="User" ToRole="SystemMessage" />
           <NavigationProperty Name="SystemMessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_TargetUser" FromRole="User" ToRole="SystemMessage" />
+          <Property Name="Verified" Type="Boolean" Nullable="false" />
         </EntityType>
         <Association Name="FK_Message_Hint">
           <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
@@ -445,6 +447,7 @@
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
               <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="Verified" ColumnName="Verified" />
                 <ScalarProperty Name="VerificationCode" ColumnName="VerificationCode" />
                 <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
                 <ScalarProperty Name="GoogleUserId" ColumnName="GoogleUserId" />

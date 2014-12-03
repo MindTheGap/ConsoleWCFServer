@@ -7,10 +7,11 @@ namespace RestWcfApplication.Communications
 {
   public enum EMessagesTypesToClient
   {
-    Message, // normal message sent
-    SystemMessage, // system message sent
-    MatchFound, // normal message AND system message sent
-    Ok, // just sends OK to registration or something
-    Error
+    Message = 1, // normal message sent
+    SystemMessage = 2, // system message sent
+    MultipleMessages = 4, // multiple messages sent
+    MatchFound = 8, // normal message AND system message sent
+    Ok = 16, // just sends OK to registration or something
+    Error = 32
   }
 }

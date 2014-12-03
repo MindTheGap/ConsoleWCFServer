@@ -44,10 +44,11 @@
     <EntitySetMapping Name="Users">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
         <MappingFragment StoreEntitySet="User">
+          <ScalarProperty Name="Verified" ColumnName="Verified" />
+          <ScalarProperty Name="VerificationCode" ColumnName="VerificationCode" />
           <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
           <ScalarProperty Name="GoogleUserId" ColumnName="GoogleUserId" />
           <ScalarProperty Name="FacebookUserId" ColumnName="FacebookUserId" />
-          <ScalarProperty Name="EmailPasswordHash" ColumnName="EmailPasswordHash" />
           <ScalarProperty Name="Email" ColumnName="Email" />
           <ScalarProperty Name="LastName" ColumnName="LastName" />
           <ScalarProperty Name="FirstName" ColumnName="FirstName" />

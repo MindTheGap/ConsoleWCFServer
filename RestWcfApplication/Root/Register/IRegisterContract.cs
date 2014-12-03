@@ -13,9 +13,15 @@ namespace RestWcfApplication.Root.Register
   public interface IRegisterContract
   {
     /// <summary>
+    /// verifies the validation code to get the user validated.
+    /// </summary>
+    [OperationContract]
+    [WebInvoke(Method = "GET", UriTemplate = "verify?phoneNumber={phoneNumber}&validationCode={validationCode}")]
+    string VerifyValidationCode(string phoneNumber, string validationCode);
+
+    /// <summary>
     /// registers the user to the system and returns his new userId
     /// </summary>
-    /// <param name="phoneNumber"></param>
     [OperationContract]
     [WebInvoke(Method = "GET", UriTemplate = "getUserId?phoneNumber={phoneNumber}")]
     string RegisterViaPhoneNumber(string phoneNumber);

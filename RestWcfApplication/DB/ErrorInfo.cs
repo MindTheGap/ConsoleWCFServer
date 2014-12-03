@@ -9,6 +9,7 @@ namespace RestWcfApplication.DB
   [DataContract]
   public enum ErrorInfo
   {
-    SourceUserIdDoesNotExist
+    UserPhoneNumberDoesNotExist,
+    UserIdDoesNotExist
   }
 }

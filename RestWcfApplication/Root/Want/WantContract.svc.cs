@@ -31,7 +31,7 @@ namespace RestWcfApplication.Root.Want
           if (sourceUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.SourceUserIdDoesNotExist.ToString("d");
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
             return toSend;
           }
 
@@ -143,7 +143,7 @@ namespace RestWcfApplication.Root.Want
           if (sourceUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.SourceUserIdDoesNotExist.ToString("d");
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
             return toSend;
           }
 

@@ -190,6 +190,7 @@
     <NavigationProperty Name="MessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
     <NavigationProperty Name="SystemMessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_SourceUser" FromRole="User" ToRole="SystemMessage" />
     <NavigationProperty Name="SystemMessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_SystemMessage_TargetUser" FromRole="User" ToRole="SystemMessage" />
+    <Property Name="Verified" Type="Boolean" Nullable="false" />
   </EntityType>
   <Association Name="FK_Message_Hint">
     <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
