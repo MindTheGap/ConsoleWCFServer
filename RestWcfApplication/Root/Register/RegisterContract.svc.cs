@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.ServiceModel.Activation;
 using System.Web;
+using Newtonsoft.Json;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using System;
@@ -34,7 +35,7 @@ namespace RestWcfApplication.Root.Register
           {
             toSend.Type = EMessagesTypesToClient.Error;
             toSend.ErrorInfo = ErrorInfo.UserPhoneNumberDoesNotExist.ToString("d");
-            return toSend;
+            return CommManager.SendMessage(toSend);
           }
 
           var user = userList.First();
@@ -46,7 +47,7 @@ namespace RestWcfApplication.Root.Register
           context.SaveChanges();
 
           toSend.Type = EMessagesTypesToClient.Ok;
-          return toSend;
+          return CommManager.SendMessage(toSend);
         }
       }
       catch (Exception e)
@@ -84,6 +85,7 @@ namespace RestWcfApplication.Root.Register
 
               toSend.Type = EMessagesTypesToClient.SystemMessage;
               toSend.SystemMessage = ESystemMessageState.VerificationCodeSent;
+              toSend.UserId = user.Id.ToString("d");
               return CommManager.SendMessage(toSend);
             }
           }
@@ -139,7 +141,7 @@ namespace RestWcfApplication.Root.Register
           {
             toSend.Type = EMessagesTypesToClient.Error;
             toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
-            return toSend;
+            return CommManager.SendMessage(toSend);
           }
 
           var userList = context.Users.Where(u => u.Id == userIdParsed);
@@ -154,7 +156,7 @@ namespace RestWcfApplication.Root.Register
           context.SaveChanges();
 
           toSend.Type = EMessagesTypesToClient.Ok;
-          return toSend;
+          return CommManager.SendMessage(toSend);
         }
       }
       catch
@@ -165,8 +167,14 @@ namespace RestWcfApplication.Root.Register
 
     public string Hello()
     {
-      const string s = "hello";
-      return s;
+      dynamic toSend = new ExpandoObject();
+      toSend.Type = "helloType";
+      toSend.MessageType = 4;
+      toSend.Message = "I love you";
+
+      var newObj = JsonConvert.SerializeObject(toSend);
+
+      return newObj;
     }
   }
 }
