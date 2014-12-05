@@ -10,6 +10,7 @@ namespace RestWcfApplication.DB
   public enum ErrorInfo
   {
     UserPhoneNumberDoesNotExist,
-    UserIdDoesNotExist
+    UserIdDoesNotExist,
+    PhoneNumberUserIdMismatch
   }
 }

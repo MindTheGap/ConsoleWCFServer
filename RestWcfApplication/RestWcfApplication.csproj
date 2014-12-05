@@ -147,6 +147,9 @@
     </Compile>
     <Compile Include="DB\ESystemMessageState.cs" />
     <Compile Include="DB\ErrorInfo.cs" />
+    <Compile Include="DB\FirstMessage.cs">
+      <DependentUpon>DBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="DB\Hint.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
@@ -178,9 +181,6 @@
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DB\prUserUpdate_Result.cs">
-      <DependentUpon>DBModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DB\SystemMessage.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DB\Token.cs">
@@ -229,6 +229,7 @@
       <LastGenOutput>DBModel.cs</LastGenOutput>
     </Content>
     <None Include="Properties\PublishProfiles\AmazonAWS.pubxml" />
+    <None Include="Properties\PublishProfiles\AmazonAWSDebug.pubxml" />
     <None Include="Properties\PublishProfiles\g.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

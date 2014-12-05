@@ -14,19 +14,10 @@
     <EntitySetMapping Name="Messages">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
         <MappingFragment StoreEntitySet="Message">
+          <ScalarProperty Name="SystemMessageState" ColumnName="SystemMessageState" />
+          <ScalarProperty Name="Text" ColumnName="Text" />
           <ScalarProperty Name="HintId" ColumnName="HintId" />
           <ScalarProperty Name="Date" ColumnName="Date" />
-          <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
-          <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
-          <ScalarProperty Name="Id" ColumnName="Id" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
-    <EntitySetMapping Name="SystemMessages">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.SystemMessage">
-        <MappingFragment StoreEntitySet="SystemMessage">
-          <ScalarProperty Name="Date" ColumnName="Date" />
-          <ScalarProperty Name="MessageState" ColumnName="MessageState" />
           <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
           <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
           <ScalarProperty Name="Id" ColumnName="Id" />
@@ -44,6 +35,7 @@
     <EntitySetMapping Name="Users">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
         <MappingFragment StoreEntitySet="User">
+          <ScalarProperty Name="ProfileImageLink" ColumnName="ProfileImageLink" />
           <ScalarProperty Name="Verified" ColumnName="Verified" />
           <ScalarProperty Name="VerificationCode" ColumnName="VerificationCode" />
           <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
@@ -52,6 +44,18 @@
           <ScalarProperty Name="Email" ColumnName="Email" />
           <ScalarProperty Name="LastName" ColumnName="LastName" />
           <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="FirstMessages">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
+        <MappingFragment StoreEntitySet="FirstMessage">
+          <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
+          <ScalarProperty Name="LastMessageId" ColumnName="LastMessageId" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
+          <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
           <ScalarProperty Name="Id" ColumnName="Id" />
         </MappingFragment>
       </EntityTypeMapping>

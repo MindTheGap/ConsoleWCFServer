@@ -18,8 +18,8 @@ namespace RestWcfApplication.DB
         {
             this.MessagesAsSourceUser = new HashSet<Message>();
             this.MessagesAsTargetUser = new HashSet<Message>();
-            this.SystemMessagesAsSourceUser = new HashSet<SystemMessage>();
-            this.SystemMessagesAsTargetUser = new HashSet<SystemMessage>();
+            this.FirstMessagesFromSourceUser = new HashSet<FirstMessage>();
+            this.FirstMessagesFromTargetUser = new HashSet<FirstMessage>();
         }
     
         public int Id { get; set; }
@@ -31,10 +31,11 @@ namespace RestWcfApplication.DB
         public string PhoneNumber { get; set; }
         public string VerificationCode { get; set; }
         public bool Verified { get; set; }
+        public string ProfileImageLink { get; set; }
     
         public virtual ICollection<Message> MessagesAsSourceUser { get; set; }
         public virtual ICollection<Message> MessagesAsTargetUser { get; set; }
-        public virtual ICollection<SystemMessage> SystemMessagesAsSourceUser { get; set; }
-        public virtual ICollection<SystemMessage> SystemMessagesAsTargetUser { get; set; }
+        public virtual ICollection<FirstMessage> FirstMessagesFromSourceUser { get; set; }
+        public virtual ICollection<FirstMessage> FirstMessagesFromTargetUser { get; set; }
     }
 }

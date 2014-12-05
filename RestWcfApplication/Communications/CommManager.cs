@@ -13,7 +13,11 @@ namespace RestWcfApplication.Communications
   {
     public static string SendMessage(dynamic dynamicObject)
     {
-      string responseString = JsonConvert.SerializeObject(dynamicObject);
+      string responseString = JsonConvert.SerializeObject(dynamicObject, Formatting.None,
+                        new JsonSerializerSettings()
+                        {
+                          ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        });
 
       // Construct a response.
       //byte[] buffer = Encoding.Unicode.GetBytes(responseString);

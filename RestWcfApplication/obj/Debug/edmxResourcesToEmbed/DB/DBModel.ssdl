@@ -1,5 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Schema Namespace="ChildTubeMainDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="FirstMessage">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SourceUserId" Type="int" Nullable="false" />
+    <Property Name="TargetUserId" Type="int" Nullable="false" />
+    <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="LastMessageId" Type="int" Nullable="false" />
+    <Property Name="SubjectName" Type="nvarchar" MaxLength="500" />
+  </EntityType>
   <EntityType Name="Hint">
     <Key>
       <PropertyRef Name="Id" />
@@ -17,17 +28,9 @@
     <Property Name="SourceUserId" Type="int" Nullable="false" />
     <Property Name="TargetUserId" Type="int" Nullable="false" />
     <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="SystemMessageState" Type="int" />
+    <Property Name="Text" Type="nvarchar" MaxLength="4000" />
     <Property Name="HintId" Type="int" />
-  </EntityType>
-  <EntityType Name="SystemMessage">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="SourceUserId" Type="int" Nullable="false" />
-    <Property Name="TargetUserId" Type="int" />
-    <Property Name="MessageState" Type="int" Nullable="false" />
-    <Property Name="Date" Type="nchar" MaxLength="50" Nullable="false" />
   </EntityType>
   <EntityType Name="Token">
     <Key>
@@ -47,9 +50,46 @@
     <Property Name="FacebookUserId" Type="int" />
     <Property Name="GoogleUserId" Type="int" />
     <Property Name="PhoneNumber" Type="nvarchar" MaxLength="100" />
+    <Property Name="ProfileImageLink" Type="nvarchar" MaxLength="500" />
     <Property Name="VerificationCode" Type="nvarchar" MaxLength="50" />
     <Property Name="Verified" Type="bit" Nullable="false" />
   </EntityType>
+  <Association Name="FK_FirstMessage_Message">
+    <End Role="Message" Type="Self.Message" Multiplicity="1" />
+    <End Role="FirstMessage" Type="Self.FirstMessage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Message">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="FirstMessage">
+        <PropertyRef Name="LastMessageId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_FirstMessage_SourceUser">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="FirstMessage" Type="Self.FirstMessage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="FirstMessage">
+        <PropertyRef Name="SourceUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_FirstMessage_TargetUser">
+    <End Role="User" Type="Self.User" Multiplicity="1" />
+    <End Role="FirstMessage" Type="Self.FirstMessage" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="FirstMessage">
+        <PropertyRef Name="TargetUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
   <Association Name="FK_Message_Hint">
     <End Role="Hint" Type="Self.Hint" Multiplicity="0..1" />
     <End Role="Message" Type="Self.Message" Multiplicity="*" />
@@ -86,36 +126,24 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
-  <Association Name="FK_SystemMessage_SourceUser">
-    <End Role="User" Type="Self.User" Multiplicity="1" />
-    <End Role="SystemMessage" Type="Self.SystemMessage" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="User">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="SystemMessage">
-        <PropertyRef Name="SourceUserId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_SystemMessage_TargetUser">
-    <End Role="User" Type="Self.User" Multiplicity="0..1" />
-    <End Role="SystemMessage" Type="Self.SystemMessage" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="User">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="SystemMessage">
-        <PropertyRef Name="TargetUserId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <EntityContainer Name="ChildTubeMainDBModelStoreContainer">
+    <EntitySet Name="FirstMessage" EntityType="Self.FirstMessage" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Hint" EntityType="Self.Hint" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Message" EntityType="Self.Message" Schema="dbo" store:Type="Tables" />
-    <EntitySet Name="SystemMessage" EntityType="Self.SystemMessage" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Token" EntityType="Self.Token" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_FirstMessage_Message" Association="Self.FK_FirstMessage_Message">
+      <End Role="Message" EntitySet="Message" />
+      <End Role="FirstMessage" EntitySet="FirstMessage" />
+    </AssociationSet>
+    <AssociationSet Name="FK_FirstMessage_SourceUser" Association="Self.FK_FirstMessage_SourceUser">
+      <End Role="User" EntitySet="User" />
+      <End Role="FirstMessage" EntitySet="FirstMessage" />
+    </AssociationSet>
+    <AssociationSet Name="FK_FirstMessage_TargetUser" Association="Self.FK_FirstMessage_TargetUser">
+      <End Role="User" EntitySet="User" />
+      <End Role="FirstMessage" EntitySet="FirstMessage" />
+    </AssociationSet>
     <AssociationSet Name="FK_Message_Hint" Association="Self.FK_Message_Hint">
       <End Role="Hint" EntitySet="Hint" />
       <End Role="Message" EntitySet="Message" />
@@ -127,14 +155,6 @@
     <AssociationSet Name="FK_Message_TargetUser" Association="Self.FK_Message_TargetUser">
       <End Role="User" EntitySet="User" />
       <End Role="Message" EntitySet="Message" />
-    </AssociationSet>
-    <AssociationSet Name="FK_SystemMessage_SourceUser" Association="Self.FK_SystemMessage_SourceUser">
-      <End Role="User" EntitySet="User" />
-      <End Role="SystemMessage" EntitySet="SystemMessage" />
-    </AssociationSet>
-    <AssociationSet Name="FK_SystemMessage_TargetUser" Association="Self.FK_SystemMessage_TargetUser">
-      <End Role="User" EntitySet="User" />
-      <End Role="SystemMessage" EntitySet="SystemMessage" />
     </AssociationSet>
   </EntityContainer>
 </Schema>

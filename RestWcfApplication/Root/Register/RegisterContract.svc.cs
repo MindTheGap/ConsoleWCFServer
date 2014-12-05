@@ -30,6 +30,8 @@ namespace RestWcfApplication.Root.Register
 
         using (var context = new Entities())
         {
+          context.Configuration.ProxyCreationEnabled = false;
+
           var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber);
           if (!userList.Any())
           {
@@ -64,6 +66,8 @@ namespace RestWcfApplication.Root.Register
 
         using (var context = new Entities())
         {
+          context.Configuration.ProxyCreationEnabled = false;
+
           int verificationCode = -1;
           var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber);
           var user = userList.FirstOrDefault();
@@ -134,6 +138,8 @@ namespace RestWcfApplication.Root.Register
 
         using (var context = new Entities())
         {
+          context.Configuration.ProxyCreationEnabled = false;
+
           // check if userId corresponds to phoneNumber
           var userIdParsed = Convert.ToInt32(userId);
           var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed && u.PhoneNumber == phoneNumber);
@@ -172,9 +178,13 @@ namespace RestWcfApplication.Root.Register
       toSend.MessageType = 4;
       toSend.Message = "I love you";
 
-      var newObj = JsonConvert.SerializeObject(toSend);
+      string responseString = JsonConvert.SerializeObject(toSend, Formatting.None,
+                        new JsonSerializerSettings()
+                        {
+                          ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                        });
 
-      return newObj;
+      return responseString;
     }
   }
 }

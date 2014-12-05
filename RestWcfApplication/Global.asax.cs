@@ -7,6 +7,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using System.Web.SessionState;
 using RestWcfApplication.Root.Register;
+using RestWcfApplication.Root.Update;
 using RestWcfApplication.Root.Want;
 
 namespace RestWcfApplication
@@ -18,7 +19,7 @@ namespace RestWcfApplication
     {
       RouteTable.Routes.Add(new ServiceRoute("want", new WebServiceHostFactory(), typeof(WantContract)));
       RouteTable.Routes.Add(new ServiceRoute("register", new WebServiceHostFactory(), typeof(RegisterContract)));
-
+      RouteTable.Routes.Add(new ServiceRoute("update", new WebServiceHostFactory(), typeof(UpdateContract)));
     }
 
     protected void Session_Start(object sender, EventArgs e)
