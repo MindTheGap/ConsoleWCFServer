@@ -18,5 +18,9 @@ namespace RestWcfApplication.Root.Update
     [OperationContract]
     [WebGet(UriTemplate = "getUserChatMessages?sourceUserId={sourceUserId}&targetUserId={targetUserId}&startingMessageId={startingMessageId}")]
     string GetUserChatMessages(string sourceUserId, string targetUserId, string startingMessageId);
+
+    [OperationContract]
+    [WebGet(UriTemplate = "getUserContactsLastSeen?userId={userId}&phoneNumbersStr={phoneNumbersStr}")]
+    string GetUserContactsLastSeen(string userId, string phoneNumbersStr);
   }
 }

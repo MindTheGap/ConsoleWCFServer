@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.ServiceModel.Activation;
+using System.Text.RegularExpressions;
 using System.Web;
 using Newtonsoft.Json;
 using RestWcfApplication.Communications;
@@ -42,6 +43,7 @@ namespace RestWcfApplication.Root.Register
 
           var user = userList.First();
 
+          user.LastSeen = DateTime.Now.ToString("g");
           if (user.VerificationCode == validationCode)
           {
             user.Verified = true;
@@ -63,6 +65,8 @@ namespace RestWcfApplication.Root.Register
       try
       {
         dynamic toSend = new ExpandoObject();
+
+        phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
 
         using (var context = new Entities())
         {
@@ -157,6 +161,7 @@ namespace RestWcfApplication.Root.Register
             user.FirstName = firstName;
             user.LastName = lastName;
             user.Email = email;
+            user.LastSeen = DateTime.Now.ToString("g");
           }
 
           context.SaveChanges();

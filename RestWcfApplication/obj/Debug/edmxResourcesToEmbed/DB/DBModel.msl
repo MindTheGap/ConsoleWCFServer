@@ -1,21 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
   <EntityContainerMapping StorageEntityContainer="ChildTubeMainDBModelStoreContainer" CdmEntityContainer="Entities">
-    <EntitySetMapping Name="Hints">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
-        <MappingFragment StoreEntitySet="Hint">
-          <ScalarProperty Name="VideoLink" ColumnName="VideoLink" />
-          <ScalarProperty Name="PictureLink" ColumnName="PictureLink" />
-          <ScalarProperty Name="Text" ColumnName="Text" />
-          <ScalarProperty Name="Id" ColumnName="Id" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
     <EntitySetMapping Name="Messages">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
         <MappingFragment StoreEntitySet="Message">
           <ScalarProperty Name="SystemMessageState" ColumnName="SystemMessageState" />
-          <ScalarProperty Name="Text" ColumnName="Text" />
           <ScalarProperty Name="HintId" ColumnName="HintId" />
           <ScalarProperty Name="Date" ColumnName="Date" />
           <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
@@ -35,6 +24,7 @@
     <EntitySetMapping Name="Users">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
         <MappingFragment StoreEntitySet="User">
+          <ScalarProperty Name="LastSeen" ColumnName="LastSeen" />
           <ScalarProperty Name="ProfileImageLink" ColumnName="ProfileImageLink" />
           <ScalarProperty Name="Verified" ColumnName="Verified" />
           <ScalarProperty Name="VerificationCode" ColumnName="VerificationCode" />
@@ -56,6 +46,16 @@
           <ScalarProperty Name="Date" ColumnName="Date" />
           <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
           <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Hints">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
+        <MappingFragment StoreEntitySet="Hint">
+          <ScalarProperty Name="VideoLink" ColumnName="VideoLink" />
+          <ScalarProperty Name="PictureLink" ColumnName="PictureLink" />
+          <ScalarProperty Name="Text" ColumnName="Text" />
           <ScalarProperty Name="Id" ColumnName="Id" />
         </MappingFragment>
       </EntityTypeMapping>

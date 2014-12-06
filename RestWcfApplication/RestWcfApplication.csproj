@@ -259,7 +259,7 @@
           <IISUrl>https://localhost:443/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>http://localhost:60086/</CustomServerUrl>
+          <CustomServerUrl>http://54.84.16.76</CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

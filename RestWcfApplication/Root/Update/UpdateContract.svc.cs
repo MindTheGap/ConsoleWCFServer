@@ -7,6 +7,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.Text;
+using System.Text.RegularExpressions;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 
@@ -20,6 +21,8 @@ namespace RestWcfApplication.Root.Update
       try
       {
         dynamic toSend = new ExpandoObject();
+
+        phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
 
         var userIdParsed = int.Parse(userId);
 
@@ -36,9 +39,12 @@ namespace RestWcfApplication.Root.Update
             return CommManager.SendMessage(toSend);
           }
 
+          user.LastSeen = DateTime.Now.ToString("g");
+          context.SaveChanges();
+
           var userFirstMessages =
             context.FirstMessages.Where(m => m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed)
-            .Include("TargetUser").Include("SourceUser").Include("Message")
+            .Include("TargetUser").Include("SourceUser").Include("Message").Include("Message.Hint")
               .ToList();
 
           toSend.Type = EMessagesTypesToClient.MultipleMessages;
@@ -66,15 +72,83 @@ namespace RestWcfApplication.Root.Update
         {
           context.Configuration.ProxyCreationEnabled = false;
 
+          var user = context.Users.SingleOrDefault(u => u.Id == sourceUserIdParsed);
+          if (user != null)
+          {
+            user.LastSeen = DateTime.Now.ToString("g");
+
+            context.SaveChanges();
+          }
+
           var userMessages =
             context.Messages.Where(m => m.Id > startingMessageIdParsed 
                                     && (    (m.SourceUserId == sourceUserIdParsed && m.TargetUserId == targetUserIdParsed)
                                         ||  (m.SourceUserId == targetUserIdParsed && m.TargetUserId == sourceUserIdParsed)))
-              .Include("SourceUser").Include("TargetUser")
+              .Include("SourceUser").Include("TargetUser").Include("Hint")
                                         .ToList();
 
           toSend.Type = EMessagesTypesToClient.MultipleMessages;
           toSend.MultipleMessages = userMessages;
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
+      }
+    }
+
+    public string GetUserContactsLastSeen(string userId, string phoneNumbersStr)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        var contactsArray = phoneNumbersStr.Split(new[] {'.'});
+        var sourceUserIdParsed = int.Parse(userId);
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          var user = context.Users.SingleOrDefault(u => u.Id == sourceUserIdParsed);
+          if (user != null)
+          {
+            user.LastSeen = DateTime.Now.ToString("g");
+
+            context.SaveChanges();
+          }
+
+          var first = true;
+          var stringBuilder = new StringBuilder();
+          foreach (var contactStr in contactsArray)
+          {
+            var phoneNumbersArray = contactStr.Split(new[] { ',' });
+
+            if (!first) stringBuilder.Append(",");
+            first = false;
+
+            var foundAtLeastOne = false;
+            string lastSeen = null;
+            foreach (var phoneNumber in phoneNumbersArray)
+            {
+              var phoneNumberRegex = Regex.Replace(phoneNumber, @"[-+ ()]", "");
+
+              var contact = context.Users.SingleOrDefault(u => u.PhoneNumber == phoneNumberRegex);
+
+              if (contact != null)
+              {
+                foundAtLeastOne = true;
+                lastSeen = contact.LastSeen;
+                break;
+              }
+            }
+
+            stringBuilder.Append(foundAtLeastOne ? lastSeen : "-1");
+          }
+
+          toSend.Type = EMessagesTypesToClient.CsvString;
+          toSend.CsvString = stringBuilder.ToString();
           return CommManager.SendMessage(toSend);
         }
       }

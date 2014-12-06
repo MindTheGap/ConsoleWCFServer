@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.Text.RegularExpressions;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using System.ServiceModel.Activation;
@@ -25,6 +26,9 @@ namespace RestWcfApplication.Root.Want
         {
           context.Configuration.ProxyCreationEnabled = false;
 
+          sourcePhoneNumber = Regex.Replace(sourcePhoneNumber, @"[-+ ()]", "");
+          targetPhoneNumber = Regex.Replace(targetPhoneNumber, @"[-+ ()]", "");
+
           // check if userId corresponds to phoneNumber
           var userIdParsed = Convert.ToInt32(userId);
           var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed && u.PhoneNumber == sourcePhoneNumber);
@@ -35,8 +39,16 @@ namespace RestWcfApplication.Root.Want
             return CommManager.SendMessage(toSend);
           }
 
+          sourceUser.LastSeen = DateTime.Now.ToString("g");
+
+          var hintNotUsed = string.IsNullOrEmpty(hint) && string.IsNullOrEmpty(hintImageLink) && string.IsNullOrEmpty(hintVideoLink);
+          var firstMessage =
+            context.FirstMessages.SingleOrDefault(u => ((u.SourceUserId == userIdParsed && u.TargetUser.PhoneNumber == targetPhoneNumber)
+                                                    ||  (u.TargetUserId == userIdParsed && u.SourceUser.PhoneNumber == targetPhoneNumber)));
+          DB.FirstMessage newFirstMessage = null;
+
           var newDate = DateTime.UtcNow.ToString("u");
-          var newHint = new DB.Hint()
+          var newHint = hintNotUsed ? null : new DB.Hint()
           {
             Text = hint,
             PictureLink = hintImageLink,
@@ -48,8 +60,23 @@ namespace RestWcfApplication.Root.Want
             Hint = newHint,
             Date = newDate
           };
+          if (firstMessage == null)
+          {
+            newFirstMessage = new DB.FirstMessage()
+            {
+              Date = newDate,
+              Message = newMessage,
+              SourceUserId = userIdParsed,
+              SubjectName = @"No Subject"
+            };
 
-          context.Hints.Add(newHint);
+            context.FirstMessages.Add(newFirstMessage);
+          }
+
+          if (!hintNotUsed)
+          {
+            context.Hints.Add(newHint);
+          }
           context.Messages.Add(newMessage);
 
           // check if target user exists in the system:
@@ -68,19 +95,28 @@ namespace RestWcfApplication.Root.Want
             var newTargetUser = new DB.User() { PhoneNumber = targetPhoneNumber };
 
             newMessage.TargetUser = newMessage.TargetUser = newTargetUser;
+            if (newFirstMessage != null)
+            {
+              newFirstMessage.TargetUser = newTargetUser;
+            }
             newMessage.SystemMessageState = (int) ESystemMessageState.SentSms;
 
             context.Users.Add(newTargetUser);
 
             context.SaveChanges();
 
-            toSend.Type = EMessagesTypesToClient.SystemMessage;
-            toSend.SystemMessage = newMessage;
+            toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
+            toSend.SystemMessage = (int)ESystemMessageState.SentSms;
+            toSend.Message = newMessage;
             return CommManager.SendMessage(toSend);
           }
 
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
+          if (newFirstMessage != null)
+          {
+            newFirstMessage.TargetUserId = targetUser.Id;
+          }
 
           // checking if target user is in source user also
           var message = context.Messages.SingleOrDefault(m => m.SourceUserId == targetUser.Id && m.TargetUserId == userIdParsed);
@@ -91,12 +127,12 @@ namespace RestWcfApplication.Root.Want
 
             // TODO: enable a chat between them
 
-            newMessage.SystemMessageState = (int) ESystemMessageState.BothSidesAreIn;
+            newMessage.SystemMessageState = (int)ESystemMessageState.BothSidesAreIn;
 
             context.SaveChanges();
 
-            toSend.Type = EMessagesTypesToClient.MatchFound;
-            toSend.SystemMessage = newMessage;
+            toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
+            toSend.SystemMessage = (int)ESystemMessageState.BothSidesAreIn;
             toSend.Message = newMessage;
             return CommManager.SendMessage(toSend);
           }
@@ -107,10 +143,13 @@ namespace RestWcfApplication.Root.Want
 
           // TODO: send target user a push notification that source user is in to him
 
-          newMessage.SystemMessageState = (int) ESystemMessageState.OneSideIsIn;
+          newMessage.SystemMessageState = (int)ESystemMessageState.OneSideIsIn;
 
-          toSend.Type = EMessagesTypesToClient.SystemMessage;
-          toSend.SystemMessage = ESystemMessageState.OneSideIsIn;
+          context.SaveChanges();
+
+          toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
+          toSend.SystemMessage = (int)ESystemMessageState.OneSideIsIn;
+          toSend.Message = newMessage;
           return CommManager.SendMessage(toSend);
         }
       }

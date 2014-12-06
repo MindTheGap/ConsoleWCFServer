@@ -32,6 +32,7 @@ namespace RestWcfApplication.DB
         public string VerificationCode { get; set; }
         public bool Verified { get; set; }
         public string ProfileImageLink { get; set; }
+        public string LastSeen { get; set; }
     
         public virtual ICollection<Message> MessagesAsSourceUser { get; set; }
         public virtual ICollection<Message> MessagesAsTargetUser { get; set; }

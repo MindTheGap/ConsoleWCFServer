@@ -21,7 +21,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Text" Type="nvarchar" MaxLength="500" />
+          <Property Name="Text" Type="nvarchar" MaxLength="4000" />
           <Property Name="PictureLink" Type="nvarchar" MaxLength="500" />
           <Property Name="VideoLink" Type="nvarchar" MaxLength="500" />
         </EntityType>
@@ -34,7 +34,6 @@
           <Property Name="TargetUserId" Type="int" Nullable="false" />
           <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="SystemMessageState" Type="int" />
-          <Property Name="Text" Type="nvarchar" MaxLength="4000" />
           <Property Name="HintId" Type="int" />
         </EntityType>
         <EntityType Name="Token">
@@ -56,6 +55,7 @@
           <Property Name="GoogleUserId" Type="int" />
           <Property Name="PhoneNumber" Type="nvarchar" MaxLength="100" />
           <Property Name="ProfileImageLink" Type="nvarchar" MaxLength="500" />
+          <Property Name="LastSeen" Type="nvarchar" MaxLength="500" />
           <Property Name="VerificationCode" Type="nvarchar" MaxLength="50" />
           <Property Name="Verified" Type="bit" Nullable="false" />
         </EntityType>
@@ -218,14 +218,9 @@
             <Parameter Name="Email" Mode="In" Type="String" />
             <Parameter Name="Activity" Mode="In" Type="Int32" />
           </FunctionImport>
-          <EntitySet Name="Hints" EntityType="ChildTubeMainDBModel.Hint" />
           <EntitySet Name="Messages" EntityType="ChildTubeMainDBModel.Message" />
           <EntitySet Name="Tokens" EntityType="ChildTubeMainDBModel.Token" />
           <EntitySet Name="Users" EntityType="ChildTubeMainDBModel.User" />
-          <AssociationSet Name="FK_Message_Hint" Association="ChildTubeMainDBModel.FK_Message_Hint">
-            <End Role="Hint" EntitySet="Hints" />
-            <End Role="Message" EntitySet="Messages" />
-          </AssociationSet>
           <AssociationSet Name="FK_Message_SourceUser" Association="ChildTubeMainDBModel.FK_Message_SourceUser">
             <End Role="User" EntitySet="Users" />
             <End Role="Message" EntitySet="Messages" />
@@ -246,6 +241,11 @@
           <AssociationSet Name="FK_FirstMessage_TargetUser" Association="ChildTubeMainDBModel.FK_FirstMessage_TargetUser">
             <End Role="User" EntitySet="Users" />
             <End Role="FirstMessage" EntitySet="FirstMessages" />
+          </AssociationSet>
+          <EntitySet Name="Hints" EntityType="ChildTubeMainDBModel.Hint" />
+          <AssociationSet Name="FK_Message_Hint" Association="ChildTubeMainDBModel.FK_Message_Hint">
+            <End Role="Hint" EntitySet="Hints" />
+            <End Role="Message" EntitySet="Messages" />
           </AssociationSet>
           </EntityContainer>
         <ComplexType Name="prEpisodeInsert_Result">
@@ -302,16 +302,6 @@
           <Property Type="String" Name="Email" Nullable="false" MaxLength="100" />
           <Property Type="Int32" Name="Activity" Nullable="true" />
         </ComplexType>
-        <EntityType Name="Hint">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Text" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="PictureLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="VideoLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
-        </EntityType>
         <EntityType Name="Message">
           <Key>
             <PropertyRef Name="Id" />
@@ -321,12 +311,11 @@
           <Property Name="TargetUserId" Type="Int32" Nullable="false" />
           <Property Name="Date" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="HintId" Type="Int32" />
-          <NavigationProperty Name="Hint" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
           <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="Message" ToRole="User" />
           <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="Message" ToRole="User" />
-          <Property Name="Text" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="FirstMessages" Relationship="ChildTubeMainDBModel.FK_FirstMessage_Message" FromRole="Message" ToRole="FirstMessage" />
           <Property Name="SystemMessageState" Type="Int32" />
+          <NavigationProperty Name="Hint" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
         </EntityType>
         <EntityType Name="Token">
           <Key>
@@ -353,19 +342,8 @@
           <Property Name="ProfileImageLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="FirstMessagesFromSourceUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="User" ToRole="FirstMessage" />
           <NavigationProperty Name="FirstMessagesFromTargetUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="User" ToRole="FirstMessage" />
+          <Property Name="LastSeen" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
         </EntityType>
-        <Association Name="FK_Message_Hint">
-          <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
-          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Hint">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Message">
-              <PropertyRef Name="HintId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Message_SourceUser">
           <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
           <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
@@ -440,27 +418,38 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="Hint">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Text" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
+          <Property Name="PictureLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="VideoLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
+        </EntityType>
+        <Association Name="FK_Message_Hint">
+          <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
+          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Hint">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Message">
+              <PropertyRef Name="HintId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="ChildTubeMainDBModelStoreContainer" CdmEntityContainer="Entities">
-          <EntitySetMapping Name="Hints">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
-              <MappingFragment StoreEntitySet="Hint">
-                <ScalarProperty Name="VideoLink" ColumnName="VideoLink" />
-                <ScalarProperty Name="PictureLink" ColumnName="PictureLink" />
-                <ScalarProperty Name="Text" ColumnName="Text" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Messages">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
               <MappingFragment StoreEntitySet="Message">
                 <ScalarProperty Name="SystemMessageState" ColumnName="SystemMessageState" />
-                <ScalarProperty Name="Text" ColumnName="Text" />
                 <ScalarProperty Name="HintId" ColumnName="HintId" />
                 <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
@@ -480,6 +469,7 @@
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
               <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="LastSeen" ColumnName="LastSeen" />
                 <ScalarProperty Name="ProfileImageLink" ColumnName="ProfileImageLink" />
                 <ScalarProperty Name="Verified" ColumnName="Verified" />
                 <ScalarProperty Name="VerificationCode" ColumnName="VerificationCode" />
@@ -501,6 +491,16 @@
                 <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
                 <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Hints">
+            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
+              <MappingFragment StoreEntitySet="Hint">
+                <ScalarProperty Name="VideoLink" ColumnName="VideoLink" />
+                <ScalarProperty Name="PictureLink" ColumnName="PictureLink" />
+                <ScalarProperty Name="Text" ColumnName="Text" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

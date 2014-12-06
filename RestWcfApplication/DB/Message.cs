@@ -24,12 +24,11 @@ namespace RestWcfApplication.DB
         public int TargetUserId { get; set; }
         public string Date { get; set; }
         public Nullable<int> HintId { get; set; }
-        public string Text { get; set; }
         public Nullable<int> SystemMessageState { get; set; }
     
-        public virtual Hint Hint { get; set; }
         public virtual User SourceUser { get; set; }
         public virtual User TargetUser { get; set; }
         public virtual ICollection<FirstMessage> FirstMessages { get; set; }
+        public virtual Hint Hint { get; set; }
     }
 }
