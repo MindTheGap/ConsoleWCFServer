@@ -12,8 +12,12 @@ namespace RestWcfApplication.Root.Update
   public interface IUpdateContract
   {
     [OperationContract]
-    [WebGet(UriTemplate = "getUserMessages?userId={userId}&phoneNumber={phoneNumber}")]
-    string GetUserMessages(string userId, string phoneNumber);
+    [WebGet(UriTemplate = "getNewFirstUserMessages?userId={userId}&phoneNumber={phoneNumber}&startingFirstUserMessageId={startingFirstUserMessageId}")]
+    string GetNewFirstUserMessages(string userId, string phoneNumber, string startingFirstUserMessageId);
+
+    [OperationContract]
+    [WebGet(UriTemplate = "updateFirstUserMessages?userId={userId}&phoneNumber={phoneNumber}&messagesIds={messagesIds}")]
+    string UpdateFirstUserMessages(string userId, string phoneNumber, string messagesIds);
 
     [OperationContract]
     [WebGet(UriTemplate = "getUserChatMessages?sourceUserId={sourceUserId}&targetUserId={targetUserId}&startingMessageId={startingMessageId}")]

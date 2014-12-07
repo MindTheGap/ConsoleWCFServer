@@ -1,4 +1,5 @@
-﻿using System.Dynamic;
+﻿using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Net;
 using System.ServiceModel.Activation;
@@ -33,6 +34,8 @@ namespace RestWcfApplication.Root.Register
         {
           context.Configuration.ProxyCreationEnabled = false;
 
+          phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
+
           var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber);
           if (!userList.Any())
           {
@@ -43,11 +46,16 @@ namespace RestWcfApplication.Root.Register
 
           var user = userList.First();
 
-          user.LastSeen = DateTime.Now.ToString("g");
-          if (user.VerificationCode == validationCode)
+          if (user.VerificationCode != validationCode)
           {
-            user.Verified = true;
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.BadVerificationCode.ToString("d");
+            return CommManager.SendMessage(toSend);
           }
+
+          user.LastSeen = DateTime.Now.ToString("g");
+          user.Verified = true;
+
           context.SaveChanges();
 
           toSend.Type = EMessagesTypesToClient.Ok;
@@ -77,25 +85,27 @@ namespace RestWcfApplication.Root.Register
           var user = userList.FirstOrDefault();
           if (user != null)
           {
-            if (user.Verified)
-            {
-              toSend.Type = EMessagesTypesToClient.SystemMessage;
-              toSend.SystemMessage = ESystemMessageState.AlreadyRegisteredAndVerified;
-              toSend.UserId = user.Id.ToString("d");
-              return CommManager.SendMessage(toSend);
-            }
-            else
-            {
-              verificationCode = SendVerificationCode(phoneNumber);
+            //if (user.Verified)
+            //{
+            //  toSend.Type = EMessagesTypesToClient.SystemMessage;
+            //  toSend.SystemMessage = ESystemMessageState.AlreadyRegisteredAndVerified;
+            //  toSend.UserId = user.Id.ToString("d");
+            //  return CommManager.SendMessage(toSend);
+            //}
+            //else
+            //{
+            user.Verified = false;
 
-              user.VerificationCode = verificationCode.ToString("d");
-              context.SaveChanges();
+            verificationCode = SendVerificationCode(phoneNumber);
 
-              toSend.Type = EMessagesTypesToClient.SystemMessage;
-              toSend.SystemMessage = ESystemMessageState.VerificationCodeSent;
-              toSend.UserId = user.Id.ToString("d");
-              return CommManager.SendMessage(toSend);
-            }
+            user.VerificationCode = verificationCode.ToString("d");
+            context.SaveChanges();
+
+            toSend.Type = EMessagesTypesToClient.SystemMessage;
+            toSend.SystemMessage = ESystemMessageState.VerificationCodeSent;
+            toSend.UserId = user.Id.ToString("d");
+            return CommManager.SendMessage(toSend);
+            //}
           }
 
           verificationCode = SendVerificationCode(phoneNumber);

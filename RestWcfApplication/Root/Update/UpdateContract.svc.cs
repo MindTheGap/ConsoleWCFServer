@@ -16,7 +16,7 @@ namespace RestWcfApplication.Root.Update
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class UpdateContract : IUpdateContract
   {
-    public string GetUserMessages(string userId, string phoneNumber)
+    public string GetNewFirstUserMessages(string userId, string phoneNumber, string startingFirstUserMessageId)
     {
       try
       {
@@ -25,6 +25,7 @@ namespace RestWcfApplication.Root.Update
         phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
 
         var userIdParsed = int.Parse(userId);
+        var startingFirstUserMessageIdParsed = int.Parse(startingFirstUserMessageId);
 
         using (var context = new Entities())
         {
@@ -43,7 +44,52 @@ namespace RestWcfApplication.Root.Update
           context.SaveChanges();
 
           var userFirstMessages =
-            context.FirstMessages.Where(m => m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed)
+            context.FirstMessages.Where(m => m.Id > startingFirstUserMessageIdParsed 
+              && (m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
+            .Include("TargetUser").Include("SourceUser").Include("Message").Include("Message.Hint")
+              .ToList();
+
+          toSend.Type = EMessagesTypesToClient.MultipleMessages;
+          toSend.MultipleMessages = userFirstMessages;
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
+      }
+    }
+
+    public string UpdateFirstUserMessages(string userId, string phoneNumber, string messagesIds)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
+
+        var userIdParsed = int.Parse(userId);
+        var messagesIdsArray = messagesIds.Split(new[] {','}).Select(int.Parse).ToArray();
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber && u.Id == userIdParsed);
+          var user = userList.FirstOrDefault();
+          if (user == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.PhoneNumberUserIdMismatch.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          user.LastSeen = DateTime.Now.ToString("g");
+          context.SaveChanges();
+
+          var userFirstMessages =
+            context.FirstMessages.Where(m => messagesIdsArray.Contains(m.Id)
+              && (m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
             .Include("TargetUser").Include("SourceUser").Include("Message").Include("Message.Hint")
               .ToList();
 
