@@ -43,6 +43,21 @@ namespace RestWcfApplication.Root.Update
           user.LastSeen = DateTime.Now.ToString("g");
           context.SaveChanges();
 
+          var result = new List<object>();
+          foreach (var firstMessage in context.FirstMessages.Include("Message").Include("SourceUser").Include("TargetUser").Include("Message.Hint"))
+          {
+            if (firstMessage.Id > startingFirstUserMessageIdParsed)
+            {
+              var otherSideId = firstMessage.SourceUserId == userIdParsed ? firstMessage.TargetUserId : firstMessage.SourceUserId;
+              var unreadMessages = context.Messages.Where(m => 
+                (m.SourceUserId == userIdParsed && m.TargetUserId == otherSideId)
+            ||  (m.TargetUserId == userIdParsed && m.SourceUserId == otherSideId)).ToList();
+              var numberOfUnreadMessages = unreadMessages.Count;
+              var anyUnreadSystemMessage = unreadMessages.Any(m => m.SystemMessageState != null && m.SystemMessageState != 0);
+              var anyUnreadMessage = unreadMessages.All(m => m.SystemMessageState == null || m.SystemMessageState == 0);
+              result.Add(new { firstMessage, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage });
+            }
+          }
           var userFirstMessages =
             context.FirstMessages.Where(m => m.Id > startingFirstUserMessageIdParsed 
               && (m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
@@ -60,16 +75,30 @@ namespace RestWcfApplication.Root.Update
       }
     }
 
-    public string UpdateFirstUserMessages(string userId, string phoneNumber, string messagesIds)
+    public string UpdateFirstUserMessages(string userId, string phoneNumber, string firstUserMessageIds, string lastMessageIds)
     {
       try
       {
         dynamic toSend = new ExpandoObject();
 
+        if (string.IsNullOrEmpty(firstUserMessageIds) || string.IsNullOrEmpty(lastMessageIds))
+        {
+          toSend.Type = EMessagesTypesToClient.Ok;
+          return CommManager.SendMessage(toSend);
+        }
+
         phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
 
         var userIdParsed = int.Parse(userId);
-        var messagesIdsArray = messagesIds.Split(new[] {','}).Select(int.Parse).ToArray();
+        var messagesIdsArray = firstUserMessageIds.Split(new[] {','}).Select(int.Parse).ToList();
+        var lastMessageIdsList = lastMessageIds.Split(new[] { ',' }).Select(int.Parse).ToList();
+
+        if (messagesIdsArray.Count() != lastMessageIdsList.Count())
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
 
         using (var context = new Entities())
         {
@@ -87,14 +116,30 @@ namespace RestWcfApplication.Root.Update
           user.LastSeen = DateTime.Now.ToString("g");
           context.SaveChanges();
 
-          var userFirstMessages =
-            context.FirstMessages.Where(m => messagesIdsArray.Contains(m.Id)
-              && (m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
-            .Include("TargetUser").Include("SourceUser").Include("Message").Include("Message.Hint")
-              .ToList();
+          var result = new List<object>();
+          foreach (var firstMessage in context.FirstMessages)
+          {
+            var indexOf = messagesIdsArray.IndexOf(firstMessage.Id);
+            if (indexOf != -1)
+            {
+              var lastMessageId = lastMessageIdsList[indexOf];
+              var otherSideId = firstMessage.SourceUserId == userIdParsed ? firstMessage.TargetUserId : firstMessage.SourceUserId;
+              var unreadMessages = context.Messages.Where(m => m.Id > lastMessageId
+                                                                       &&
+                                                                       (m.SourceUserId == userIdParsed &&
+                                                                        m.TargetUserId == otherSideId
+                                                                        ||
+                                                                        m.TargetUserId == userIdParsed &&
+                                                                        m.SourceUserId == otherSideId)).ToList();
+              var numberOfUnreadMessages = unreadMessages.Count;
+              var anyUnreadSystemMessage = unreadMessages.Any(m => m.SystemMessageState != null && m.SystemMessageState != 0);
+              var anyUnreadMessage = unreadMessages.All(m => m.SystemMessageState == null || m.SystemMessageState == 0);
+              result.Add(new { firstMessage.Id, firstMessage.Message, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage });
+            }
+          }
 
           toSend.Type = EMessagesTypesToClient.MultipleMessages;
-          toSend.MultipleMessages = userFirstMessages;
+          toSend.MultipleMessages = result;
           return CommManager.SendMessage(toSend);
         }
       }

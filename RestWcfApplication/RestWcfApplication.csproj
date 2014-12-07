@@ -231,6 +231,7 @@
     <None Include="Properties\PublishProfiles\AmazonAWS.pubxml" />
     <None Include="Properties\PublishProfiles\AmazonAWSDebug.pubxml" />
     <None Include="Properties\PublishProfiles\g.pubxml" />
+    <None Include="Properties\PublishProfiles\gDebug.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

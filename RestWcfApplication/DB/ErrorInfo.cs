@@ -12,6 +12,7 @@ namespace RestWcfApplication.DB
     UserPhoneNumberDoesNotExist,
     UserIdDoesNotExist,
     PhoneNumberUserIdMismatch,
-    BadVerificationCode
+    BadVerificationCode,
+    BadArgumentsLength
   }
 }
