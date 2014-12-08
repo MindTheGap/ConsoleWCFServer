@@ -48,11 +48,11 @@ namespace RestWcfApplication.Root.Want
           DB.FirstMessage newFirstMessage = null;
 
           var newDate = DateTime.UtcNow.ToString("u");
-          var newHint = hintNotUsed ? null : new DB.Hint()
+          var newHint = new DB.Hint
           {
-            Text = hint,
             PictureLink = hintImageLink,
-            VideoLink = hintVideoLink
+            VideoLink = hintVideoLink,
+            Text = hintNotUsed ? @"Guess who..." : hint
           };
           var newMessage = new DB.Message()
           {
@@ -73,10 +73,7 @@ namespace RestWcfApplication.Root.Want
             context.FirstMessages.Add(newFirstMessage);
           }
 
-          if (!hintNotUsed)
-          {
-            context.Hints.Add(newHint);
-          }
+          context.Hints.Add(newHint);
           context.Messages.Add(newMessage);
 
           // check if target user exists in the system:

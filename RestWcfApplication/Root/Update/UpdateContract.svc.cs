@@ -58,14 +58,9 @@ namespace RestWcfApplication.Root.Update
               result.Add(new { firstMessage, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage });
             }
           }
-          var userFirstMessages =
-            context.FirstMessages.Where(m => m.Id > startingFirstUserMessageIdParsed 
-              && (m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
-            .Include("TargetUser").Include("SourceUser").Include("Message").Include("Message.Hint")
-              .ToList();
 
           toSend.Type = EMessagesTypesToClient.MultipleMessages;
-          toSend.MultipleMessages = userFirstMessages;
+          toSend.MultipleMessages = result;
           return CommManager.SendMessage(toSend);
         }
       }
@@ -117,7 +112,7 @@ namespace RestWcfApplication.Root.Update
           context.SaveChanges();
 
           var result = new List<object>();
-          foreach (var firstMessage in context.FirstMessages)
+          foreach (var firstMessage in context.FirstMessages.Include("Message").Include("Message.Hint"))
           {
             var indexOf = messagesIdsArray.IndexOf(firstMessage.Id);
             if (indexOf != -1)
