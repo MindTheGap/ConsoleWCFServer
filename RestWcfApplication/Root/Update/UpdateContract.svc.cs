@@ -54,7 +54,7 @@ namespace RestWcfApplication.Root.Update
             ||  (m.TargetUserId == userIdParsed && m.SourceUserId == otherSideId)).ToList();
               var numberOfUnreadMessages = unreadMessages.Count;
               var anyUnreadSystemMessage = unreadMessages.Any(m => m.SystemMessageState != null && m.SystemMessageState != 0);
-              var anyUnreadMessage = unreadMessages.All(m => m.SystemMessageState == null || m.SystemMessageState == 0);
+              var anyUnreadMessage = unreadMessages.Any(m => string.IsNullOrEmpty(m.Hint.Text) == false);
               result.Add(new { firstMessage, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage });
             }
           }
@@ -128,7 +128,7 @@ namespace RestWcfApplication.Root.Update
                                                                         m.SourceUserId == otherSideId)).ToList();
               var numberOfUnreadMessages = unreadMessages.Count;
               var anyUnreadSystemMessage = unreadMessages.Any(m => m.SystemMessageState != null && m.SystemMessageState != 0);
-              var anyUnreadMessage = unreadMessages.All(m => m.SystemMessageState == null || m.SystemMessageState == 0);
+              var anyUnreadMessage = unreadMessages.Any(m => string.IsNullOrEmpty(m.Hint.Text) == false);
               result.Add(new { firstMessage.Id, firstMessage.Message, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage });
             }
           }
