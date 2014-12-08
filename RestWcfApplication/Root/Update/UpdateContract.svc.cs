@@ -49,7 +49,7 @@ namespace RestWcfApplication.Root.Update
             if (firstMessage.Id > startingFirstUserMessageIdParsed)
             {
               var otherSideId = firstMessage.SourceUserId == userIdParsed ? firstMessage.TargetUserId : firstMessage.SourceUserId;
-              var unreadMessages = context.Messages.Where(m => 
+              var unreadMessages = context.Messages.Include("Hint").Where(m => 
                 (m.SourceUserId == userIdParsed && m.TargetUserId == otherSideId)
             ||  (m.TargetUserId == userIdParsed && m.SourceUserId == otherSideId)).ToList();
               var numberOfUnreadMessages = unreadMessages.Count;
@@ -119,7 +119,7 @@ namespace RestWcfApplication.Root.Update
             {
               var lastMessageId = lastMessageIdsList[indexOf];
               var otherSideId = firstMessage.SourceUserId == userIdParsed ? firstMessage.TargetUserId : firstMessage.SourceUserId;
-              var unreadMessages = context.Messages.Where(m => m.Id > lastMessageId
+              var unreadMessages = context.Messages.Include("Hint").Where(m => m.Id > lastMessageId
                                                                        &&
                                                                        (m.SourceUserId == userIdParsed &&
                                                                         m.TargetUserId == otherSideId
