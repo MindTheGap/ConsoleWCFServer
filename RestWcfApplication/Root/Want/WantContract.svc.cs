@@ -15,6 +15,13 @@ namespace RestWcfApplication.Root.Want
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class WantContract : IWantContract
   {
+    private const string DefaultClue = @"Guess who...";
+
+    private bool IsStringEmpty(string s)
+    {
+      return string.IsNullOrEmpty(s) || s == "(null)";
+    }
+
     public string UpdateIWantUserByPhoneNumber(string userId, string sourcePhoneNumber, string targetPhoneNumber,
       string hint, string hintImageLink, string hintVideoLink)
     {
@@ -41,18 +48,23 @@ namespace RestWcfApplication.Root.Want
 
           sourceUser.LastSeen = DateTime.Now.ToString("g");
 
-          var hintNotUsed = string.IsNullOrEmpty(hint) && string.IsNullOrEmpty(hintImageLink) && string.IsNullOrEmpty(hintVideoLink);
+          var hintNotUsed = IsStringEmpty(hint) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
           var firstMessage =
             context.FirstMessages.SingleOrDefault(u => ((u.SourceUserId == userIdParsed && u.TargetUser.PhoneNumber == targetPhoneNumber)
                                                     ||  (u.TargetUserId == userIdParsed && u.SourceUser.PhoneNumber == targetPhoneNumber)));
           DB.FirstMessage newFirstMessage = null;
+
+          if (hintNotUsed)
+          {
+            toSend.DefaultClue = DefaultClue;
+          }
 
           var newDate = DateTime.UtcNow.ToString("u");
           var newHint = new DB.Hint
           {
             PictureLink = hintImageLink,
             VideoLink = hintVideoLink,
-            Text = hintNotUsed ? @"Guess who..." : hint
+            Text = hintNotUsed ? DefaultClue : hint
           };
           var newMessage = new DB.Message()
           {
