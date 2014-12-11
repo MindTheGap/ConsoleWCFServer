@@ -20,6 +20,7 @@ namespace RestWcfApplication.DB
         public string Date { get; set; }
         public int LastMessageId { get; set; }
         public string SubjectName { get; set; }
+        public bool MatchFound { get; set; }
     
         public virtual Message Message { get; set; }
         public virtual User SourceUser { get; set; }

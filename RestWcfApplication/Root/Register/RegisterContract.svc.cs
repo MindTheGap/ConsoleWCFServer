@@ -53,7 +53,7 @@ namespace RestWcfApplication.Root.Register
             return CommManager.SendMessage(toSend);
           }
 
-          user.LastSeen = DateTime.Now.ToString("g");
+          user.LastSeen = DateTime.Now.ToString("u");
           user.Verified = true;
 
           context.SaveChanges();
@@ -171,7 +171,7 @@ namespace RestWcfApplication.Root.Register
             user.FirstName = firstName;
             user.LastName = lastName;
             user.Email = email;
-            user.LastSeen = DateTime.Now.ToString("g");
+            user.LastSeen = DateTime.Now.ToString("u");
           }
 
           context.SaveChanges();

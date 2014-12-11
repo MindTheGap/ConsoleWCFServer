@@ -41,6 +41,7 @@
     <EntitySetMapping Name="FirstMessages">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
         <MappingFragment StoreEntitySet="FirstMessage">
+          <ScalarProperty Name="MatchFound" ColumnName="MatchFound" />
           <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
           <ScalarProperty Name="LastMessageId" ColumnName="LastMessageId" />
           <ScalarProperty Name="Date" ColumnName="Date" />

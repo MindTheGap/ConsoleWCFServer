@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using RestWcfApplication.DB;
@@ -10,8 +12,13 @@ namespace RestWcfApplication.Root.Want
   public interface IWantContract
   {
     [OperationContract]
-    [WebGet(UriTemplate = "iamin?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetPhoneNumber={targetPhoneNumber}&hint={hint}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
-    string UpdateIWantUserByPhoneNumber(string userId, string sourcePhoneNumber, string targetPhoneNumber, 
-      string hint, string hintImageLink, string hintVideoLink);
+    [WebInvoke(Method = "POST", UriTemplate = "iamin?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetPhoneNumber={targetPhoneNumber}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
+    string UpdateIWantUserByPhoneNumber(string userId, string sourcePhoneNumber, string targetPhoneNumber,
+              string hintImageLink, string hintVideoLink, Stream data);
+
+    [OperationContract]
+    [WebInvoke(Method = "POST", UriTemplate = "match?userId={userId}&targetUserId={targetUserId}&firstMessageId={firstMessageId}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
+    string UpdateIWantUserByUserId(string userId, string targetUserId, string firstMessageId,
+              string hintImageLink, string hintVideoLink, Stream data);
   }
 }

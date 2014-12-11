@@ -215,6 +215,7 @@
     <NavigationProperty Name="Message" Relationship="ChildTubeMainDBModel.FK_FirstMessage_Message" FromRole="FirstMessage" ToRole="Message" />
     <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="FirstMessage" ToRole="User" />
     <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="FirstMessage" ToRole="User" />
+    <Property Name="MatchFound" Type="Boolean" Nullable="false" />
   </EntityType>
   <Association Name="FK_FirstMessage_Message">
     <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="1" />

@@ -9,6 +9,7 @@
     <Property Name="TargetUserId" Type="int" Nullable="false" />
     <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
     <Property Name="LastMessageId" Type="int" Nullable="false" />
+    <Property Name="MatchFound" Type="bit" Nullable="false" />
     <Property Name="SubjectName" Type="nvarchar" MaxLength="500" />
   </EntityType>
   <EntityType Name="Hint">

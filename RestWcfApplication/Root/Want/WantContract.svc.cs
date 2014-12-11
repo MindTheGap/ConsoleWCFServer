@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -23,11 +24,14 @@ namespace RestWcfApplication.Root.Want
     }
 
     public string UpdateIWantUserByPhoneNumber(string userId, string sourcePhoneNumber, string targetPhoneNumber,
-      string hint, string hintImageLink, string hintVideoLink)
+      string hintImageLink, string hintVideoLink, Stream data)
     {
       try
       {
         dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(data);
+        var text = reader.ReadToEnd();
 
         using (var context = new Entities())
         {
@@ -46,13 +50,12 @@ namespace RestWcfApplication.Root.Want
             return CommManager.SendMessage(toSend);
           }
 
-          sourceUser.LastSeen = DateTime.Now.ToString("g");
+          sourceUser.LastSeen = DateTime.Now.ToString("u");
 
-          var hintNotUsed = IsStringEmpty(hint) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
+          var hintNotUsed = IsStringEmpty(text) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
           var firstMessage =
             context.FirstMessages.SingleOrDefault(u => ((u.SourceUserId == userIdParsed && u.TargetUser.PhoneNumber == targetPhoneNumber)
                                                     ||  (u.TargetUserId == userIdParsed && u.SourceUser.PhoneNumber == targetPhoneNumber)));
-          DB.FirstMessage newFirstMessage = null;
 
           if (hintNotUsed)
           {
@@ -64,7 +67,7 @@ namespace RestWcfApplication.Root.Want
           {
             PictureLink = hintImageLink,
             VideoLink = hintVideoLink,
-            Text = hintNotUsed ? DefaultClue : hint
+            Text = hintNotUsed ? DefaultClue : text
           };
           var newMessage = new DB.Message()
           {
@@ -74,7 +77,7 @@ namespace RestWcfApplication.Root.Want
           };
           if (firstMessage == null)
           {
-            newFirstMessage = new DB.FirstMessage()
+            var newFirstMessage = new DB.FirstMessage()
             {
               Date = newDate,
               Message = newMessage,
@@ -83,6 +86,8 @@ namespace RestWcfApplication.Root.Want
             };
 
             context.FirstMessages.Add(newFirstMessage);
+
+            firstMessage = newFirstMessage;
           }
 
           context.Hints.Add(newHint);
@@ -104,10 +109,7 @@ namespace RestWcfApplication.Root.Want
             var newTargetUser = new DB.User() { PhoneNumber = targetPhoneNumber };
 
             newMessage.TargetUser = newMessage.TargetUser = newTargetUser;
-            if (newFirstMessage != null)
-            {
-              newFirstMessage.TargetUser = newTargetUser;
-            }
+            firstMessage.TargetUser = newTargetUser;
             newMessage.SystemMessageState = (int) ESystemMessageState.SentSms;
 
             context.Users.Add(newTargetUser);
@@ -122,10 +124,7 @@ namespace RestWcfApplication.Root.Want
 
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
-          if (newFirstMessage != null)
-          {
-            newFirstMessage.TargetUserId = targetUser.Id;
-          }
+          firstMessage.TargetUserId = targetUser.Id;
 
           // checking if target user is in source user also
           var message = context.Messages.SingleOrDefault(m => m.SourceUserId == targetUser.Id && m.TargetUserId == userIdParsed);
@@ -137,6 +136,7 @@ namespace RestWcfApplication.Root.Want
             // TODO: enable a chat between them
 
             newMessage.SystemMessageState = (int)ESystemMessageState.BothSidesAreIn;
+            firstMessage.MatchFound = true;
 
             context.SaveChanges();
 
@@ -158,6 +158,88 @@ namespace RestWcfApplication.Root.Want
 
           toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
           toSend.SystemMessage = (int)ESystemMessageState.OneSideIsIn;
+          toSend.Message = newMessage;
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        throw new FaultException("Something went wrong. exception is: " + e.Message);
+      }
+    }
+
+    public string UpdateIWantUserByUserId(string userId, string targetUserId, string firstMessageId,
+              string hintImageLink, string hintVideoLink, Stream data)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(data);
+        var text = reader.ReadToEnd();
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          // check if userId corresponds to phoneNumber
+          var userIdParsed = Convert.ToInt32(userId);
+          var targetUserIdParsed = Convert.ToInt32(targetUserId);
+          var firstMessageIdParsed = Convert.ToInt32(firstMessageId);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
+          if (sourceUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          var date = DateTime.Now.ToString("u");
+          sourceUser.LastSeen = date;
+
+          var targetUser = context.Users.SingleOrDefault(u => u.Id == targetUserIdParsed);
+          if (targetUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          var firstMessage =
+            context.FirstMessages.SingleOrDefault(
+              f =>
+                f.Id == firstMessageIdParsed && f.SourceUserId == userIdParsed && f.TargetUserId == targetUserIdParsed);
+          if (firstMessage == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          Debug.Assert(firstMessage.MatchFound);
+
+          var newHint = new DB.Hint()
+          {
+            Text = text,
+            PictureLink = hintImageLink,
+            VideoLink = hintVideoLink
+          };
+          var newMessage = new DB.Message()
+          {
+            Date = date,
+            SourceUserId = userIdParsed,
+            TargetUserId = targetUserIdParsed,
+            Hint = newHint
+          };
+
+          context.Hints.Add(newHint);
+          context.Messages.Add(newMessage);
+
+          firstMessage.Message = newMessage;
+
+          context.SaveChanges();
+
+          toSend.Type = EMessagesTypesToClient.Message;
           toSend.Message = newMessage;
           return CommManager.SendMessage(toSend);
         }
