@@ -6,6 +6,7 @@ using System.ServiceModel.Activation;
 using System.Text.RegularExpressions;
 using System.Web;
 using Newtonsoft.Json;
+using RestSharp.Deserializers;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using System;
@@ -144,11 +145,27 @@ namespace RestWcfApplication.Root.Register
       return verificationCode;
     }
 
-    public string RegisterUserDetails(string userId, string phoneNumber, string firstName, string lastName, string email)
+    public string RegisterUserDetails(string userId, string phoneNumber, string fbUserId, string email, Stream stream)
     {
       try
       {
         dynamic toSend = new ExpandoObject();
+
+        phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
+        var reader = new StreamReader(stream);
+        var text = reader.ReadToEnd();
+
+        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
+        if (jsonObject == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
+
+        var firstName = jsonObject["firstName"];
+        var lastName = jsonObject["lastName"];
 
         using (var context = new Entities())
         {
@@ -171,6 +188,7 @@ namespace RestWcfApplication.Root.Register
             user.FirstName = firstName;
             user.LastName = lastName;
             user.Email = email;
+            user.FacebookUserId = fbUserId;
             user.LastSeen = DateTime.Now.ToString("u");
           }
 
@@ -180,9 +198,13 @@ namespace RestWcfApplication.Root.Register
           return CommManager.SendMessage(toSend);
         }
       }
-      catch
+      catch (Exception e)
       {
-        throw new FaultException("Something went wrong");
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Exception = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
       }
     }
 

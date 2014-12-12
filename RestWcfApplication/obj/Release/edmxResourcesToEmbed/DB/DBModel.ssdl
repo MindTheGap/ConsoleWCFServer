@@ -11,6 +11,8 @@
     <Property Name="LastMessageId" Type="int" Nullable="false" />
     <Property Name="MatchFound" Type="bit" Nullable="false" />
     <Property Name="SubjectName" Type="nvarchar" MaxLength="500" />
+    <Property Name="SourceUserDeleted" Type="bit" Nullable="false" />
+    <Property Name="TargetUserDeleted" Type="bit" Nullable="false" />
   </EntityType>
   <EntityType Name="Hint">
     <Key>
@@ -47,8 +49,8 @@
     <Property Name="FirstName" Type="nvarchar" MaxLength="500" />
     <Property Name="LastName" Type="nvarchar" MaxLength="500" />
     <Property Name="Email" Type="nvarchar" MaxLength="100" />
-    <Property Name="FacebookUserId" Type="int" />
-    <Property Name="GoogleUserId" Type="int" />
+    <Property Name="FacebookUserId" Type="nvarchar" MaxLength="50" />
+    <Property Name="GoogleUserId" Type="nvarchar" MaxLength="50" />
     <Property Name="PhoneNumber" Type="nvarchar" MaxLength="100" />
     <Property Name="ProfileImageLink" Type="nvarchar" MaxLength="500" />
     <Property Name="LastSeen" Type="nvarchar" MaxLength="500" />

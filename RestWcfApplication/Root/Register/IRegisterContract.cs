@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -29,14 +30,12 @@ namespace RestWcfApplication.Root.Register
     /// <summary>
     /// registers the user to the system and returns his new userId
     /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="phoneNumber"></param>
-    /// <param name="firstName"></param>
-    /// <param name="lastName"></param>
-    /// <param name="email"></param>
     [OperationContract]
-    [WebInvoke(Method = "POST", UriTemplate = "updateUser?userId={userId}&firstName={firstName}&lastName={lastName}&email={email}")]
-    string RegisterUserDetails(string userId, string phoneNumber, string firstName, string lastName, string email);
+    [WebInvoke(Method = "POST", 
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare, 
+      UriTemplate = "updateUser?userId={userId}&phoneNumber={phoneNumber}&fbUserId={fbUserId}&email={email}")]
+    string RegisterUserDetails(string userId, string phoneNumber, string fbUserId, string email, Stream stream);
 
     /// <summary>
     /// returns "hello" string for testing

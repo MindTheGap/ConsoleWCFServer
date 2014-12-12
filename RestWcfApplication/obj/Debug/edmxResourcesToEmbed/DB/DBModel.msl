@@ -21,26 +21,11 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="Users">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
-        <MappingFragment StoreEntitySet="User">
-          <ScalarProperty Name="LastSeen" ColumnName="LastSeen" />
-          <ScalarProperty Name="ProfileImageLink" ColumnName="ProfileImageLink" />
-          <ScalarProperty Name="Verified" ColumnName="Verified" />
-          <ScalarProperty Name="VerificationCode" ColumnName="VerificationCode" />
-          <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
-          <ScalarProperty Name="GoogleUserId" ColumnName="GoogleUserId" />
-          <ScalarProperty Name="FacebookUserId" ColumnName="FacebookUserId" />
-          <ScalarProperty Name="Email" ColumnName="Email" />
-          <ScalarProperty Name="LastName" ColumnName="LastName" />
-          <ScalarProperty Name="FirstName" ColumnName="FirstName" />
-          <ScalarProperty Name="Id" ColumnName="Id" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
     <EntitySetMapping Name="FirstMessages">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
         <MappingFragment StoreEntitySet="FirstMessage">
+          <ScalarProperty Name="TargetUserDeleted" ColumnName="TargetUserDeleted" />
+          <ScalarProperty Name="SourceUserDeleted" ColumnName="SourceUserDeleted" />
           <ScalarProperty Name="MatchFound" ColumnName="MatchFound" />
           <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
           <ScalarProperty Name="LastMessageId" ColumnName="LastMessageId" />
@@ -57,6 +42,23 @@
           <ScalarProperty Name="VideoLink" ColumnName="VideoLink" />
           <ScalarProperty Name="PictureLink" ColumnName="PictureLink" />
           <ScalarProperty Name="Text" ColumnName="Text" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Users">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
+        <MappingFragment StoreEntitySet="User">
+          <ScalarProperty Name="Verified" ColumnName="Verified" />
+          <ScalarProperty Name="VerificationCode" ColumnName="VerificationCode" />
+          <ScalarProperty Name="LastSeen" ColumnName="LastSeen" />
+          <ScalarProperty Name="ProfileImageLink" ColumnName="ProfileImageLink" />
+          <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+          <ScalarProperty Name="GoogleUserId" ColumnName="GoogleUserId" />
+          <ScalarProperty Name="FacebookUserId" ColumnName="FacebookUserId" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="LastName" ColumnName="LastName" />
+          <ScalarProperty Name="FirstName" ColumnName="FirstName" />
           <ScalarProperty Name="Id" ColumnName="Id" />
         </MappingFragment>
       </EntityTypeMapping>

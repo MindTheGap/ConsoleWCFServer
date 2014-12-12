@@ -16,27 +16,27 @@ namespace RestWcfApplication.DB
     {
         public User()
         {
-            this.MessagesAsSourceUser = new HashSet<Message>();
-            this.MessagesAsTargetUser = new HashSet<Message>();
             this.FirstMessagesFromSourceUser = new HashSet<FirstMessage>();
             this.FirstMessagesFromTargetUser = new HashSet<FirstMessage>();
+            this.MessagesAsSourceUser = new HashSet<Message>();
+            this.MessagesAsTargetUser = new HashSet<Message>();
         }
     
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public Nullable<int> FacebookUserId { get; set; }
-        public Nullable<int> GoogleUserId { get; set; }
+        public string FacebookUserId { get; set; }
+        public string GoogleUserId { get; set; }
         public string PhoneNumber { get; set; }
-        public string VerificationCode { get; set; }
-        public bool Verified { get; set; }
         public string ProfileImageLink { get; set; }
         public string LastSeen { get; set; }
+        public string VerificationCode { get; set; }
+        public bool Verified { get; set; }
     
-        public virtual ICollection<Message> MessagesAsSourceUser { get; set; }
-        public virtual ICollection<Message> MessagesAsTargetUser { get; set; }
         public virtual ICollection<FirstMessage> FirstMessagesFromSourceUser { get; set; }
         public virtual ICollection<FirstMessage> FirstMessagesFromTargetUser { get; set; }
+        public virtual ICollection<Message> MessagesAsSourceUser { get; set; }
+        public virtual ICollection<Message> MessagesAsTargetUser { get; set; }
     }
 }

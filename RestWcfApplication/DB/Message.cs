@@ -26,9 +26,9 @@ namespace RestWcfApplication.DB
         public Nullable<int> HintId { get; set; }
         public Nullable<int> SystemMessageState { get; set; }
     
-        public virtual User SourceUser { get; set; }
-        public virtual User TargetUser { get; set; }
         public virtual ICollection<FirstMessage> FirstMessages { get; set; }
         public virtual Hint Hint { get; set; }
+        public virtual User SourceUser { get; set; }
+        public virtual User TargetUser { get; set; }
     }
 }
