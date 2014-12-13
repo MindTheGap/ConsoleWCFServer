@@ -46,16 +46,22 @@ namespace RestWcfApplication.Root.Update
           var result = new List<object>();
           foreach (var firstMessage in context.FirstMessages.Include("Message").Include("SourceUser").Include("TargetUser").Include("Message.Hint"))
           {
-            if (firstMessage.Id > startingFirstUserMessageIdParsed)
+            if (firstMessage.SourceUserId == userIdParsed || firstMessage.TargetUserId == userIdParsed)
             {
-              var otherSideId = firstMessage.SourceUserId == userIdParsed ? firstMessage.TargetUserId : firstMessage.SourceUserId;
-              var unreadMessages = context.Messages.Include("Hint").Where(m => 
-                (m.SourceUserId == userIdParsed && m.TargetUserId == otherSideId)
-            ||  (m.TargetUserId == userIdParsed && m.SourceUserId == otherSideId)).ToList();
-              var numberOfUnreadMessages = unreadMessages.Count;
-              var anyUnreadSystemMessage = unreadMessages.Any(m => m.SystemMessageState != null && m.SystemMessageState != 0);
-              var anyUnreadMessage = unreadMessages.Any(m => string.IsNullOrEmpty(m.Hint.Text) == false);
-              result.Add(new { firstMessage, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage });
+              if (firstMessage.Id > startingFirstUserMessageIdParsed)
+              {
+                var otherSideId = firstMessage.SourceUserId == userIdParsed
+                  ? firstMessage.TargetUserId
+                  : firstMessage.SourceUserId;
+                var unreadMessages = context.Messages.Include("Hint").Where(m =>
+                  (m.SourceUserId == userIdParsed && m.TargetUserId == otherSideId)
+                  || (m.TargetUserId == userIdParsed && m.SourceUserId == otherSideId)).ToList();
+                var numberOfUnreadMessages = unreadMessages.Count;
+                var anyUnreadSystemMessage =
+                  unreadMessages.Any(m => m.SystemMessageState != null && m.SystemMessageState != 0);
+                var anyUnreadMessage = unreadMessages.Any(m => string.IsNullOrEmpty(m.Hint.Text) == false);
+                result.Add(new {firstMessage, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage});
+              }
             }
           }
 
