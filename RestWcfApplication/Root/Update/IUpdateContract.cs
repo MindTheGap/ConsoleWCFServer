@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -24,7 +25,7 @@ namespace RestWcfApplication.Root.Update
     string GetUserChatMessages(string sourceUserId, string targetUserId, string startingMessageId);
 
     [OperationContract]
-    [WebGet(UriTemplate = "getUserContactsLastSeen?userId={userId}&phoneNumbersStr={phoneNumbersStr}")]
-    string GetUserContactsLastSeen(string userId, string phoneNumbersStr);
+    [WebInvoke(Method = "POST", UriTemplate = "getUserContactsLastSeen?userId={userId}")]
+    string GetUserContactsLastSeen(string userId, Stream stream);
   }
 }

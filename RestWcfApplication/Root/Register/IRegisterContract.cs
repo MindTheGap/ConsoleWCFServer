@@ -17,14 +17,14 @@ namespace RestWcfApplication.Root.Register
     /// verifies the validation code to get the user validated.
     /// </summary>
     [OperationContract]
-    [WebInvoke(Method = "GET", UriTemplate = "verify?phoneNumber={phoneNumber}&validationCode={validationCode}")]
+    [WebGet(UriTemplate = "verify?phoneNumber={phoneNumber}&validationCode={validationCode}")]
     string VerifyValidationCode(string phoneNumber, string validationCode);
 
     /// <summary>
     /// registers the user to the system and returns his new userId
     /// </summary>
     [OperationContract]
-    [WebInvoke(Method = "GET", UriTemplate = "getUserId?phoneNumber={phoneNumber}")]
+    [WebGet(UriTemplate = "getUserId?phoneNumber={phoneNumber}")]
     string RegisterViaPhoneNumber(string phoneNumber);
 
     /// <summary>
@@ -42,7 +42,7 @@ namespace RestWcfApplication.Root.Register
     /// </summary>
     /// <returns>"hello"</returns>
     [OperationContract]
-    [WebInvoke(Method = "GET")]
+    [WebGet(UriTemplate = "hello")]
     string Hello();
   }
 }

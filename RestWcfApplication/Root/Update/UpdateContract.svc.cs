@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 
@@ -190,13 +192,24 @@ namespace RestWcfApplication.Root.Update
       }
     }
 
-    public string GetUserContactsLastSeen(string userId, string phoneNumbersStr)
+    public string GetUserContactsLastSeen(string userId, Stream stream)
     {
       try
       {
         dynamic toSend = new ExpandoObject();
 
-        var contactsArray = phoneNumbersStr.Split(new[] {'.'});
+        var reader = new StreamReader(stream);
+        var text = reader.ReadToEnd();
+
+        var contactsList = JsonConvert.DeserializeObject<List<List<string>>>(text);
+        if (contactsList == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
+
         var sourceUserIdParsed = int.Parse(userId);
 
         using (var context = new Entities())
@@ -211,36 +224,31 @@ namespace RestWcfApplication.Root.Update
             context.SaveChanges();
           }
 
-          var first = true;
-          var stringBuilder = new StringBuilder();
-          foreach (var contactStr in contactsArray)
+          var resultList = new List<string>();
+          foreach (var contactPhoneNumberList in contactsList)
           {
-            var phoneNumbersArray = contactStr.Split(new[] { ',' });
-
-            if (!first) stringBuilder.Append(",");
-            first = false;
-
-            var foundAtLeastOne = false;
-            string lastSeen = null;
-            foreach (var phoneNumber in phoneNumbersArray)
+            var foundContact = false;
+            foreach (var phoneNumber in contactPhoneNumberList)
             {
-              var phoneNumberRegex = Regex.Replace(phoneNumber, @"[-+ ()]", "");
-
-              var contact = context.Users.SingleOrDefault(u => u.PhoneNumber == phoneNumberRegex);
+              var phoneNumberWithoutPlusSign = phoneNumber.Substring(1);
+              var contact = context.Users.SingleOrDefault(u => u.PhoneNumber == phoneNumberWithoutPlusSign);
 
               if (contact != null)
               {
-                foundAtLeastOne = true;
-                lastSeen = contact.LastSeen;
+                resultList.Add(contact.LastSeen);
+                foundContact = true;
                 break;
               }
             }
 
-            stringBuilder.Append(foundAtLeastOne ? lastSeen : "-1");
+            if (!foundContact)
+            {
+              resultList.Add("0");
+            }
           }
 
-          toSend.Type = EMessagesTypesToClient.CsvString;
-          toSend.CsvString = stringBuilder.ToString();
+          toSend.Type = EMessagesTypesToClient.StringsList;
+          toSend.StringsList = resultList;
           return CommManager.SendMessage(toSend);
         }
       }

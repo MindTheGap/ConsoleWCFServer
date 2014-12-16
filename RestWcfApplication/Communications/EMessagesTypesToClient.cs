@@ -11,7 +11,7 @@ namespace RestWcfApplication.Communications
     Message = 1, // normal message sent
     SystemMessage = 2, // system message sent
     MultipleMessages = 4, // multiple messages sent
-    CsvString = 8, // comma seperated values sent
+    StringsList = 8, // list of strings sent
     Ok = 16, // just sends OK to registration or something
     Error = 32
   }
