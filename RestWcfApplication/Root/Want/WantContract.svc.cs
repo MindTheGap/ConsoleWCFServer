@@ -16,7 +16,7 @@ namespace RestWcfApplication.Root.Want
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class WantContract : IWantContract
   {
-    private const string DefaultClue = @"Guess who...";
+    private const string DefaultClue = @"I need another clue...";
 
     private bool IsStringEmpty(string s)
     {
@@ -36,9 +36,6 @@ namespace RestWcfApplication.Root.Want
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
-
-          sourcePhoneNumber = Regex.Replace(sourcePhoneNumber, @"[-+ ()]", "");
-          targetPhoneNumber = Regex.Replace(targetPhoneNumber, @"[-+ ()]", "");
 
           // check if userId corresponds to phoneNumber
           var userIdParsed = Convert.ToInt32(userId);
@@ -102,7 +99,8 @@ namespace RestWcfApplication.Root.Want
           if (targetUser == null)
           {
             // target user doesn't exist in the system yet
-            // TODO: Send him an SMS
+            // sending him an invitation sms
+            Twilio.Twilio.SendInvitationMessage(sourceUser.FirstName + " " + sourceUser.LastName, targetPhoneNumber);
 
             // TODO: check maybe we need to save 3 times to get identity ID field from DB context
 
@@ -158,6 +156,78 @@ namespace RestWcfApplication.Root.Want
 
           toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
           toSend.SystemMessage = (int)ESystemMessageState.OneSideIsIn;
+          toSend.Message = newMessage;
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        throw new FaultException("Something went wrong. exception is: " + e.Message);
+      }
+    }
+
+    public string UpdateAskForClue(string userId, string sourcePhoneNumber, string targetUserId, Stream data)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(data);
+        var text = reader.ReadToEnd();
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          // check if userId corresponds to phoneNumber
+          var userIdParsed = Convert.ToInt32(userId);
+          var targetUserIdParsed = Convert.ToInt32(targetUserId);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed && u.PhoneNumber == sourcePhoneNumber);
+          if (sourceUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          sourceUser.LastSeen = DateTime.Now.ToString("u");
+
+          var newDate = DateTime.UtcNow.ToString("u");
+          var newHint = new DB.Hint
+          {
+            Text = DefaultClue
+          };
+          var newMessage = new DB.Message()
+          {
+            SourceUserId = userIdParsed,
+            Hint = newHint,
+            Date = newDate
+          };
+
+          context.Hints.Add(newHint);
+          context.Messages.Add(newMessage);
+
+          // check if target user exists in the system:
+          //  if so, send him a message telling him a clue is needed
+          var targetUser = context.Users.SingleOrDefault(u => u.Id == targetUserIdParsed);
+          if (targetUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          // target user exists
+          newMessage.TargetUserId = targetUser.Id;
+
+          // TODO: send target user a push notification that source user is in to him
+
+          newMessage.SystemMessageState = (int)ESystemMessageState.ClueNeeded;
+
+          context.SaveChanges();
+
+          toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
+          toSend.SystemMessage = (int)ESystemMessageState.ClueNeeded;
           toSend.Message = newMessage;
           return CommManager.SendMessage(toSend);
         }

@@ -15,7 +15,8 @@ namespace RestWcfApplication.DB
     AlreadyRegisteredAndVerified = 4, // to let the client know of the UserId field
     SentSms = 8, // server sent sms
     BothSidesAreIn = 16, // both sides are in
-    OneSideIsIn = 32 // only source user is in
+    OneSideIsIn = 32, // only source user is in
+    ClueNeeded = 64
 
   }
 }

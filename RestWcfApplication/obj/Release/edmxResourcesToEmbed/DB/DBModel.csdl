@@ -228,6 +228,7 @@
     <NavigationProperty Name="FirstMessagesFromTargetUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="User" ToRole="FirstMessage" />
     <NavigationProperty Name="MessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
     <NavigationProperty Name="MessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
+    <Property Name="DeviceId" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
   </EntityType>
   <Association Name="FK_FirstMessage_SourceUser">
     <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />

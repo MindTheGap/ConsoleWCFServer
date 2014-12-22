@@ -22,9 +22,6 @@ namespace RestWcfApplication.Root.Register
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class RegisterContract : IRegisterContract
   {
-    private const string AccountSid = "ACd63332ed17dd316250547fa9906174b3";
-    private const string AuthToken = "8c0e45ea5def9d3f69da04b9c6e7b905";
-
     public string VerifyValidationCode(string phoneNumber, string validationCode)
     {
       try
@@ -34,8 +31,6 @@ namespace RestWcfApplication.Root.Register
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
-
-          phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
 
           var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber);
           if (!userList.Any())
@@ -75,8 +70,6 @@ namespace RestWcfApplication.Root.Register
       {
         dynamic toSend = new ExpandoObject();
 
-        phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
-
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
@@ -97,7 +90,7 @@ namespace RestWcfApplication.Root.Register
             //{
             user.Verified = false;
 
-            verificationCode = SendVerificationCode(phoneNumber);
+            verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
 
             user.VerificationCode = verificationCode.ToString("d");
             context.SaveChanges();
@@ -109,7 +102,7 @@ namespace RestWcfApplication.Root.Register
             //}
           }
 
-          verificationCode = SendVerificationCode(phoneNumber);
+          verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
 
           var newUser = new User()
           {
@@ -132,26 +125,12 @@ namespace RestWcfApplication.Root.Register
       }
     }
 
-    private static int SendVerificationCode(string phoneNumber)
-    {
-      var twilio = new TwilioRestClient(AccountSid, AuthToken);
-      var random = new Random();
-      var verificationCode = random.Next(100000, 999999);
-      var message = twilio.SendMessage("+15098226878", "+" + phoneNumber, "Verification Code: " + verificationCode);
-      if (message.ErrorCode != null)
-      {
-        throw new Exception(message.ErrorMessage);
-      }
-      return verificationCode;
-    }
-
     public string RegisterUserDetails(string userId, string phoneNumber, string fbUserId, string email, Stream stream)
     {
       try
       {
         dynamic toSend = new ExpandoObject();
 
-        phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
         var reader = new StreamReader(stream);
         var text = reader.ReadToEnd();
 

@@ -24,8 +24,6 @@ namespace RestWcfApplication.Root.Update
       {
         dynamic toSend = new ExpandoObject();
 
-        phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
-
         var userIdParsed = int.Parse(userId);
         var startingFirstUserMessageIdParsed = int.Parse(startingFirstUserMessageId);
 
@@ -89,8 +87,6 @@ namespace RestWcfApplication.Root.Update
           toSend.Type = EMessagesTypesToClient.Ok;
           return CommManager.SendMessage(toSend);
         }
-
-        phoneNumber = Regex.Replace(phoneNumber, @"[-+ ()]", "");
 
         var userIdParsed = int.Parse(userId);
         var messagesIdsArray = firstUserMessageIds.Split(new[] {','}).Select(int.Parse).ToList();
@@ -230,8 +226,7 @@ namespace RestWcfApplication.Root.Update
             var foundContact = false;
             foreach (var phoneNumber in contactPhoneNumberList)
             {
-              var phoneNumberWithoutPlusSign = phoneNumber.Substring(1);
-              var contact = context.Users.SingleOrDefault(u => u.PhoneNumber == phoneNumberWithoutPlusSign);
+              var contact = context.Users.SingleOrDefault(u => u.PhoneNumber == phoneNumber);
 
               if (contact != null)
               {

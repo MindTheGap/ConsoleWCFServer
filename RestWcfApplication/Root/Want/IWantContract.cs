@@ -17,6 +17,10 @@ namespace RestWcfApplication.Root.Want
               string hintImageLink, string hintVideoLink, Stream data);
 
     [OperationContract]
+    [WebInvoke(Method = "POST", UriTemplate = "askforclue?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetUserId={targetUserId}")]
+    string UpdateAskForClue(string userId, string sourcePhoneNumber, string targetUserId, Stream data);
+
+    [OperationContract]
     [WebInvoke(Method = "POST", UriTemplate = "match?userId={userId}&targetUserId={targetUserId}&firstMessageId={firstMessageId}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
     string UpdateIWantUserByUserId(string userId, string targetUserId, string firstMessageId,
               string hintImageLink, string hintVideoLink, Stream data);

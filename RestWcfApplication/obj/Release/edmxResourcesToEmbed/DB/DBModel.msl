@@ -49,6 +49,7 @@
     <EntitySetMapping Name="Users">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
         <MappingFragment StoreEntitySet="User">
+          <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
           <ScalarProperty Name="Verified" ColumnName="Verified" />
           <ScalarProperty Name="VerificationCode" ColumnName="VerificationCode" />
           <ScalarProperty Name="LastSeen" ColumnName="LastSeen" />

@@ -78,7 +78,18 @@ D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Micro
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Microsoft.Data.Services.Client.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Microsoft.Data.Services.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Newtonsoft.Json.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Amazon.Adm.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Android.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Apple.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Blackberry.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Core.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.FirefoxOS.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Google.Chrome.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Windows.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.WindowsPhone.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\RestSharp.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\System.Net.Http.Extensions.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\System.Net.Http.Primitives.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\System.Spatial.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Twilio.Api.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\AutoMapper.xml
@@ -90,6 +101,8 @@ D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Micro
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Microsoft.Data.Services.Client.xml
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Newtonsoft.Json.xml
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\RestSharp.xml
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\System.Net.Http.Extensions.xml
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\System.Net.Http.Primitives.xml
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\System.Spatial.xml
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Twilio.Api.pdb
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Twilio.Api.xml
@@ -138,6 +151,7 @@ D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\ko\Sy
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\ru\System.Spatial.resources.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\zh-Hans\System.Spatial.resources.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\zh-Hant\System.Spatial.resources.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.csproj.App.config
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.csprojResolveAssemblyReference.cache
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.pdb
-D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.csprojResolveAssemblyReference.cache

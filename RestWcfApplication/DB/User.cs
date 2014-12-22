@@ -33,6 +33,7 @@ namespace RestWcfApplication.DB
         public string LastSeen { get; set; }
         public string VerificationCode { get; set; }
         public bool Verified { get; set; }
+        public string DeviceId { get; set; }
     
         public virtual ICollection<FirstMessage> FirstMessagesFromSourceUser { get; set; }
         public virtual ICollection<FirstMessage> FirstMessagesFromTargetUser { get; set; }

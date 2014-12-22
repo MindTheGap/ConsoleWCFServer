@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="ChildTubeMainDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="ChildTubeMainDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="FirstMessage">
           <Key>
             <PropertyRef Name="Id" />
@@ -59,6 +59,7 @@
           <Property Name="PhoneNumber" Type="nvarchar" MaxLength="100" />
           <Property Name="ProfileImageLink" Type="nvarchar" MaxLength="500" />
           <Property Name="LastSeen" Type="nvarchar" MaxLength="500" />
+          <Property Name="DeviceId" Type="varchar" MaxLength="64" />
           <Property Name="VerificationCode" Type="nvarchar" MaxLength="50" />
           <Property Name="Verified" Type="bit" Nullable="false" />
         </EntityType>
@@ -397,6 +398,7 @@
           <NavigationProperty Name="FirstMessagesFromTargetUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="User" ToRole="FirstMessage" />
           <NavigationProperty Name="MessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
           <NavigationProperty Name="MessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
+          <Property Name="DeviceId" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
         </EntityType>
         <Association Name="FK_FirstMessage_SourceUser">
           <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
@@ -500,6 +502,7 @@
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
               <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
                 <ScalarProperty Name="Verified" ColumnName="Verified" />
                 <ScalarProperty Name="VerificationCode" ColumnName="VerificationCode" />
                 <ScalarProperty Name="LastSeen" ColumnName="LastSeen" />

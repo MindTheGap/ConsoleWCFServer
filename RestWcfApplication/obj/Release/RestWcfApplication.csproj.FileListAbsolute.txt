@@ -73,3 +73,17 @@ D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Twili
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Twilio.Api.xml
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Newtonsoft.Json.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Newtonsoft.Json.xml
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Amazon.Adm.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Android.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Apple.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Blackberry.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Core.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.FirefoxOS.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Google.Chrome.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.Windows.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\PushSharp.WindowsPhone.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\System.Net.Http.Extensions.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\System.Net.Http.Primitives.dll
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\System.Net.Http.Extensions.xml
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\System.Net.Http.Primitives.xml
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Release\RestWcfApplication.csproj.App.config
