@@ -267,6 +267,9 @@
       <DependentUpon>DBModel.edmx</DependentUpon>
       <LastGenOutput>DBModel.cs</LastGenOutput>
     </Content>
+    <Content Include="Certifications\HowToNotifications.p12">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Properties\PublishProfiles\AmazonAWS.pubxml" />
     <None Include="Properties\PublishProfiles\AmazonAWSDebug.pubxml" />
     <None Include="Properties\PublishProfiles\g.pubxml" />

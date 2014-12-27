@@ -7,6 +7,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using System.ServiceModel.Activation;
@@ -17,6 +18,7 @@ namespace RestWcfApplication.Root.Want
   public class WantContract : IWantContract
   {
     private const string DefaultClue = @"I need another clue...";
+    private const string DefaultEmptyMessage = @"Guess Who...";
 
     private bool IsStringEmpty(string s)
     {
@@ -123,6 +125,136 @@ namespace RestWcfApplication.Root.Want
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
           firstMessage.TargetUserId = targetUser.Id;
+
+          // checking if target user is in source user also
+          var message = context.Messages.SingleOrDefault(m => m.SourceUserId == targetUser.Id && m.TargetUserId == userIdParsed);
+          if (message != null)
+          {
+            // target user is in source user also - love is in the air
+            // enabling a chat between them by sending the target user id to the source user
+
+            // TODO: enable a chat between them
+
+            newMessage.SystemMessageState = (int)ESystemMessageState.BothSidesAreIn;
+            firstMessage.MatchFound = true;
+
+            context.SaveChanges();
+
+            toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
+            toSend.SystemMessage = (int)ESystemMessageState.BothSidesAreIn;
+            toSend.Message = newMessage;
+            return CommManager.SendMessage(toSend);
+          }
+
+          // target user does not want source user yet so:
+          //  1. sending source user system message to let him know
+          //  2. sending target user that source user is in to him
+
+          // TODO: send target user a push notification that source user is in to him
+
+          newMessage.SystemMessageState = (int)ESystemMessageState.OneSideIsIn;
+
+          context.SaveChanges();
+
+          toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
+          toSend.SystemMessage = (int)ESystemMessageState.OneSideIsIn;
+          toSend.Message = newMessage;
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        throw new FaultException("Something went wrong. exception is: " + e.Message);
+      }
+    }
+
+    public string UpdateIWantUserByFacebookId(string userId, string facebookId, Stream data)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(data);
+        var text = reader.ReadToEnd();
+
+        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
+        if (jsonObject == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
+
+        var hint = jsonObject["hint"];
+        var hintImageLink = jsonObject["hintImageLink"];
+        var hintVideoLink = jsonObject["hintVideoLink"];
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          // check if userId corresponds to phoneNumber
+          var userIdParsed = Convert.ToInt32(userId);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
+          if (sourceUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          sourceUser.LastSeen = DateTime.Now.ToString("u");
+
+          var targetUser = context.Users.SingleOrDefault(u => u.FacebookUserId == facebookId);
+          if (targetUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          var hintNotUsed = IsStringEmpty(hint) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
+          var firstMessage =
+            context.FirstMessages.SingleOrDefault(u => ((u.SourceUserId == userIdParsed && u.TargetUser.Id == targetUser.Id)
+                                                    || (u.TargetUserId == userIdParsed && u.SourceUser.Id == targetUser.Id)));
+
+          var newDate = DateTime.UtcNow.ToString("u");
+          var newHint = new DB.Hint
+          {
+            PictureLink = hintImageLink,
+            VideoLink = hintVideoLink,
+            Text = hintNotUsed ? DefaultEmptyMessage : text
+          };
+          var newMessage = new DB.Message()
+          {
+            SourceUserId = userIdParsed,
+            TargetUserId = targetUser.Id,
+            Hint = newHint,
+            Date = newDate
+          };
+          if (firstMessage == null)
+          {
+            var newFirstMessage = new DB.FirstMessage()
+            {
+              Date = newDate,
+              Message = newMessage,
+              SourceUserId = userIdParsed,
+              TargetUserId = targetUser.Id,
+              SubjectName = @"No Subject"
+            };
+
+            context.FirstMessages.Add(newFirstMessage);
+
+            firstMessage = newFirstMessage;
+          }
+
+          context.Hints.Add(newHint);
+          context.Messages.Add(newMessage);
+
+          //  check if target user is also in the source user:
+          //    if not, send him a message telling him someone (source user) is in him
+          //    if so, love is in the air - connect chat between them
 
           // checking if target user is in source user also
           var message = context.Messages.SingleOrDefault(m => m.SourceUserId == targetUser.Id && m.TargetUserId == userIdParsed);

@@ -155,3 +155,4 @@ D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.csprojResolveAssemblyReference.cache
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.pdb
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Certifications\HowToNotifications.p12

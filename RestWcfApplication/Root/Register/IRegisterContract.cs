@@ -44,5 +44,16 @@ namespace RestWcfApplication.Root.Register
     [OperationContract]
     [WebGet(UriTemplate = "hello")]
     string Hello();
+
+    /// <summary>
+    /// returns "hello" string for testing
+    /// </summary>
+    /// <returns>"hello"</returns>
+    [OperationContract]
+    [WebInvoke(Method = "POST", 
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare, 
+      UriTemplate = "hellopush?deviceId={deviceId}")]
+    string HelloPush(string deviceId, Stream data);
   }
 }

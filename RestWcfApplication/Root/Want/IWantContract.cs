@@ -17,6 +17,13 @@ namespace RestWcfApplication.Root.Want
               string hintImageLink, string hintVideoLink, Stream data);
 
     [OperationContract]
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare, 
+      UriTemplate = "iaminfacebook?userId={userId}&facebookId={facebookId}")]
+    string UpdateIWantUserByFacebookId(string userId, string facebookId, Stream data);
+
+    [OperationContract]
     [WebInvoke(Method = "POST", UriTemplate = "askforclue?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetUserId={targetUserId}")]
     string UpdateAskForClue(string userId, string sourcePhoneNumber, string targetUserId, Stream data);
 

@@ -15,6 +15,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
+using RestWcfApplication.PushSharp;
 using Twilio;
 
 namespace RestWcfApplication.Root.Register
@@ -201,6 +202,42 @@ namespace RestWcfApplication.Root.Register
                         });
 
       return responseString;
+    }
+
+    public string HelloPush(string deviceId, Stream data)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(data);
+        var text = reader.ReadToEnd();
+
+        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
+        if (jsonObject == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
+
+        var alert = jsonObject["alert"];
+
+        PushManager.PushToIos(deviceId, alert);
+      
+        toSend.Type = EMessagesTypesToClient.Ok;
+
+        return CommManager.SendMessage(toSend);
+      }
+      catch (Exception e)
+      {
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Exception = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
+      }
     }
   }
 }
