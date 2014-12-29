@@ -17,7 +17,8 @@ namespace RestWcfApplication.PushSharp
       var push = new PushBroker();
 
       push.OnNotificationSent += NotificationSent;
-      push.OnChannelException += ChannelException;ush.OnServiceException += ServiceException;
+      push.OnChannelException += ChannelException;
+      push.OnServiceException += ServiceException;
       push.OnNotificationFailed += NotificationFailed;
       push.OnDeviceSubscriptionExpired += DeviceSubscriptionExpired;
       push.OnDeviceSubscriptionChanged += DeviceSubscriptionChanged;
@@ -29,7 +30,8 @@ namespace RestWcfApplication.PushSharp
       push.RegisterAppleService(new ApplePushChannelSettings(false, appleCert, @"aaazzz123"));
       push.QueueNotification(new AppleNotification()
                                  .ForDeviceToken(deviceId)
-                                 .WithAlert(alert));
+                                 .WithAlert(alert)
+                                 .WithSound("default"));
 
       push.StopAllServices();
     }
