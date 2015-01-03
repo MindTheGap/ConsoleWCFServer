@@ -34,8 +34,18 @@ namespace RestWcfApplication.Root.Register
     [WebInvoke(Method = "POST", 
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare, 
-      UriTemplate = "updateUser?userId={userId}&phoneNumber={phoneNumber}&fbUserId={fbUserId}&email={email}")]
-    string RegisterUserDetails(string userId, string phoneNumber, string fbUserId, string email, Stream stream);
+      UriTemplate = "updateUserFbDetails?userId={userId}&phoneNumber={phoneNumber}&fbUserId={fbUserId}&email={email}")]
+    string RegisterUserDetailsFacebookDetails(string userId, string phoneNumber, string fbUserId, string email, Stream stream);
+
+    /// <summary>
+    /// registers the user to the system and returns his new userId
+    /// </summary>
+    [OperationContract]
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare,
+      UriTemplate = "updateUserDeviceId?userId={userId}&phoneNumber={phoneNumber}")]
+    string RegisterUserDetailsDeviceId(string userId, string phoneNumber, Stream stream);
 
     /// <summary>
     /// returns "hello" string for testing

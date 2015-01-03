@@ -126,7 +126,7 @@ namespace RestWcfApplication.Root.Register
       }
     }
 
-    public string RegisterUserDetails(string userId, string phoneNumber, string fbUserId, string email, Stream stream)
+    public string RegisterUserDetailsFacebookDetails(string userId, string phoneNumber, string fbUserId, string email, Stream stream)
     {
       try
       {
@@ -161,16 +161,64 @@ namespace RestWcfApplication.Root.Register
             return CommManager.SendMessage(toSend);
           }
 
-          var userList = context.Users.Where(u => u.Id == userIdParsed);
-          if (userList.Any())
+          sourceUser.FirstName = firstName;
+          sourceUser.LastName = lastName;
+          sourceUser.Email = email;
+          sourceUser.FacebookUserId = fbUserId;
+          sourceUser.LastSeen = DateTime.Now.ToString("u");
+
+          context.SaveChanges();
+
+          toSend.Type = EMessagesTypesToClient.Ok;
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Exception = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
+      }
+    }
+
+    public string RegisterUserDetailsDeviceId(string userId, string phoneNumber, Stream stream)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(stream);
+        var text = reader.ReadToEnd();
+
+        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
+        if (jsonObject == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
+
+        var deviceId = jsonObject["deviceId"];
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          // check if userId corresponds to phoneNumber
+          var userIdParsed = Convert.ToInt32(userId);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed && u.PhoneNumber == phoneNumber);
+          if (sourceUser == null)
           {
-            var user = userList.First();
-            user.FirstName = firstName;
-            user.LastName = lastName;
-            user.Email = email;
-            user.FacebookUserId = fbUserId;
-            user.LastSeen = DateTime.Now.ToString("u");
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
           }
+
+          sourceUser.DeviceId = deviceId;
+          sourceUser.LastSeen = DateTime.Now.ToString("u");
 
           context.SaveChanges();
 

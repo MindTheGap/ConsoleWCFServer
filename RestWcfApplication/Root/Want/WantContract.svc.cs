@@ -56,11 +56,6 @@ namespace RestWcfApplication.Root.Want
             context.FirstMessages.SingleOrDefault(u => ((u.SourceUserId == userIdParsed && u.TargetUser.PhoneNumber == targetPhoneNumber)
                                                     ||  (u.TargetUserId == userIdParsed && u.SourceUser.PhoneNumber == targetPhoneNumber)));
 
-          if (hintNotUsed)
-          {
-            toSend.DefaultClue = DefaultClue;
-          }
-
           var newDate = DateTime.UtcNow.ToString("u");
           var newHint = new DB.Hint
           {
@@ -81,7 +76,7 @@ namespace RestWcfApplication.Root.Want
               Date = newDate,
               Message = newMessage,
               SourceUserId = userIdParsed,
-              SubjectName = @"No Subject"
+              SubjectName = @""
             };
 
             context.FirstMessages.Add(newFirstMessage);
@@ -104,8 +99,6 @@ namespace RestWcfApplication.Root.Want
             // sending him an invitation sms
             Twilio.Twilio.SendInvitationMessage(sourceUser.FirstName + " " + sourceUser.LastName, targetPhoneNumber);
 
-            // TODO: check maybe we need to save 3 times to get identity ID field from DB context
-
             var newTargetUser = new DB.User() { PhoneNumber = targetPhoneNumber };
 
             newMessage.TargetUser = newMessage.TargetUser = newTargetUser;
@@ -118,6 +111,7 @@ namespace RestWcfApplication.Root.Want
 
             toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
             toSend.SystemMessage = (int)ESystemMessageState.SentSms;
+            toSend.FirstMessage = firstMessage;
             toSend.Message = newMessage;
             return CommManager.SendMessage(toSend);
           }
@@ -133,8 +127,6 @@ namespace RestWcfApplication.Root.Want
             // target user is in source user also - love is in the air
             // enabling a chat between them by sending the target user id to the source user
 
-            // TODO: enable a chat between them
-
             newMessage.SystemMessageState = (int)ESystemMessageState.BothSidesAreIn;
             firstMessage.MatchFound = true;
 
@@ -143,6 +135,7 @@ namespace RestWcfApplication.Root.Want
             toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
             toSend.SystemMessage = (int)ESystemMessageState.BothSidesAreIn;
             toSend.Message = newMessage;
+            toSend.FirstMessage = firstMessage;
             return CommManager.SendMessage(toSend);
           }
 
@@ -150,7 +143,10 @@ namespace RestWcfApplication.Root.Want
           //  1. sending source user system message to let him know
           //  2. sending target user that source user is in to him
 
-          // TODO: send target user a push notification that source user is in to him
+          if (targetUser.DeviceId != null)
+          {
+            PushSharp.PushManager.PushToIos(targetUser.DeviceId, "Someone is in to you!");
+          }
 
           newMessage.SystemMessageState = (int)ESystemMessageState.OneSideIsIn;
 
@@ -159,6 +155,7 @@ namespace RestWcfApplication.Root.Want
           toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
           toSend.SystemMessage = (int)ESystemMessageState.OneSideIsIn;
           toSend.Message = newMessage;
+          toSend.FirstMessage = firstMessage;
           return CommManager.SendMessage(toSend);
         }
       }
@@ -241,7 +238,7 @@ namespace RestWcfApplication.Root.Want
               Message = newMessage,
               SourceUserId = userIdParsed,
               TargetUserId = targetUser.Id,
-              SubjectName = @"No Subject"
+              SubjectName = @""
             };
 
             context.FirstMessages.Add(newFirstMessage);
@@ -263,8 +260,6 @@ namespace RestWcfApplication.Root.Want
             // target user is in source user also - love is in the air
             // enabling a chat between them by sending the target user id to the source user
 
-            // TODO: enable a chat between them
-
             newMessage.SystemMessageState = (int)ESystemMessageState.BothSidesAreIn;
             firstMessage.MatchFound = true;
 
@@ -273,6 +268,7 @@ namespace RestWcfApplication.Root.Want
             toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
             toSend.SystemMessage = (int)ESystemMessageState.BothSidesAreIn;
             toSend.Message = newMessage;
+            toSend.FirstMessage = firstMessage;
             return CommManager.SendMessage(toSend);
           }
 
@@ -280,7 +276,10 @@ namespace RestWcfApplication.Root.Want
           //  1. sending source user system message to let him know
           //  2. sending target user that source user is in to him
 
-          // TODO: send target user a push notification that source user is in to him
+          if (targetUser.DeviceId != null)
+          {
+            PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Someone is in to you!");
+          }
 
           newMessage.SystemMessageState = (int)ESystemMessageState.OneSideIsIn;
 
@@ -288,6 +287,98 @@ namespace RestWcfApplication.Root.Want
 
           toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
           toSend.SystemMessage = (int)ESystemMessageState.OneSideIsIn;
+          toSend.Message = newMessage;
+          toSend.FirstMessage = firstMessage;
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        throw new FaultException("Something went wrong. exception is: " + e.Message);
+      }
+    }
+
+    public string UpdateIWantUserExistingMessage(string userId, string firstMessageId, Stream data)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(data);
+        var text = reader.ReadToEnd();
+
+        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
+        if (jsonObject == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
+
+        var messageText = jsonObject["text"];
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          // check if userId corresponds to phoneNumber
+          var userIdParsed = Convert.ToInt32(userId);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
+          if (sourceUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          sourceUser.LastSeen = DateTime.Now.ToString("u");
+
+          var firstMessage = context.FirstMessages.SingleOrDefault(fm => fm.Id == int.Parse(firstMessageId));
+          if (firstMessage == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          var targetUserId = firstMessage.SourceUserId == userIdParsed ? firstMessage.TargetUserId : firstMessage.SourceUserId;
+          var targetUser = context.Users.SingleOrDefault(u => u.Id == targetUserId);
+          if (targetUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            return CommManager.SendMessage(toSend);
+          }
+
+          var newDate = DateTime.UtcNow.ToString("u");
+          var newHint = new DB.Hint
+          {
+            Text = messageText
+          };
+          var newMessage = new DB.Message()
+          {
+            SourceUserId = userIdParsed,
+            TargetUserId = targetUser.Id,
+            Hint = newHint,
+            Date = newDate
+          };
+
+          context.Hints.Add(newHint);
+          context.Messages.Add(newMessage);
+          firstMessage.Message = newMessage;
+
+          // target user does not want source user yet so:
+          //  sending target user the message from source user
+
+          if (targetUser.DeviceId != null)
+          {
+            PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"You have a new message!");
+          }
+
+          context.SaveChanges();
+
+          toSend.Type = (int)EMessagesTypesToClient.Message;
           toSend.Message = newMessage;
           return CommManager.SendMessage(toSend);
         }
@@ -352,7 +443,10 @@ namespace RestWcfApplication.Root.Want
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
 
-          // TODO: send target user a push notification that source user is in to him
+          if (targetUser.DeviceId != null)
+          {
+            PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Someone needs a clue...");
+          }
 
           newMessage.SystemMessageState = (int)ESystemMessageState.ClueNeeded;
 
@@ -370,7 +464,7 @@ namespace RestWcfApplication.Root.Want
       }
     }
 
-    public string UpdateIWantUserByUserId(string userId, string targetUserId, string firstMessageId,
+    public string UpdateIWantUserByChatMessage(string userId, string targetUserId, string firstMessageId,
               string hintImageLink, string hintVideoLink, Stream data)
     {
       try
