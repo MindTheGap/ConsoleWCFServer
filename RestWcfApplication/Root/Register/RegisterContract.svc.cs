@@ -43,12 +43,12 @@ namespace RestWcfApplication.Root.Register
 
           var user = userList.First();
 
-          if (user.VerificationCode != validationCode)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.BadVerificationCode.ToString("d");
-            return CommManager.SendMessage(toSend);
-          }
+          //if (user.VerificationCode != validationCode)
+          //{
+          //  toSend.Type = EMessagesTypesToClient.Error;
+          //  toSend.ErrorInfo = ErrorInfo.BadVerificationCode.ToString("d");
+          //  return CommManager.SendMessage(toSend);
+          //}
 
           user.LastSeen = DateTime.Now.ToString("u");
           user.Verified = true;

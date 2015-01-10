@@ -109,8 +109,7 @@ namespace RestWcfApplication.Root.Want
 
             context.SaveChanges();
 
-            toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
-            toSend.SystemMessage = (int)ESystemMessageState.SentSms;
+            toSend.Type = (int)EMessagesTypesToClient.Ok;
             toSend.FirstMessage = firstMessage;
             toSend.Message = newMessage;
             return CommManager.SendMessage(toSend);
@@ -132,8 +131,7 @@ namespace RestWcfApplication.Root.Want
 
             context.SaveChanges();
 
-            toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
-            toSend.SystemMessage = (int)ESystemMessageState.BothSidesAreIn;
+            toSend.Type = (int)EMessagesTypesToClient.Ok;
             toSend.Message = newMessage;
             toSend.FirstMessage = firstMessage;
             return CommManager.SendMessage(toSend);
@@ -143,17 +141,16 @@ namespace RestWcfApplication.Root.Want
           //  1. sending source user system message to let him know
           //  2. sending target user that source user is in to him
 
+          newMessage.SystemMessageState = (int)ESystemMessageState.OneSideIsIn;
+
+          context.SaveChanges();
+
           if (targetUser.DeviceId != null)
           {
             PushSharp.PushManager.PushToIos(targetUser.DeviceId, "Someone is in to you!");
           }
 
-          newMessage.SystemMessageState = (int)ESystemMessageState.OneSideIsIn;
-
-          context.SaveChanges();
-
-          toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
-          toSend.SystemMessage = (int)ESystemMessageState.OneSideIsIn;
+          toSend.Type = (int)EMessagesTypesToClient.Ok;
           toSend.Message = newMessage;
           toSend.FirstMessage = firstMessage;
           return CommManager.SendMessage(toSend);
@@ -265,8 +262,7 @@ namespace RestWcfApplication.Root.Want
 
             context.SaveChanges();
 
-            toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
-            toSend.SystemMessage = (int)ESystemMessageState.BothSidesAreIn;
+            toSend.Type = (int) EMessagesTypesToClient.Ok;
             toSend.Message = newMessage;
             toSend.FirstMessage = firstMessage;
             return CommManager.SendMessage(toSend);
@@ -276,17 +272,16 @@ namespace RestWcfApplication.Root.Want
           //  1. sending source user system message to let him know
           //  2. sending target user that source user is in to him
 
+          newMessage.SystemMessageState = (int)ESystemMessageState.OneSideIsIn;
+
+          context.SaveChanges();
+
           if (targetUser.DeviceId != null)
           {
             PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Someone is in to you!");
           }
 
-          newMessage.SystemMessageState = (int)ESystemMessageState.OneSideIsIn;
-
-          context.SaveChanges();
-
-          toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
-          toSend.SystemMessage = (int)ESystemMessageState.OneSideIsIn;
+          toSend.Type = (int)EMessagesTypesToClient.Ok;
           toSend.Message = newMessage;
           toSend.FirstMessage = firstMessage;
           return CommManager.SendMessage(toSend);
@@ -334,7 +329,8 @@ namespace RestWcfApplication.Root.Want
 
           sourceUser.LastSeen = DateTime.Now.ToString("u");
 
-          var firstMessage = context.FirstMessages.SingleOrDefault(fm => fm.Id == int.Parse(firstMessageId));
+          var firstMessageIdReal = Convert.ToInt32(firstMessageId);
+          var firstMessage = context.FirstMessages.SingleOrDefault(fm => fm.Id == firstMessageIdReal);
           if (firstMessage == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
@@ -371,14 +367,14 @@ namespace RestWcfApplication.Root.Want
           // target user does not want source user yet so:
           //  sending target user the message from source user
 
+          context.SaveChanges();
+
           if (targetUser.DeviceId != null)
           {
             PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"You have a new message!");
           }
 
-          context.SaveChanges();
-
-          toSend.Type = (int)EMessagesTypesToClient.Message;
+          toSend.Type = (int)EMessagesTypesToClient.Ok;
           toSend.Message = newMessage;
           return CommManager.SendMessage(toSend);
         }
@@ -443,17 +439,16 @@ namespace RestWcfApplication.Root.Want
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
 
+          newMessage.SystemMessageState = (int)ESystemMessageState.ClueNeeded;
+
+          context.SaveChanges();
+
           if (targetUser.DeviceId != null)
           {
             PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Someone needs a clue...");
           }
 
-          newMessage.SystemMessageState = (int)ESystemMessageState.ClueNeeded;
-
-          context.SaveChanges();
-
-          toSend.Type = (int)EMessagesTypesToClient.Message | (int)EMessagesTypesToClient.SystemMessage;
-          toSend.SystemMessage = (int)ESystemMessageState.ClueNeeded;
+          toSend.Type = (int)EMessagesTypesToClient.Ok;
           toSend.Message = newMessage;
           return CommManager.SendMessage(toSend);
         }
@@ -535,7 +530,12 @@ namespace RestWcfApplication.Root.Want
 
           context.SaveChanges();
 
-          toSend.Type = EMessagesTypesToClient.Message;
+          if (targetUser.DeviceId != null)
+          {
+            PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"You have a new message...");
+          }
+
+          toSend.Type = EMessagesTypesToClient.Ok;
           toSend.Message = newMessage;
           return CommManager.SendMessage(toSend);
         }

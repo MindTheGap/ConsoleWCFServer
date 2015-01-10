@@ -60,7 +60,7 @@ namespace RestWcfApplication.Root.Update
                 var anyUnreadSystemMessage =
                   unreadMessages.Any(m => m.SystemMessageState != null && m.SystemMessageState != 0);
                 var anyUnreadMessage = unreadMessages.Any(m => string.IsNullOrEmpty(m.Hint.Text) == false);
-                result.Add(new {firstMessage, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage});
+                result.Add(new {FirstMessage = firstMessage, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage});
               }
             }
           }
@@ -116,7 +116,7 @@ namespace RestWcfApplication.Root.Update
           context.SaveChanges();
 
           var result = new List<object>();
-          foreach (var firstMessage in context.FirstMessages.Include("Message").Include("Message.Hint"))
+          foreach (var firstMessage in context.FirstMessages.Include("Message").Include("Message.Hint").Include("SourceUser").Include("TargetUser"))
           {
             var indexOf = messagesIdsArray.IndexOf(firstMessage.Id);
             if (indexOf != -1)
@@ -133,7 +133,7 @@ namespace RestWcfApplication.Root.Update
               var numberOfUnreadMessages = unreadMessages.Count;
               var anyUnreadSystemMessage = unreadMessages.Any(m => m.SystemMessageState != null && m.SystemMessageState != 0);
               var anyUnreadMessage = unreadMessages.Any(m => string.IsNullOrEmpty(m.Hint.Text) == false);
-              result.Add(new { firstMessage, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage });
+              result.Add(new { FirstMessage = firstMessage, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage });
             }
           }
 
