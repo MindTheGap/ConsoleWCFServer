@@ -439,7 +439,7 @@ namespace RestWcfApplication.Root.Want
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
 
-          newMessage.SystemMessageState = (int)ESystemMessageState.ClueNeeded;
+          //newMessage.SystemMessageState = (int)ESystemMessageState.ClueNeeded;
 
           context.SaveChanges();
 
