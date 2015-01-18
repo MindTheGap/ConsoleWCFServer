@@ -36,6 +36,7 @@
           <Property Name="SourceUserId" Type="int" Nullable="false" />
           <Property Name="TargetUserId" Type="int" Nullable="false" />
           <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ReceivedState" Type="int" Nullable="false" />
           <Property Name="SystemMessageState" Type="int" />
           <Property Name="HintId" Type="int" />
         </EntityType>
@@ -320,6 +321,7 @@
           <NavigationProperty Name="Hint" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
           <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="Message" ToRole="User" />
           <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="Message" ToRole="User" />
+          <Property Name="ReceivedState" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Token">
           <Key>
@@ -457,6 +459,7 @@
           <EntitySetMapping Name="Messages">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
               <MappingFragment StoreEntitySet="Message">
+                <ScalarProperty Name="ReceivedState" ColumnName="ReceivedState" />
                 <ScalarProperty Name="SystemMessageState" ColumnName="SystemMessageState" />
                 <ScalarProperty Name="HintId" ColumnName="HintId" />
                 <ScalarProperty Name="Date" ColumnName="Date" />

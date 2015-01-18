@@ -4,6 +4,7 @@
     <EntitySetMapping Name="Messages">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
         <MappingFragment StoreEntitySet="Message">
+          <ScalarProperty Name="ReceivedState" ColumnName="ReceivedState" />
           <ScalarProperty Name="SystemMessageState" ColumnName="SystemMessageState" />
           <ScalarProperty Name="HintId" ColumnName="HintId" />
           <ScalarProperty Name="Date" ColumnName="Date" />

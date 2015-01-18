@@ -31,6 +31,7 @@
     <Property Name="SourceUserId" Type="int" Nullable="false" />
     <Property Name="TargetUserId" Type="int" Nullable="false" />
     <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="ReceivedState" Type="int" Nullable="false" />
     <Property Name="SystemMessageState" Type="int" />
     <Property Name="HintId" Type="int" />
   </EntityType>

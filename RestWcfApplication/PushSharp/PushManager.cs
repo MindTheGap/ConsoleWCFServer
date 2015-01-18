@@ -11,29 +11,36 @@ namespace RestWcfApplication.PushSharp
 {
   public static class PushManager
   {
-    public static void PushToIos(string deviceId, string alert)
-    {
-      //Create our push services broker
-      var push = new PushBroker();
+    private static readonly PushBroker PushBroker = new PushBroker();
 
-      push.OnNotificationSent += NotificationSent;
-      push.OnChannelException += ChannelException;
-      push.OnServiceException += ServiceException;
-      push.OnNotificationFailed += NotificationFailed;
-      push.OnDeviceSubscriptionExpired += DeviceSubscriptionExpired;
-      push.OnDeviceSubscriptionChanged += DeviceSubscriptionChanged;
-      push.OnChannelCreated += ChannelCreated;
-      push.OnChannelDestroyed += ChannelDestroyed;
+    static PushManager()
+    {
+      PushBroker.OnNotificationSent += NotificationSent;
+      PushBroker.OnChannelException += ChannelException;
+      PushBroker.OnServiceException += ServiceException;
+      PushBroker.OnNotificationFailed += NotificationFailed;
+      PushBroker.OnDeviceSubscriptionExpired += DeviceSubscriptionExpired;
+      PushBroker.OnDeviceSubscriptionChanged += DeviceSubscriptionChanged;
+      PushBroker.OnChannelCreated += ChannelCreated;
+      PushBroker.OnChannelDestroyed += ChannelDestroyed;
 
       //Registering the Apple Service and sending an iOS Notification
       var appleCert = File.ReadAllBytes("HowToNotifications.p12");
-      push.RegisterAppleService(new ApplePushChannelSettings(false, appleCert, @"aaazzz123"));
-      push.QueueNotification(new AppleNotification()
+      PushBroker.RegisterAppleService(new ApplePushChannelSettings(false, appleCert, @"aaazzz123"));
+    }
+
+    public static void PushToIos(string deviceId, string alert)
+    {
+      PushBroker.QueueNotification(new AppleNotification()
                                  .ForDeviceToken(deviceId)
                                  .WithAlert(alert)
                                  .WithSound("default"));
+    }
 
-      push.StopAllServices();
+    public static void PushToIos(string deviceId)
+    {
+      PushBroker.QueueNotification(new AppleNotification()
+                                 .ForDeviceToken(deviceId));
     }
 
     static void DeviceSubscriptionChanged(object sender,

@@ -7,11 +7,14 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
+using RestWcfApplication.PushSharp;
+using Message = RestWcfApplication.DB.Message;
 
 namespace RestWcfApplication.Root.Update
 {
@@ -166,19 +169,40 @@ namespace RestWcfApplication.Root.Update
           if (user != null)
           {
             user.LastSeen = DateTime.Now.ToString("u");
-
-            context.SaveChanges();
           }
 
+          var newMessagesList = new List<Message>();
+          var existingMessagesList = new List<Message>();
           var userMessages =
             context.Messages.Where(m => m.Id > startingMessageIdParsed 
                                     && (    (m.SourceUserId == sourceUserIdParsed && m.TargetUserId == targetUserIdParsed)
                                         ||  (m.SourceUserId == targetUserIdParsed && m.TargetUserId == sourceUserIdParsed)))
-              .Include("SourceUser").Include("TargetUser").Include("Hint")
-                                        .ToList();
+              .Include("SourceUser").Include("TargetUser").Include("Hint");
 
-          toSend.Type = EMessagesTypesToClient.MultipleMessages;
-          toSend.MultipleMessages = userMessages;
+          foreach (var userMessage in userMessages)
+          {
+            if (userMessage.ReceivedState == (int) EMessageReceivedState.MessageStateSendToClient)
+            {
+              existingMessagesList.Add(userMessage);
+            }
+            else if (userMessage.ReceivedState == (int) EMessageReceivedState.MessageStateSentToServer)
+            {
+              newMessagesList.Add(userMessage);
+
+              userMessage.ReceivedState = (int)EMessageReceivedState.MessageStateSendToClient;
+            }
+
+            if (userMessage.SourceUser.DeviceId != null)
+            {
+              PushManager.PushToIos(userMessage.SourceUser.DeviceId); // send empty push for client to only update the UI and not get an actual message
+            }
+          }
+
+          context.SaveChanges();
+
+          toSend.Type = EMessagesTypesToClient.Ok;
+          toSend.NewMessages = newMessagesList;
+          toSend.ExistingMessages = existingMessagesList;
           return CommManager.SendMessage(toSend);
         }
       }

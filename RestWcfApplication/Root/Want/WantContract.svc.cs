@@ -67,7 +67,8 @@ namespace RestWcfApplication.Root.Want
           {
             SourceUserId = userIdParsed,
             Hint = newHint,
-            Date = newDate
+            Date = newDate,
+            ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
           };
           if (firstMessage == null)
           {
@@ -97,7 +98,7 @@ namespace RestWcfApplication.Root.Want
           {
             // target user doesn't exist in the system yet
             // sending him an invitation sms
-            Twilio.Twilio.SendInvitationMessage(sourceUser.FirstName + " " + sourceUser.LastName, targetPhoneNumber);
+            //Twilio.Twilio.SendInvitationMessage(sourceUser.FirstName + " " + sourceUser.LastName, targetPhoneNumber);
 
             var newTargetUser = new DB.User() { PhoneNumber = targetPhoneNumber };
 
@@ -120,8 +121,8 @@ namespace RestWcfApplication.Root.Want
           firstMessage.TargetUserId = targetUser.Id;
 
           // checking if target user is in source user also
-          var message = context.Messages.SingleOrDefault(m => m.SourceUserId == targetUser.Id && m.TargetUserId == userIdParsed);
-          if (message != null)
+          var anyMessage = context.Messages.Any(m => m.SourceUserId == targetUser.Id && m.TargetUserId == userIdParsed);
+          if (anyMessage)
           {
             // target user is in source user also - love is in the air
             // enabling a chat between them by sending the target user id to the source user
@@ -225,7 +226,8 @@ namespace RestWcfApplication.Root.Want
             SourceUserId = userIdParsed,
             TargetUserId = targetUser.Id,
             Hint = newHint,
-            Date = newDate
+            Date = newDate,
+            ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
           };
           if (firstMessage == null)
           {
@@ -357,7 +359,8 @@ namespace RestWcfApplication.Root.Want
             SourceUserId = userIdParsed,
             TargetUserId = targetUser.Id,
             Hint = newHint,
-            Date = newDate
+            Date = newDate,
+            ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
           };
 
           context.Hints.Add(newHint);
@@ -420,7 +423,8 @@ namespace RestWcfApplication.Root.Want
           {
             SourceUserId = userIdParsed,
             Hint = newHint,
-            Date = newDate
+            Date = newDate,
+            ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
           };
 
           context.Hints.Add(newHint);
@@ -520,7 +524,8 @@ namespace RestWcfApplication.Root.Want
             Date = date,
             SourceUserId = userIdParsed,
             TargetUserId = targetUserIdParsed,
-            Hint = newHint
+            Hint = newHint,
+            ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
           };
 
           context.Hints.Add(newHint);

@@ -25,6 +25,7 @@ namespace RestWcfApplication.DB
         public string Date { get; set; }
         public Nullable<int> HintId { get; set; }
         public Nullable<int> SystemMessageState { get; set; }
+        public int ReceivedState { get; set; }
     
         public virtual ICollection<FirstMessage> FirstMessages { get; set; }
         public virtual Hint Hint { get; set; }

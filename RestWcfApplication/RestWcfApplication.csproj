@@ -182,6 +182,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="DB\EMessageReceivedState.cs" />
     <Compile Include="DB\ESystemMessageState.cs" />
     <Compile Include="DB\ErrorInfo.cs" />
     <Compile Include="DB\FirstMessage.cs">
