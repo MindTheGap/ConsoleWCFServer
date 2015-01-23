@@ -17,8 +17,8 @@ namespace RestWcfApplication.Root.Update
     string GetNewFirstUserMessages(string userId, string phoneNumber, string startingFirstUserMessageId);
 
     [OperationContract]
-    [WebGet(UriTemplate = "updateFirstUserMessages?userId={userId}&phoneNumber={phoneNumber}&firstUserMessageIds={firstUserMessageIds}&lastMessageIds={lastMessageIds}")]
-    string UpdateFirstUserMessages(string userId, string phoneNumber, string firstUserMessageIds, string lastMessageIds);
+    [WebInvoke(Method = "POST", UriTemplate = "updateFirstUserMessages?userId={userId}&phoneNumber={phoneNumber}")]
+    string UpdateFirstUserMessages(string userId, string phoneNumber, Stream stream);
 
     [OperationContract]
     [WebGet(UriTemplate = "getUserChatMessages?sourceUserId={sourceUserId}&targetUserId={targetUserId}&startingMessageId={startingMessageId}")]

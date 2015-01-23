@@ -61,7 +61,7 @@ namespace RestWcfApplication.Root.Want
           {
             PictureLink = hintImageLink,
             VideoLink = hintVideoLink,
-            Text = hintNotUsed ? DefaultClue : text
+            Text = hintNotUsed ? DefaultEmptyMessage : text
           };
           var newMessage = new DB.Message()
           {
@@ -397,6 +397,17 @@ namespace RestWcfApplication.Root.Want
         var reader = new StreamReader(data);
         var text = reader.ReadToEnd();
 
+        var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
+        if (dictionary == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
+
+        var firstMessageId = int.Parse(dictionary["firstMessageId"]);
+
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
@@ -426,9 +437,12 @@ namespace RestWcfApplication.Root.Want
             Date = newDate,
             ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
           };
+          var firstMessage = context.FirstMessages.Single(f => f.Id == firstMessageId);
 
           context.Hints.Add(newHint);
           context.Messages.Add(newMessage);
+
+          firstMessage.Message = newMessage;
 
           // check if target user exists in the system:
           //  if so, send him a message telling him a clue is needed
@@ -442,8 +456,6 @@ namespace RestWcfApplication.Root.Want
 
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
-
-          //newMessage.SystemMessageState = (int)ESystemMessageState.ClueNeeded;
 
           context.SaveChanges();
 
