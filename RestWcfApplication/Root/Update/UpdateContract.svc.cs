@@ -180,19 +180,18 @@ namespace RestWcfApplication.Root.Update
             user.LastSeen = DateTime.Now.ToString("u");
           }
 
-          var firstMessage =
-            context.FirstMessages.Where(
-              f => (f.SourceUserId == sourceUserIdParsed && f.TargetUserId == targetUserIdParsed)
-                   || (f.SourceUserId == targetUserIdParsed && f.TargetUserId == sourceUserIdParsed)).Include("SourceUser").Include("TargetUser").SingleOrDefault();
-          if (firstMessage == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
-            return CommManager.SendMessage(toSend);
-          }
+          //var firstMessage =
+          //  context.FirstMessages.Where(
+          //    f => (f.SourceUserId == sourceUserIdParsed && f.TargetUserId == targetUserIdParsed)
+          //         || (f.SourceUserId == targetUserIdParsed && f.TargetUserId == sourceUserIdParsed)).Include("SourceUser").Include("TargetUser").SingleOrDefault();
+          //if (firstMessage == null)
+          //{
+          //  toSend.Type = EMessagesTypesToClient.Error;
+          //  toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+          //  return CommManager.SendMessage(toSend);
+          //}
 
-          var realSourceUser = firstMessage.SourceUser;
-          var realTargetUser = firstMessage.TargetUser;
+          var realTargetUser = context.Users.SingleOrDefault(u => u.Id == targetUserIdParsed);
 
           var userMessages =
             context.Messages.Where(m => m.Id > startingMessageIdParsed 
@@ -200,17 +199,19 @@ namespace RestWcfApplication.Root.Update
                                         ||  (m.SourceUserId == targetUserIdParsed && m.TargetUserId == sourceUserIdParsed)))
               .Include("SourceUser").Include("TargetUser").Include("Hint");
 
+          var sendPush = false;
           foreach (var userMessage in userMessages)
           {
-            if (sourceUserIdParsed == realTargetUser.Id && userMessage.ReceivedState == (int)EMessageReceivedState.MessageStateSentToServer)
+            if (sourceUserIdParsed == userMessage.TargetUserId && userMessage.ReceivedState == (int)EMessageReceivedState.MessageStateSentToServer)
             {
-              userMessage.ReceivedState = (int)EMessageReceivedState.MessageStateSendToClient;  
+              userMessage.ReceivedState = (int)EMessageReceivedState.MessageStateSendToClient;
+              sendPush = true;
             }
           }
 
-          if (sourceUserIdParsed == realTargetUser.Id && realSourceUser.DeviceId != null)
+          if (sendPush && realTargetUser != null && realTargetUser.DeviceId != null)
           {
-            PushManager.PushToIos(realSourceUser.DeviceId); // send empty push for client to only update the UI and not get an actual message
+            PushManager.PushToIos(realTargetUser.DeviceId); // send empty push for client to only update the UI and not get an actual message
           }
 
           context.SaveChanges();

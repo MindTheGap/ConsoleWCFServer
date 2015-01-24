@@ -12,9 +12,11 @@ namespace RestWcfApplication.Root.Want
   public interface IWantContract
   {
     [OperationContract]
-    [WebInvoke(Method = "POST", UriTemplate = "iamin?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetPhoneNumber={targetPhoneNumber}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
-    string UpdateIWantUserByPhoneNumber(string userId, string sourcePhoneNumber, string targetPhoneNumber,
-              string hintImageLink, string hintVideoLink, Stream data);
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare, 
+      UriTemplate = "iamin?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetPhoneNumber={targetPhoneNumber}")]
+    string UpdateIWantUserByPhoneNumber(string userId, string sourcePhoneNumber, string targetPhoneNumber, Stream data);
 
     [OperationContract]
     [WebInvoke(Method = "POST",
@@ -27,16 +29,16 @@ namespace RestWcfApplication.Root.Want
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "iaminexisting?userId={userId}&firstMessageId={firstMessageId}")]
+      UriTemplate = "iaminnewmessage?userId={userId}&firstMessageId={firstMessageId}")]
     string UpdateIWantUserExistingMessage(string userId, string firstMessageId, Stream data);
 
-    [OperationContract]
-    [WebInvoke(Method = "POST", UriTemplate = "askforclue?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetUserId={targetUserId}")]
-    string UpdateAskForClue(string userId, string sourcePhoneNumber, string targetUserId, Stream data);
+    //[OperationContract]
+    //[WebInvoke(Method = "POST", UriTemplate = "askforclue?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetUserId={targetUserId}")]
+    //string UpdateAskForClue(string userId, string sourcePhoneNumber, string targetUserId, Stream data);
 
-    [OperationContract]
-    [WebInvoke(Method = "POST", UriTemplate = "match?userId={userId}&targetUserId={targetUserId}&firstMessageId={firstMessageId}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
-    string UpdateIWantUserByChatMessage(string userId, string targetUserId, string firstMessageId,
-              string hintImageLink, string hintVideoLink, Stream data);
+    //[OperationContract]
+    //[WebInvoke(Method = "POST", UriTemplate = "match?userId={userId}&targetUserId={targetUserId}&firstMessageId={firstMessageId}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
+    //string UpdateIWantUserByChatMessage(string userId, string targetUserId, string firstMessageId,
+    //          string hintImageLink, string hintVideoLink, Stream data);
   }
 }
