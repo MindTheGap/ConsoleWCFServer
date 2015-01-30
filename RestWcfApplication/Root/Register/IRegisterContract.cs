@@ -17,25 +17,11 @@ namespace RestWcfApplication.Root.Register
     /// verifies the validation code to get the user validated.
     /// </summary>
     [OperationContract]
-    [WebGet(UriTemplate = "verify?phoneNumber={phoneNumber}&validationCode={validationCode}")]
-    string VerifyValidationCode(string phoneNumber, string validationCode);
-
-    /// <summary>
-    /// registers the user to the system and returns his new userId
-    /// </summary>
-    [OperationContract]
-    [WebGet(UriTemplate = "getUserId?phoneNumber={phoneNumber}")]
-    string RegisterViaPhoneNumber(string phoneNumber);
-
-    /// <summary>
-    /// registers the user to the system and returns his new userId
-    /// </summary>
-    [OperationContract]
-    [WebInvoke(Method = "POST", 
+    [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
-      BodyStyle = WebMessageBodyStyle.Bare, 
-      UriTemplate = "updateUserFbDetails?userId={userId}&phoneNumber={phoneNumber}&fbUserId={fbUserId}&email={email}")]
-    string RegisterUserDetailsFacebookDetails(string userId, string phoneNumber, string fbUserId, string email, Stream stream);
+      BodyStyle = WebMessageBodyStyle.Bare,
+      UriTemplate = "verifyPhoneNumber")]
+    string VerifyValidationCode(Stream stream);
 
     /// <summary>
     /// registers the user to the system and returns his new userId
@@ -44,8 +30,28 @@ namespace RestWcfApplication.Root.Register
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "updateUserDeviceId?userId={userId}&phoneNumber={phoneNumber}")]
-    string RegisterUserDetailsDeviceId(string userId, string phoneNumber, Stream stream);
+      UriTemplate = "registerPhoneNumber")]
+    string RegisterViaPhoneNumber(Stream stream);
+
+    /// <summary>
+    /// registers the user to the system and returns his new userId
+    /// </summary>
+    [OperationContract]
+    [WebInvoke(Method = "POST", 
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare, 
+      UriTemplate = "updateUserFbDetails?userId={userId}")]
+    string RegisterUserDetailsFacebookDetails(string userId, Stream stream);
+
+    /// <summary>
+    /// registers the user to the system and returns his new userId
+    /// </summary>
+    [OperationContract]
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare,
+      UriTemplate = "updateUserDeviceId?userId={userId}")]
+    string RegisterUserDetailsDeviceId(string userId, Stream stream);
 
     /// <summary>
     /// returns "hello" string for testing

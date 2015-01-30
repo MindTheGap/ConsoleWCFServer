@@ -48,23 +48,23 @@ namespace RestWcfApplication.Root.Update
           context.SaveChanges();
 
           var result = new List<object>();
-          foreach (var firstMessage in context.FirstMessages.Include("Message").Include("SourceUser").Include("TargetUser").Include("Message.Hint"))
+          foreach (var initialMessage in context.FirstMessages.Include("Message").Include("SourceUser").Include("TargetUser").Include("Message.Hint"))
           {
-            if (firstMessage.SourceUserId == userIdParsed || firstMessage.TargetUserId == userIdParsed)
+            if (initialMessage.SourceUserId == userIdParsed || initialMessage.TargetUserId == userIdParsed)
             {
-              if (firstMessage.Id > startingFirstUserMessageIdParsed)
+              if (initialMessage.Id > startingFirstUserMessageIdParsed)
               {
-                var otherSideId = firstMessage.SourceUserId == userIdParsed
-                  ? firstMessage.TargetUserId
-                  : firstMessage.SourceUserId;
-                var unreadMessages = context.Messages.Include("Hint").Where(m =>
-                  (m.SourceUserId == userIdParsed && m.TargetUserId == otherSideId)
+                var otherSideId = initialMessage.SourceUserId == userIdParsed
+                  ? initialMessage.TargetUserId
+                  : initialMessage.SourceUserId;
+                var unreadMessages = context.Messages.Include("SourceUser").Include("TargetUser").Include("Hint")
+                  .Where(m => (m.SourceUserId == userIdParsed && m.TargetUserId == otherSideId)
                   || (m.TargetUserId == userIdParsed && m.SourceUserId == otherSideId)).ToList();
-                var numberOfUnreadMessages = unreadMessages.Count;
-                var anyUnreadSystemMessage =
-                  unreadMessages.Any(m => m.SystemMessageState != null && m.SystemMessageState != 0);
-                var anyUnreadMessage = unreadMessages.Any(m => string.IsNullOrEmpty(m.Hint.Text) == false);
-                result.Add(new {FirstMessage = firstMessage, numberOfUnreadMessages, anyUnreadSystemMessage, anyUnreadMessage});
+                //var numberOfUnreadMessages = unreadMessages.Count;
+                //var anyUnreadSystemMessage =
+                //  unreadMessages.Any(m => m.SystemMessageState != null && m.SystemMessageState != 0);
+                //var anyUnreadMessage = unreadMessages.Any(m => string.IsNullOrEmpty(m.Hint.Text) == false);
+                result.Add(new { InitialMessage = initialMessage, UnreadMessages = unreadMessages });
               }
             }
           }

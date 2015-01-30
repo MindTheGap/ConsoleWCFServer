@@ -23,11 +23,26 @@ namespace RestWcfApplication.Root.Register
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class RegisterContract : IRegisterContract
   {
-    public string VerifyValidationCode(string phoneNumber, string validationCode)
+    public string VerifyValidationCode(Stream stream)
     {
       try
       {
         dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(stream);
+        var text = reader.ReadToEnd();
+
+        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
+        if (jsonObject == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
+
+        var phoneNumber = jsonObject["phoneNumber"] as string;
+        var validationCode = jsonObject["validationCode"];
 
         using (var context = new Entities())
         {
@@ -65,11 +80,25 @@ namespace RestWcfApplication.Root.Register
       }
     }
 
-    public string RegisterViaPhoneNumber(string phoneNumber)
+    public string RegisterViaPhoneNumber(Stream stream)
     {
       try
       {
         dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(stream);
+        var text = reader.ReadToEnd();
+
+        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
+        if (jsonObject == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          return CommManager.SendMessage(toSend);
+        }
+
+        var phoneNumber = jsonObject["phoneNumber"] as string;
 
         using (var context = new Entities())
         {
@@ -126,7 +155,7 @@ namespace RestWcfApplication.Root.Register
       }
     }
 
-    public string RegisterUserDetailsFacebookDetails(string userId, string phoneNumber, string fbUserId, string email, Stream stream)
+    public string RegisterUserDetailsFacebookDetails(string userId, Stream stream)
     {
       try
       {
@@ -146,6 +175,8 @@ namespace RestWcfApplication.Root.Register
 
         var firstName = jsonObject["firstName"];
         var lastName = jsonObject["lastName"];
+        var facebookUserId = jsonObject["facebookUserId"];
+        var email = jsonObject["email"];
 
         using (var context = new Entities())
         {
@@ -153,7 +184,7 @@ namespace RestWcfApplication.Root.Register
 
           // check if userId corresponds to phoneNumber
           var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed && u.PhoneNumber == phoneNumber);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
           if (sourceUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
@@ -164,7 +195,7 @@ namespace RestWcfApplication.Root.Register
           sourceUser.FirstName = firstName;
           sourceUser.LastName = lastName;
           sourceUser.Email = email;
-          sourceUser.FacebookUserId = fbUserId;
+          sourceUser.FacebookUserId = facebookUserId;
           sourceUser.LastSeen = DateTime.Now.ToString("u");
 
           context.SaveChanges();
@@ -183,7 +214,7 @@ namespace RestWcfApplication.Root.Register
       }
     }
 
-    public string RegisterUserDetailsDeviceId(string userId, string phoneNumber, Stream stream)
+    public string RegisterUserDetailsDeviceId(string userId, Stream stream)
     {
       try
       {
@@ -209,7 +240,7 @@ namespace RestWcfApplication.Root.Register
 
           // check if userId corresponds to phoneNumber
           var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed && u.PhoneNumber == phoneNumber);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
           if (sourceUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
