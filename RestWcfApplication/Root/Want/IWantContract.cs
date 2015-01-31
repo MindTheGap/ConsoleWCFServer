@@ -15,8 +15,8 @@ namespace RestWcfApplication.Root.Want
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare, 
-      UriTemplate = "iamin?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetPhoneNumber={targetPhoneNumber}")]
-    string UpdateIWantUserByPhoneNumber(string userId, string sourcePhoneNumber, string targetPhoneNumber, Stream data);
+      UriTemplate = "iamin?userId={userId}&targetPhoneNumber={targetPhoneNumber}")]
+    string UpdateIWantUserByPhoneNumber(string userId, string targetPhoneNumber, Stream data);
 
     [OperationContract]
     [WebInvoke(Method = "POST",
@@ -29,8 +29,8 @@ namespace RestWcfApplication.Root.Want
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "iaminnewmessage?userId={userId}&firstMessageId={firstMessageId}")]
-    string UpdateIWantUserExistingMessage(string userId, string firstMessageId, Stream data);
+      UriTemplate = "iaminnewmessage?userId={userId}&initialMessageId={initialMessageId}")]
+    string UpdateIWantUserExistingMessage(string userId, string initialMessageId, Stream data);
 
     //[OperationContract]
     //[WebInvoke(Method = "POST", UriTemplate = "askforclue?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetUserId={targetUserId}")]

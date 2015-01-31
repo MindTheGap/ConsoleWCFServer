@@ -13,16 +13,25 @@ namespace RestWcfApplication.Root.Update
   public interface IUpdateContract
   {
     [OperationContract]
-    [WebGet(UriTemplate = "getNewFirstUserMessages?userId={userId}&phoneNumber={phoneNumber}&startingFirstUserMessageId={startingFirstUserMessageId}")]
-    string GetNewFirstUserMessages(string userId, string phoneNumber, string startingFirstUserMessageId);
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare,
+      UriTemplate = "getAllInitialMessages?userId={userId}")]
+    string GetAllInitialMessages(string userId, Stream stream);
 
     [OperationContract]
-    [WebInvoke(Method = "POST", UriTemplate = "updateFirstUserMessages?userId={userId}&phoneNumber={phoneNumber}")]
-    string UpdateFirstUserMessages(string userId, string phoneNumber, Stream stream);
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare,
+      UriTemplate = "getUserChatMessages?userId={userId}")]
+    string GetUserChatMessages(string userId, Stream stream);
 
     [OperationContract]
-    [WebGet(UriTemplate = "getUserChatMessages?sourceUserId={sourceUserId}&targetUserId={targetUserId}&startingMessageId={startingMessageId}")]
-    string GetUserChatMessages(string sourceUserId, string targetUserId, string startingMessageId);
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare,
+      UriTemplate = "readUserChatMessages?userId={userId}")]
+    string ReadUserChatMessages(string userId, Stream stream);
 
     [OperationContract]
     [WebInvoke(Method = "POST", UriTemplate = "getUserContactsLastSeen?userId={userId}")]

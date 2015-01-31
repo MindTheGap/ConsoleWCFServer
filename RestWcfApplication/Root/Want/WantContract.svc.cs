@@ -25,7 +25,7 @@ namespace RestWcfApplication.Root.Want
       return string.IsNullOrEmpty(s) || s == "(null)";
     }
 
-    public string UpdateIWantUserByPhoneNumber(string userId, string sourcePhoneNumber, string targetPhoneNumber, Stream data)
+    public string UpdateIWantUserByPhoneNumber(string userId, string targetPhoneNumber, Stream data)
     {
       try
       {
@@ -53,7 +53,7 @@ namespace RestWcfApplication.Root.Want
 
           // check if userId corresponds to phoneNumber
           var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed && u.PhoneNumber == sourcePhoneNumber);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
           if (sourceUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
@@ -64,7 +64,7 @@ namespace RestWcfApplication.Root.Want
           sourceUser.LastSeen = DateTime.Now.ToString("u");
 
           var hintNotUsed = IsStringEmpty(hint) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
-          var firstMessage =
+          var initialMessage =
             context.FirstMessages.SingleOrDefault(u => ((u.SourceUserId == userIdParsed && u.TargetUser.PhoneNumber == targetPhoneNumber)
                                                     ||  (u.TargetUserId == userIdParsed && u.SourceUser.PhoneNumber == targetPhoneNumber)));
 
@@ -82,9 +82,9 @@ namespace RestWcfApplication.Root.Want
             Date = newDate,
             ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
           };
-          if (firstMessage == null)
+          if (initialMessage == null)
           {
-            var newFirstMessage = new DB.FirstMessage()
+            var newInitialMessage = new DB.FirstMessage()
             {
               Date = newDate,
               Message = newMessage,
@@ -92,9 +92,9 @@ namespace RestWcfApplication.Root.Want
               SubjectName = @""
             };
 
-            context.FirstMessages.Add(newFirstMessage);
+            context.FirstMessages.Add(newInitialMessage);
 
-            firstMessage = newFirstMessage;
+            initialMessage = newInitialMessage;
           }
 
           context.Hints.Add(newHint);
@@ -115,7 +115,7 @@ namespace RestWcfApplication.Root.Want
             var newTargetUser = new DB.User() { PhoneNumber = targetPhoneNumber };
 
             newMessage.TargetUser = newMessage.TargetUser = newTargetUser;
-            firstMessage.TargetUser = newTargetUser;
+            initialMessage.TargetUser = newTargetUser;
             newMessage.SystemMessageState = (int) ESystemMessageState.SentSms;
 
             context.Users.Add(newTargetUser);
@@ -123,29 +123,29 @@ namespace RestWcfApplication.Root.Want
             context.SaveChanges();
 
             toSend.Type = (int)EMessagesTypesToClient.Ok;
-            toSend.FirstMessage = firstMessage;
-            toSend.Message = newMessage;
+            toSend.InitialMessage = initialMessage;
+            toSend.ChatMessage = newMessage;
             return CommManager.SendMessage(toSend);
           }
 
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
-          firstMessage.TargetUserId = targetUser.Id;
+          initialMessage.TargetUserId = targetUser.Id;
 
           // checking if target user is in source user also
-          if (firstMessage.TargetUserId == userIdParsed)
+          if (initialMessage.TargetUserId == userIdParsed)
           {
             // target user is in source user also - love is in the air
             // enabling a chat between them by sending the target user id to the source user
 
             newMessage.SystemMessageState = (int)ESystemMessageState.BothSidesAreIn;
-            firstMessage.MatchFound = true;
+            initialMessage.MatchFound = true;
 
             context.SaveChanges();
 
             toSend.Type = (int)EMessagesTypesToClient.Ok;
-            toSend.Message = newMessage;
-            toSend.FirstMessage = firstMessage;
+            toSend.ChatMessage = newMessage;
+            toSend.InitialMessage = initialMessage;
             return CommManager.SendMessage(toSend);
           }
 
@@ -163,8 +163,8 @@ namespace RestWcfApplication.Root.Want
           }
 
           toSend.Type = (int)EMessagesTypesToClient.Ok;
-          toSend.Message = newMessage;
-          toSend.FirstMessage = firstMessage;
+          toSend.ChatMessage = newMessage;
+          toSend.InitialMessage = initialMessage;
           return CommManager.SendMessage(toSend);
         }
       }
@@ -306,7 +306,7 @@ namespace RestWcfApplication.Root.Want
       }
     }
 
-    public string UpdateIWantUserExistingMessage(string userId, string firstMessageId, Stream data)
+    public string UpdateIWantUserExistingMessage(string userId, string initialMessageId, Stream data)
     {
       try
       {
@@ -342,8 +342,8 @@ namespace RestWcfApplication.Root.Want
 
           sourceUser.LastSeen = DateTime.Now.ToString("u");
 
-          var firstMessageIdReal = Convert.ToInt32(firstMessageId);
-          var firstMessage = context.FirstMessages.SingleOrDefault(fm => fm.Id == firstMessageIdReal);
+          var initialMessageIdReal = Convert.ToInt32(initialMessageId);
+          var firstMessage = context.FirstMessages.SingleOrDefault(fm => fm.Id == initialMessageIdReal);
           if (firstMessage == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
