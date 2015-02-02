@@ -131,6 +131,7 @@ namespace RestWcfApplication.Root.Want
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
           initialMessage.TargetUserId = targetUser.Id;
+          initialMessage.TargetUser = targetUser;
 
           // checking if target user is in source user also
           if (initialMessage.TargetUserId == userIdParsed)

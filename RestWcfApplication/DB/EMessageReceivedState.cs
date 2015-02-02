@@ -13,6 +13,7 @@ namespace RestWcfApplication.DB
     MessageStateNotReceivedYet = 1,
     MessageStateSentToServer = 2,
     MessageStateSentToClient = 4,
-    MessageStateReadByClient = 8
+    MessageStateReadByClient = 8,
+    MessageStateReadByClientAck = 16,
   }
 }

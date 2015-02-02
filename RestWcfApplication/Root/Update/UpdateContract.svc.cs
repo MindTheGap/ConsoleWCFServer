@@ -65,12 +65,24 @@ namespace RestWcfApplication.Root.Update
               ? initialMessage.TargetUserId
               : initialMessage.SourceUserId;
             var unreadMessages = context.Messages.Include("SourceUser").Include("TargetUser").Include("Hint")
-              .Where(m => m.ReceivedState < (int)EMessageReceivedState.MessageStateSentToClient
-                && ((m.SourceUserId == userIdParsed && m.TargetUserId == otherSideId)
-                  || (m.TargetUserId == userIdParsed && m.SourceUserId == otherSideId))).ToList();
+              .Where(m => 
+                (m.ReceivedState == (int)EMessageReceivedState.MessageStateSentToServer
+                && m.TargetUserId == userIdParsed)
+                || (m.ReceivedState == (int)EMessageReceivedState.MessageStateReadByClient
+                && m.SourceUserId == userIdParsed)).ToList();
             if (unreadMessages.Count > 0)
             {
-              unreadMessages.ForEach(m => m.ReceivedState = (int)EMessageReceivedState.MessageStateSentToClient);
+              unreadMessages.ForEach(m =>
+              {
+                if (m.ReceivedState == (int) EMessageReceivedState.MessageStateSentToServer)
+                {
+                  m.ReceivedState = (int) EMessageReceivedState.MessageStateSentToClient;
+                }
+                else // == MessageStateReadByClient
+                {
+                  m.ReceivedState = (int)EMessageReceivedState.MessageStateReadByClientAck;
+                }
+              });
               result.Add(new { InitialMessage = initialMessage, UnreadMessages = unreadMessages });
             }
           }
@@ -166,8 +178,8 @@ namespace RestWcfApplication.Root.Update
         }
 
         var userIdParsed = int.Parse(userId);
-        var targetUserId = dictionary["targetUserId"];
-        var readMessageId = dictionary["readMessageId"];
+        var initialMessageId = dictionary["initialMessageId"];
+        var maxChatMessageId = dictionary["maxChatMessageId"];
 
         using (var context = new Entities())
         {
@@ -179,25 +191,36 @@ namespace RestWcfApplication.Root.Update
             user.LastSeen = DateTime.Now.ToString("u");
           }
 
-          var realTargetUser = context.Users.SingleOrDefault(u => u.Id == targetUserId);
-
-          var userMessage =
-            context.Messages.FirstOrDefault(m => m.Id == readMessageId);
-          if (userMessage == null)
+          var initialMessage = context.FirstMessages.SingleOrDefault(m => m.Id == initialMessageId);
+          if (initialMessage == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
             toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
             return CommManager.SendMessage(toSend);
           }
 
-          userMessage.ReceivedState = (int)EMessageReceivedState.MessageStateReadByClient;
-          
-          if (realTargetUser != null && realTargetUser.DeviceId != null)
+          var realTargetUserId = initialMessage.SourceUserId == userIdParsed
+            ? initialMessage.TargetUserId
+            : initialMessage.SourceUserId;
+          var realTargetUser = context.Users.FirstOrDefault(u => u.Id == realTargetUserId);
+
+          var sendPush = false;
+          var userMessages =
+            context.Messages.Where(m => m.ReceivedState < (int)EMessageReceivedState.MessageStateReadByClient
+              && m.Id <= maxChatMessageId
+              && m.TargetUserId == userIdParsed && m.SourceUserId == realTargetUserId);
+          foreach (var userMessage in userMessages)
           {
-            PushManager.PushToIos(realTargetUser.DeviceId); // send empty push for client to only update the UI and not get an actual message
+            userMessage.ReceivedState = (int)EMessageReceivedState.MessageStateReadByClient;
+            sendPush = true;
           }
 
           context.SaveChanges();
+
+          if (sendPush && realTargetUser.DeviceId != null)
+          {
+            PushManager.PushToIos(realTargetUser.DeviceId); // send empty push for client to only update the UI and not get an actual message
+          }
 
           toSend.Type = EMessagesTypesToClient.Ok;
           return CommManager.SendMessage(toSend);
