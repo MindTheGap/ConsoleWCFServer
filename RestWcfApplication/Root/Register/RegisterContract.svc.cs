@@ -120,7 +120,7 @@ namespace RestWcfApplication.Root.Register
             //{
             user.Verified = false;
 
-            verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
+            //verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
 
             user.VerificationCode = verificationCode.ToString("d");
             context.SaveChanges();
@@ -132,7 +132,7 @@ namespace RestWcfApplication.Root.Register
             //}
           }
 
-          verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
+          //verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
 
           var newUser = new User()
           {

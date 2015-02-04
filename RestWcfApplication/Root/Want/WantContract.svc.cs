@@ -130,8 +130,11 @@ namespace RestWcfApplication.Root.Want
 
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
-          initialMessage.TargetUserId = targetUser.Id;
-          initialMessage.TargetUser = targetUser;
+          if (initialMessage.TargetUserId == 0)
+          {
+            initialMessage.TargetUserId = targetUser.Id;
+            initialMessage.TargetUser = targetUser;
+          }
 
           // checking if target user is in source user also
           if (initialMessage.TargetUserId == userIdParsed)
@@ -143,6 +146,11 @@ namespace RestWcfApplication.Root.Want
             initialMessage.MatchFound = true;
 
             context.SaveChanges();
+
+            if (targetUser.DeviceId != null)
+            {
+              PushSharp.PushManager.PushToIos(targetUser.DeviceId, "You have a match!");
+            }
 
             toSend.Type = (int)EMessagesTypesToClient.Ok;
             toSend.ChatMessage = newMessage;
