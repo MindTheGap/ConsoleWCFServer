@@ -19,6 +19,9 @@ namespace RestWcfApplication.Root.Want
   {
     private const string DefaultClue = @"I need another clue...";
     private const string DefaultEmptyMessage = @"Guess Who...";
+    private const string MatchFound = "Match Found";
+    private const string OneSideIsIn = "Waiting for other party to be in too";
+    private const string SentSms = "Sent SMS, Waiting for the other party to install the application";
 
     private bool IsStringEmpty(string s)
     {
@@ -116,7 +119,22 @@ namespace RestWcfApplication.Root.Want
 
             newMessage.TargetUser = newMessage.TargetUser = newTargetUser;
             initialMessage.TargetUser = newTargetUser;
-            newMessage.SystemMessageState = (int) ESystemMessageState.SentSms;
+
+            var newSystemMessageHintSms = new DB.Hint()
+            {
+              Text = SentSms
+            };
+            var newSystemMessageSms = new DB.Message()
+            {
+              SourceUserId = userIdParsed,
+              TargetUser = newTargetUser,
+              Hint = newSystemMessageHintSms,
+              Date = newDate,
+              SystemMessageState = 1,
+              ReceivedState = (int)EMessageReceivedState.MessageStateSentToClient
+            };
+
+            context.Messages.Add(newSystemMessageSms);
 
             context.Users.Add(newTargetUser);
 
@@ -124,6 +142,7 @@ namespace RestWcfApplication.Root.Want
 
             toSend.Type = (int)EMessagesTypesToClient.Ok;
             toSend.InitialMessage = initialMessage;
+            toSend.SystemMessage = newSystemMessageSms;
             toSend.ChatMessage = newMessage;
             return CommManager.SendMessage(toSend);
           }
@@ -142,18 +161,33 @@ namespace RestWcfApplication.Root.Want
             // target user is in source user also - love is in the air
             // enabling a chat between them by sending the target user id to the source user
 
-            newMessage.SystemMessageState = (int)ESystemMessageState.BothSidesAreIn;
+            var newSystemMessageHintMatch = new DB.Hint()
+            {
+              Text = MatchFound
+            };
+            var newSystemMessageMatch = new DB.Message()
+            {
+              SourceUserId = userIdParsed,
+              TargetUser = targetUser,
+              Hint = newSystemMessageHintMatch,
+              Date = newDate,
+              SystemMessageState = 1,
+              ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
+            };
+
+            context.Messages.Add(newSystemMessageMatch);
             initialMessage.MatchFound = true;
 
             context.SaveChanges();
 
             if (targetUser.DeviceId != null)
             {
-              PushSharp.PushManager.PushToIos(targetUser.DeviceId, "You have a match!");
+              PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Match was found!");
             }
 
             toSend.Type = (int)EMessagesTypesToClient.Ok;
             toSend.ChatMessage = newMessage;
+            toSend.SystemMessage = newSystemMessageMatch;
             toSend.InitialMessage = initialMessage;
             return CommManager.SendMessage(toSend);
           }
@@ -162,7 +196,21 @@ namespace RestWcfApplication.Root.Want
           //  1. sending source user system message to let him know
           //  2. sending target user that source user is in to him
 
-          newMessage.SystemMessageState = (int)ESystemMessageState.OneSideIsIn;
+          var newSystemMessageHint = new DB.Hint()
+          {
+            Text = OneSideIsIn
+          };
+          var newSystemMessage = new DB.Message()
+          {
+            SourceUserId = userIdParsed,
+            TargetUser = targetUser,
+            Hint = newSystemMessageHint,
+            Date = newDate,
+            SystemMessageState = 1,
+            ReceivedState = (int)EMessageReceivedState.MessageStateSentToClient
+          };
+
+          context.Messages.Add(newSystemMessage);
 
           context.SaveChanges();
 
@@ -173,6 +221,7 @@ namespace RestWcfApplication.Root.Want
 
           toSend.Type = (int)EMessagesTypesToClient.Ok;
           toSend.ChatMessage = newMessage;
+          toSend.SystemMessage = newSystemMessage;
           toSend.InitialMessage = initialMessage;
           return CommManager.SendMessage(toSend);
         }
@@ -221,7 +270,7 @@ namespace RestWcfApplication.Root.Want
 
           sourceUser.LastSeen = DateTime.Now.ToString("u");
 
-          var targetUser = context.Users.SingleOrDefault(u => u.FacebookUserId == facebookId);
+          var targetUser = context.Users.FirstOrDefault(u => u.FacebookUserId == facebookId);
           if (targetUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
@@ -251,7 +300,7 @@ namespace RestWcfApplication.Root.Want
           };
           if (firstMessage == null)
           {
-            var newFirstMessage = new DB.FirstMessage()
+            firstMessage = new FirstMessage()
             {
               Date = newDate,
               Message = newMessage,
@@ -260,9 +309,7 @@ namespace RestWcfApplication.Root.Want
               SubjectName = @""
             };
 
-            context.FirstMessages.Add(newFirstMessage);
-
-            firstMessage = newFirstMessage;
+            context.FirstMessages.Add(firstMessage);
           }
 
           context.Hints.Add(newHint);
@@ -273,20 +320,41 @@ namespace RestWcfApplication.Root.Want
           //    if so, love is in the air - connect chat between them
 
           // checking if target user is in source user also
-          var message = context.Messages.SingleOrDefault(m => m.SourceUserId == targetUser.Id && m.TargetUserId == userIdParsed);
-          if (message != null)
+          var messageExists = context.Messages.Any(m => m.SourceUserId == targetUser.Id && m.TargetUserId == userIdParsed);
+          if (messageExists)
           {
             // target user is in source user also - love is in the air
             // enabling a chat between them by sending the target user id to the source user
 
-            newMessage.SystemMessageState = (int)ESystemMessageState.BothSidesAreIn;
+            var newSystemMessageHintMatch = new DB.Hint()
+            {
+              Text = MatchFound
+            };
+            var newSystemMessageMatch = new DB.Message()
+            {
+              SourceUserId = userIdParsed,
+              TargetUser = targetUser,
+              Hint = newSystemMessageHintMatch,
+              Date = newDate,
+              SystemMessageState = 1,
+              ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
+            };
+
+            context.Messages.Add(newSystemMessageMatch);
+
             firstMessage.MatchFound = true;
 
             context.SaveChanges();
 
+            if (targetUser.DeviceId != null)
+            {
+              PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Match was found!");
+            }
+
             toSend.Type = (int) EMessagesTypesToClient.Ok;
-            toSend.Message = newMessage;
-            toSend.FirstMessage = firstMessage;
+            toSend.ChatMessage = newMessage;
+            toSend.SystemMessage = newSystemMessageMatch;
+            toSend.InitialMessage = firstMessage;
             return CommManager.SendMessage(toSend);
           }
 
@@ -294,7 +362,21 @@ namespace RestWcfApplication.Root.Want
           //  1. sending source user system message to let him know
           //  2. sending target user that source user is in to him
 
-          newMessage.SystemMessageState = (int)ESystemMessageState.OneSideIsIn;
+          var newSystemMessageHint = new DB.Hint()
+          {
+            Text = OneSideIsIn
+          };
+          var newSystemMessage = new DB.Message()
+          {
+            SourceUserId = userIdParsed,
+            TargetUser = targetUser,
+            Hint = newSystemMessageHint,
+            Date = newDate,
+            SystemMessageState = 1,
+            ReceivedState = (int)EMessageReceivedState.MessageStateSentToClient
+          };
+
+          context.Messages.Add(newSystemMessage);
 
           context.SaveChanges();
 
@@ -304,8 +386,9 @@ namespace RestWcfApplication.Root.Want
           }
 
           toSend.Type = (int)EMessagesTypesToClient.Ok;
-          toSend.Message = newMessage;
-          toSend.FirstMessage = firstMessage;
+          toSend.ChatMessage = newMessage;
+          toSend.SystemMessage = newSystemMessage;
+          toSend.InitialMessage = firstMessage;
           return CommManager.SendMessage(toSend);
         }
       }
