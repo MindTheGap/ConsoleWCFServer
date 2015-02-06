@@ -58,7 +58,7 @@ namespace RestWcfApplication.Root.Update
           if (user == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.PhoneNumberUserIdMismatch.ToString("d");
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
             return CommManager.SendMessage(toSend);
           }
 
@@ -97,6 +97,7 @@ namespace RestWcfApplication.Root.Update
           {
             foreach (var message in initialMessageWithUnreadMessages.UnreadMessages)
             {
+              message.SourceUser.PhoneNumber = string.Empty;
               message.TargetUser.PhoneNumber = string.Empty;
             }
           }
@@ -126,7 +127,7 @@ namespace RestWcfApplication.Root.Update
         {
           toSend.Type = EMessagesTypesToClient.Error;
           toSend.text = text;
-          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
@@ -148,7 +149,7 @@ namespace RestWcfApplication.Root.Update
           if (initialMessage == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
             return CommManager.SendMessage(toSend);
           }
 
@@ -169,11 +170,6 @@ namespace RestWcfApplication.Root.Update
           }
 
           context.SaveChanges();
-
-          if (realTargetUser != null)
-          {
-            realTargetUser.PhoneNumber = string.Empty;
-          }
 
           if (sendPush && realTargetUser != null && realTargetUser.DeviceId != null)
           {
@@ -204,7 +200,7 @@ namespace RestWcfApplication.Root.Update
         {
           toSend.Type = EMessagesTypesToClient.Error;
           toSend.text = text;
-          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 

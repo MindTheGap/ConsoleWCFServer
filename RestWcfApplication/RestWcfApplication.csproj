@@ -184,7 +184,7 @@
     </Compile>
     <Compile Include="DB\EMessageReceivedState.cs" />
     <Compile Include="DB\ESystemMessageState.cs" />
-    <Compile Include="DB\ErrorInfo.cs" />
+    <Compile Include="DB\ErrorDetails.cs" />
     <Compile Include="DB\FirstMessage.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>

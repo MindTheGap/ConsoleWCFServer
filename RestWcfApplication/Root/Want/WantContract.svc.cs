@@ -46,7 +46,7 @@ namespace RestWcfApplication.Root.Want
           {
             toSend.Type = EMessagesTypesToClient.Error;
             toSend.text = text;
-            toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+            toSend.ErrorInfo = ErrorDetails.BadArguments;
             return CommManager.SendMessage(toSend);
           }
 
@@ -60,7 +60,7 @@ namespace RestWcfApplication.Root.Want
           if (sourceUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
             return CommManager.SendMessage(toSend);
           }
 
@@ -250,7 +250,7 @@ namespace RestWcfApplication.Root.Want
         {
           toSend.Type = EMessagesTypesToClient.Error;
           toSend.text = text;
-          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
@@ -268,7 +268,7 @@ namespace RestWcfApplication.Root.Want
           if (sourceUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
             return CommManager.SendMessage(toSend);
           }
 
@@ -278,7 +278,7 @@ namespace RestWcfApplication.Root.Want
           if (targetUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
             return CommManager.SendMessage(toSend);
           }
 
@@ -420,7 +420,7 @@ namespace RestWcfApplication.Root.Want
         {
           toSend.Type = EMessagesTypesToClient.Error;
           toSend.text = text;
-          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
@@ -436,7 +436,7 @@ namespace RestWcfApplication.Root.Want
           if (sourceUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
             return CommManager.SendMessage(toSend);
           }
 
@@ -447,7 +447,7 @@ namespace RestWcfApplication.Root.Want
           if (firstMessage == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
             return CommManager.SendMessage(toSend);
           }
 
@@ -456,7 +456,7 @@ namespace RestWcfApplication.Root.Want
           if (targetUser == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
             return CommManager.SendMessage(toSend);
           }
 
