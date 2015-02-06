@@ -23,13 +23,6 @@ namespace RestWcfApplication.Root.Update
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "getUserChatMessages?userId={userId}")]
-    string GetUserChatMessages(string userId, Stream stream);
-
-    [OperationContract]
-    [WebInvoke(Method = "POST",
-      RequestFormat = WebMessageFormat.Json,
-      BodyStyle = WebMessageBodyStyle.Bare,
       UriTemplate = "readUserChatMessages?userId={userId}")]
     string ReadUserChatMessages(string userId, Stream stream);
 

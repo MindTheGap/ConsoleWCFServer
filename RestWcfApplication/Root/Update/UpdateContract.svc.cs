@@ -19,6 +19,13 @@ using Message = RestWcfApplication.DB.Message;
 
 namespace RestWcfApplication.Root.Update
 {
+  public class InitialMessageWithUnreadMessages
+  {
+    public FirstMessage InitialMessage { get; set; }
+    public List<Message> UnreadMessages { get; set; }
+  };
+    
+
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class UpdateContract : IUpdateContract
   {
@@ -57,13 +64,10 @@ namespace RestWcfApplication.Root.Update
 
           user.LastSeen = DateTime.Now.ToString("u");
 
-          var result = new List<object>();
+          var result = new List<InitialMessageWithUnreadMessages>();
           foreach (var initialMessage in context.FirstMessages.Include("Message").Include("SourceUser").Include("TargetUser").Include("Message.Hint")
             .Where(m => m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
           {
-            var otherSideId = initialMessage.SourceUserId == userIdParsed
-              ? initialMessage.TargetUserId
-              : initialMessage.SourceUserId;
             var unreadMessages = context.Messages.Include("SourceUser").Include("TargetUser").Include("Hint")
               .Where(m => 
                 (m.ReceivedState == (int)EMessageReceivedState.MessageStateSentToServer
@@ -83,73 +87,22 @@ namespace RestWcfApplication.Root.Update
                   m.ReceivedState = (int)EMessageReceivedState.MessageStateReadByClientAck;
                 }
               });
-              result.Add(new { InitialMessage = initialMessage, UnreadMessages = unreadMessages });
+              result.Add(new InitialMessageWithUnreadMessages() { InitialMessage = initialMessage, UnreadMessages = unreadMessages});
             }
           }
 
           context.SaveChanges();
+
+          foreach (var initialMessageWithUnreadMessages in result)
+          {
+            foreach (var message in initialMessageWithUnreadMessages.UnreadMessages)
+            {
+              message.TargetUser.PhoneNumber = string.Empty;
+            }
+          }
 
           toSend.Type = EMessagesTypesToClient.MultipleMessages;
           toSend.MultipleMessages = result;
-          return CommManager.SendMessage(toSend);
-        }
-      }
-      catch (Exception e)
-      {
-        throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
-      }
-    }
-
-    public string GetUserChatMessages(string userId, Stream stream)
-    {
-      try
-      {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var dictionary = JsonConvert.DeserializeObject<Dictionary<string, int>>(text);
-        if (dictionary == null)
-        {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
-          return CommManager.SendMessage(toSend);
-        }
-
-        var userIdParsed = int.Parse(userId);
-        var targetUserId = dictionary["targetUserId"];
-        var maxChatMessageId = dictionary["maxChatMessageId"];
-
-        using (var context = new Entities())
-        {
-          context.Configuration.ProxyCreationEnabled = false;
-
-          var user = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (user != null)
-          {
-            user.LastSeen = DateTime.Now.ToString("u");
-          }
-
-          var userMessages =
-            context.Messages.Where(m => m.Id > maxChatMessageId
-                                    && ((m.SourceUserId == userIdParsed && m.TargetUserId == targetUserId)
-                                        || (m.SourceUserId == targetUserId && m.TargetUserId == userIdParsed)))
-              .Include("SourceUser").Include("TargetUser").Include("Hint");
-
-          foreach (var userMessage in userMessages)
-          {
-            if (userIdParsed == userMessage.TargetUserId && userMessage.ReceivedState == (int)EMessageReceivedState.MessageStateSentToServer)
-            {
-              userMessage.ReceivedState = (int)EMessageReceivedState.MessageStateSentToClient;
-            }
-          }
-
-          context.SaveChanges();
-
-          toSend.Type = EMessagesTypesToClient.Ok;
-          toSend.Messages = userMessages;
           return CommManager.SendMessage(toSend);
         }
       }
@@ -217,7 +170,12 @@ namespace RestWcfApplication.Root.Update
 
           context.SaveChanges();
 
-          if (sendPush && realTargetUser.DeviceId != null)
+          if (realTargetUser != null)
+          {
+            realTargetUser.PhoneNumber = string.Empty;
+          }
+
+          if (sendPush && realTargetUser != null && realTargetUser.DeviceId != null)
           {
             PushManager.PushToIos(realTargetUser.DeviceId); // send empty push for client to only update the UI and not get an actual message
           }

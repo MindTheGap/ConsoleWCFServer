@@ -180,6 +180,8 @@ namespace RestWcfApplication.Root.Want
 
             context.SaveChanges();
 
+            targetUser.PhoneNumber = string.Empty;
+
             if (targetUser.DeviceId != null)
             {
               PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Match was found!");
@@ -213,6 +215,8 @@ namespace RestWcfApplication.Root.Want
           context.Messages.Add(newSystemMessage);
 
           context.SaveChanges();
+
+          targetUser.PhoneNumber = string.Empty;
 
           if (targetUser.DeviceId != null)
           {
@@ -288,7 +292,7 @@ namespace RestWcfApplication.Root.Want
           {
             PictureLink = hintImageLink,
             VideoLink = hintVideoLink,
-            Text = hintNotUsed ? DefaultEmptyMessage : text
+            Text = hintNotUsed ? DefaultEmptyMessage : hint
           };
           var newMessage = new DB.Message()
           {
@@ -346,6 +350,8 @@ namespace RestWcfApplication.Root.Want
 
             context.SaveChanges();
 
+            targetUser.PhoneNumber = string.Empty;
+
             if (targetUser.DeviceId != null)
             {
               PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Match was found!");
@@ -379,6 +385,8 @@ namespace RestWcfApplication.Root.Want
           context.Messages.Add(newSystemMessage);
 
           context.SaveChanges();
+
+          targetUser.PhoneNumber = string.Empty;
 
           if (targetUser.DeviceId != null)
           {
@@ -475,6 +483,8 @@ namespace RestWcfApplication.Root.Want
 
           context.SaveChanges();
 
+          targetUser.PhoneNumber = string.Empty;
+
           if (targetUser.DeviceId != null)
           {
             PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"You have a new message!");
@@ -490,180 +500,5 @@ namespace RestWcfApplication.Root.Want
         throw new FaultException("Something went wrong. exception is: " + e.Message);
       }
     }
-
-    //public string UpdateAskForClue(string userId, string sourcePhoneNumber, string targetUserId, Stream data)
-    //{
-    //  try
-    //  {
-    //    dynamic toSend = new ExpandoObject();
-
-    //    var reader = new StreamReader(data);
-    //    var text = reader.ReadToEnd();
-
-    //    var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
-    //    if (dictionary == null)
-    //    {
-    //      toSend.Type = EMessagesTypesToClient.Error;
-    //      toSend.text = text;
-    //      toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
-    //      return CommManager.SendMessage(toSend);
-    //    }
-
-    //    var firstMessageId = int.Parse(dictionary["firstMessageId"]);
-
-    //    using (var context = new Entities())
-    //    {
-    //      context.Configuration.ProxyCreationEnabled = false;
-
-    //      // check if userId corresponds to phoneNumber
-    //      var userIdParsed = Convert.ToInt32(userId);
-    //      var targetUserIdParsed = Convert.ToInt32(targetUserId);
-    //      var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed && u.PhoneNumber == sourcePhoneNumber);
-    //      if (sourceUser == null)
-    //      {
-    //        toSend.Type = EMessagesTypesToClient.Error;
-    //        toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
-    //        return CommManager.SendMessage(toSend);
-    //      }
-
-    //      sourceUser.LastSeen = DateTime.Now.ToString("u");
-
-    //      var newDate = DateTime.UtcNow.ToString("u");
-    //      var newHint = new DB.Hint
-    //      {
-    //        Text = DefaultClue
-    //      };
-    //      var newMessage = new DB.Message()
-    //      {
-    //        SourceUserId = userIdParsed,
-    //        Hint = newHint,
-    //        Date = newDate,
-    //        ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
-    //      };
-    //      var firstMessage = context.FirstMessages.Single(f => f.Id == firstMessageId);
-
-    //      context.Hints.Add(newHint);
-    //      context.Messages.Add(newMessage);
-
-    //      firstMessage.Message = newMessage;
-
-    //      // check if target user exists in the system:
-    //      //  if so, send him a message telling him a clue is needed
-    //      var targetUser = context.Users.SingleOrDefault(u => u.Id == targetUserIdParsed);
-    //      if (targetUser == null)
-    //      {
-    //        toSend.Type = EMessagesTypesToClient.Error;
-    //        toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
-    //        return CommManager.SendMessage(toSend);
-    //      }
-
-    //      // target user exists
-    //      newMessage.TargetUserId = targetUser.Id;
-
-    //      context.SaveChanges();
-
-    //      if (targetUser.DeviceId != null)
-    //      {
-    //        PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Someone needs a clue...");
-    //      }
-
-    //      toSend.Type = (int)EMessagesTypesToClient.Ok;
-    //      toSend.Message = newMessage;
-    //      return CommManager.SendMessage(toSend);
-    //    }
-    //  }
-    //  catch (Exception e)
-    //  {
-    //    throw new FaultException("Something went wrong. exception is: " + e.Message);
-    //  }
-    //}
-
-    //public string UpdateIWantUserByChatMessage(string userId, string targetUserId, string firstMessageId,
-    //          string hintImageLink, string hintVideoLink, Stream data)
-    //{
-    //  try
-    //  {
-    //    dynamic toSend = new ExpandoObject();
-
-    //    var reader = new StreamReader(data);
-    //    var text = reader.ReadToEnd();
-
-    //    using (var context = new Entities())
-    //    {
-    //      context.Configuration.ProxyCreationEnabled = false;
-
-    //      // check if userId corresponds to phoneNumber
-    //      var userIdParsed = Convert.ToInt32(userId);
-    //      var targetUserIdParsed = Convert.ToInt32(targetUserId);
-    //      var firstMessageIdParsed = Convert.ToInt32(firstMessageId);
-    //      var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-    //      if (sourceUser == null)
-    //      {
-    //        toSend.Type = EMessagesTypesToClient.Error;
-    //        toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
-    //        return CommManager.SendMessage(toSend);
-    //      }
-
-    //      var date = DateTime.Now.ToString("u");
-    //      sourceUser.LastSeen = date;
-
-    //      var targetUser = context.Users.SingleOrDefault(u => u.Id == targetUserIdParsed);
-    //      if (targetUser == null)
-    //      {
-    //        toSend.Type = EMessagesTypesToClient.Error;
-    //        toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
-    //        return CommManager.SendMessage(toSend);
-    //      }
-
-    //      var firstMessage =
-    //        context.FirstMessages.SingleOrDefault(
-    //          f =>
-    //            f.Id == firstMessageIdParsed && f.SourceUserId == userIdParsed && f.TargetUserId == targetUserIdParsed);
-    //      if (firstMessage == null)
-    //      {
-    //        toSend.Type = EMessagesTypesToClient.Error;
-    //        toSend.ErrorInfo = ErrorInfo.UserIdDoesNotExist.ToString("d");
-    //        return CommManager.SendMessage(toSend);
-    //      }
-
-    //      Debug.Assert(firstMessage.MatchFound);
-
-    //      var newHint = new DB.Hint()
-    //      {
-    //        Text = text,
-    //        PictureLink = hintImageLink,
-    //        VideoLink = hintVideoLink
-    //      };
-    //      var newMessage = new DB.Message()
-    //      {
-    //        Date = date,
-    //        SourceUserId = userIdParsed,
-    //        TargetUserId = targetUserIdParsed,
-    //        Hint = newHint,
-    //        ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
-    //      };
-
-    //      context.Hints.Add(newHint);
-    //      context.Messages.Add(newMessage);
-
-    //      firstMessage.Message = newMessage;
-
-    //      context.SaveChanges();
-
-    //      if (targetUser.DeviceId != null)
-    //      {
-    //        PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"You have a new message...");
-    //      }
-
-    //      toSend.Type = EMessagesTypesToClient.Ok;
-    //      toSend.Message = newMessage;
-    //      return CommManager.SendMessage(toSend);
-    //    }
-    //  }
-    //  catch (Exception e)
-    //  {
-    //    throw new FaultException("Something went wrong. exception is: " + e.Message);
-    //  }
-    //}
   }
 }
