@@ -11,27 +11,51 @@ namespace RestWcfApplication.PushSharp
 {
   public static class PushManager
   {
-    private static readonly PushBroker PushBroker = new PushBroker();
+    private static readonly PushBroker PushBrokerDev = new PushBroker();
+    private static readonly PushBroker PushBrokerProd = new PushBroker();
+
 
     static PushManager()
     {
-      PushBroker.OnNotificationSent += NotificationSent;
-      PushBroker.OnChannelException += ChannelException;
-      PushBroker.OnServiceException += ServiceException;
-      PushBroker.OnNotificationFailed += NotificationFailed;
-      PushBroker.OnDeviceSubscriptionExpired += DeviceSubscriptionExpired;
-      PushBroker.OnDeviceSubscriptionChanged += DeviceSubscriptionChanged;
-      PushBroker.OnChannelCreated += ChannelCreated;
-      PushBroker.OnChannelDestroyed += ChannelDestroyed;
+      PushBrokerDev.OnNotificationSent += NotificationSent;
+      PushBrokerDev.OnChannelException += ChannelException;
+      PushBrokerDev.OnServiceException += ServiceException;
+      PushBrokerDev.OnNotificationFailed += NotificationFailed;
+      PushBrokerDev.OnDeviceSubscriptionExpired += DeviceSubscriptionExpired;
+      PushBrokerDev.OnDeviceSubscriptionChanged += DeviceSubscriptionChanged;
+      PushBrokerDev.OnChannelCreated += ChannelCreated;
+      PushBrokerDev.OnChannelDestroyed += ChannelDestroyed;
 
-      //Registering the Apple Service and sending an iOS Notification
-      var appleCert = File.ReadAllBytes("HowToNotifications.p12");
-      PushBroker.RegisterAppleService(new ApplePushChannelSettings(false, appleCert, @"aaazzz123"));
+      PushBrokerProd.OnNotificationSent += NotificationSent;
+      PushBrokerProd.OnChannelException += ChannelException;
+      PushBrokerProd.OnServiceException += ServiceException;
+      PushBrokerProd.OnNotificationFailed += NotificationFailed;
+      PushBrokerProd.OnDeviceSubscriptionExpired += DeviceSubscriptionExpired;
+      PushBrokerProd.OnDeviceSubscriptionChanged += DeviceSubscriptionChanged;
+      PushBrokerProd.OnChannelCreated += ChannelCreated;
+      PushBrokerProd.OnChannelDestroyed += ChannelDestroyed;
+
+      try
+      {
+        //Registering the Apple Service and sending an iOS Notification
+        var appleCertProd = File.ReadAllBytes("HowToNotificationsProd.p12");
+        PushBrokerProd.RegisterAppleService(new ApplePushChannelSettings(true, appleCertProd, @"aaazzz123"));
+        var appleCertDev = File.ReadAllBytes("HowToNotificationsDev.p12");
+        PushBrokerDev.RegisterAppleService(new ApplePushChannelSettings(false, appleCertDev, @"aaazzz123"));
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine("Error: {0}", e.Message);
+      }
     }
 
     public static void PushToIos(string deviceId, string alert)
     {
-      PushBroker.QueueNotification(new AppleNotification()
+      PushBrokerDev.QueueNotification(new AppleNotification()
+                                 .ForDeviceToken(deviceId)
+                                 .WithAlert(alert)
+                                 .WithSound("default"));
+      PushBrokerProd.QueueNotification(new AppleNotification()
                                  .ForDeviceToken(deviceId)
                                  .WithAlert(alert)
                                  .WithSound("default"));
@@ -39,7 +63,9 @@ namespace RestWcfApplication.PushSharp
 
     public static void PushToIos(string deviceId)
     {
-      PushBroker.QueueNotification(new AppleNotification()
+      PushBrokerDev.QueueNotification(new AppleNotification()
+                                 .ForDeviceToken(deviceId));
+      PushBrokerProd.QueueNotification(new AppleNotification()
                                  .ForDeviceToken(deviceId));
     }
 

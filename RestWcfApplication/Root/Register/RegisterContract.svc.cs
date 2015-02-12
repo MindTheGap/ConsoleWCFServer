@@ -155,7 +155,7 @@ namespace RestWcfApplication.Root.Register
       }
     }
 
-    public string RegisterUserDetailsFacebookDetails(string userId, Stream stream)
+    public string RegisterUserInformation(string userId, Stream stream)
     {
       try
       {
@@ -173,10 +173,13 @@ namespace RestWcfApplication.Root.Register
           return CommManager.SendMessage(toSend);
         }
 
+        var name = jsonObject["name"];
         var firstName = jsonObject["firstName"];
         var lastName = jsonObject["lastName"];
         var facebookUserId = jsonObject["facebookUserId"];
         var email = jsonObject["email"];
+        var deviceId = jsonObject["deviceId"];
+        var contacts = jsonObject["contacts"];
 
         using (var context = new Entities())
         {
@@ -192,65 +195,37 @@ namespace RestWcfApplication.Root.Register
             return CommManager.SendMessage(toSend);
           }
 
+          sourceUser.DisplayName = name;
           sourceUser.FirstName = firstName;
           sourceUser.LastName = lastName;
           sourceUser.Email = email;
           sourceUser.FacebookUserId = facebookUserId;
-          sourceUser.LastSeen = DateTime.Now.ToString("u");
-
-          context.SaveChanges();
-
-          toSend.Type = EMessagesTypesToClient.Ok;
-          return CommManager.SendMessage(toSend);
-        }
-      }
-      catch (Exception e)
-      {
-        dynamic toSend = new ExpandoObject();
-        toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Exception = e.Message;
-        toSend.InnerMessage = e.InnerException;
-        return CommManager.SendMessage(toSend);
-      }
-    }
-
-    public string RegisterUserDetailsDeviceId(string userId, Stream stream)
-    {
-      try
-      {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
-        if (jsonObject == null)
-        {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
-          return CommManager.SendMessage(toSend);
-        }
-
-        var deviceId = jsonObject["deviceId"];
-
-        using (var context = new Entities())
-        {
-          context.Configuration.ProxyCreationEnabled = false;
-
-          // check if userId corresponds to phoneNumber
-          var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (sourceUser == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
-
           sourceUser.DeviceId = deviceId;
           sourceUser.LastSeen = DateTime.Now.ToString("u");
 
+          var sourceUserName = firstName != null ? firstName + " " + lastName : name;
+
+          if (contacts != null)
+          {
+            foreach (var phoneNumbers in contacts)
+            {
+              foreach (string phoneNumber in phoneNumbers)
+              {
+                var contactUser = context.Users.SingleOrDefault(u => u.PhoneNumber == phoneNumber);
+                if (contactUser != null)
+                {
+                  if (contactUser.DeviceId != null)
+                  {
+                    PushManager.PushToIos(contactUser.DeviceId,
+                      string.Format("{0} just joined IAmInToo! Feel free to be into them!", sourceUserName));
+                  }
+
+                  break;
+                }
+              }
+            }
+          }
+
           context.SaveChanges();
 
           toSend.Type = EMessagesTypesToClient.Ok;
@@ -261,7 +236,7 @@ namespace RestWcfApplication.Root.Register
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Exception = e.Message;
+        toSend.Error = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }

@@ -34,6 +34,7 @@ namespace RestWcfApplication.DB
         public string VerificationCode { get; set; }
         public bool Verified { get; set; }
         public string DeviceId { get; set; }
+        public string DisplayName { get; set; }
     
         public virtual ICollection<FirstMessage> FirstMessagesFromSourceUser { get; set; }
         public virtual ICollection<FirstMessage> FirstMessagesFromTargetUser { get; set; }

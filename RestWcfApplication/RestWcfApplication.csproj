@@ -183,8 +183,8 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="DB\EMessageReceivedState.cs" />
-    <Compile Include="DB\ESystemMessageState.cs" />
     <Compile Include="DB\ErrorDetails.cs" />
+    <Compile Include="DB\ESystemMessageState.cs" />
     <Compile Include="DB\FirstMessage.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
@@ -268,7 +268,10 @@
       <DependentUpon>DBModel.edmx</DependentUpon>
       <LastGenOutput>DBModel.cs</LastGenOutput>
     </Content>
-    <Content Include="Certifications\HowToNotifications.p12">
+    <Content Include="Certifications\HowToNotificationsDev.p12">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Certifications\HowToNotificationsProd.p12">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Properties\PublishProfiles\AmazonAWS.pubxml" />

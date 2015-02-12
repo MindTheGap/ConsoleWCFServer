@@ -37,21 +37,11 @@ namespace RestWcfApplication.Root.Register
     /// registers the user to the system and returns his new userId
     /// </summary>
     [OperationContract]
-    [WebInvoke(Method = "POST", 
-      RequestFormat = WebMessageFormat.Json,
-      BodyStyle = WebMessageBodyStyle.Bare, 
-      UriTemplate = "updateUserFbDetails?userId={userId}")]
-    string RegisterUserDetailsFacebookDetails(string userId, Stream stream);
-
-    /// <summary>
-    /// registers the user to the system and returns his new userId
-    /// </summary>
-    [OperationContract]
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "updateUserDeviceId?userId={userId}")]
-    string RegisterUserDetailsDeviceId(string userId, Stream stream);
+      UriTemplate = "updateUserInformation?userId={userId}")]
+    string RegisterUserInformation(string userId, Stream stream);
 
     /// <summary>
     /// returns "hello" string for testing
