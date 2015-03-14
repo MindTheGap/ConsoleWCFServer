@@ -27,6 +27,7 @@
           <Property Name="Text" Type="nvarchar" MaxLength="4000" />
           <Property Name="PictureLink" Type="nvarchar" MaxLength="500" />
           <Property Name="VideoLink" Type="nvarchar" MaxLength="500" />
+          <Property Name="ThumbnailImage" Type="image" />
         </EntityType>
         <EntityType Name="Message">
           <Key>
@@ -369,6 +370,7 @@
           <Property Name="PictureLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="VideoLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
+          <Property Name="ThumbnailImage" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <Association Name="FK_Message_Hint">
           <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
@@ -497,6 +499,7 @@
           <EntitySetMapping Name="Hints">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
               <MappingFragment StoreEntitySet="Hint">
+                <ScalarProperty Name="ThumbnailImage" ColumnName="ThumbnailImage" />
                 <ScalarProperty Name="VideoLink" ColumnName="VideoLink" />
                 <ScalarProperty Name="PictureLink" ColumnName="PictureLink" />
                 <ScalarProperty Name="Text" ColumnName="Text" />

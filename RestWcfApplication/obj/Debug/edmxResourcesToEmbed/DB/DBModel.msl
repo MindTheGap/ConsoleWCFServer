@@ -40,6 +40,7 @@
     <EntitySetMapping Name="Hints">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
         <MappingFragment StoreEntitySet="Hint">
+          <ScalarProperty Name="ThumbnailImage" ColumnName="ThumbnailImage" />
           <ScalarProperty Name="VideoLink" ColumnName="VideoLink" />
           <ScalarProperty Name="PictureLink" ColumnName="PictureLink" />
           <ScalarProperty Name="Text" ColumnName="Text" />

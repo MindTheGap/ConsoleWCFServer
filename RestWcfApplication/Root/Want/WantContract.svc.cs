@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using System.ServiceModel.Activation;
+using System.Drawing;
 
 namespace RestWcfApplication.Root.Want
 {
@@ -51,8 +52,8 @@ namespace RestWcfApplication.Root.Want
           }
 
           var hint = jsonObject["hint"];
-          var hintImageLink = jsonObject["hintImageLink"];
-          var hintVideoLink = jsonObject["hintVideoLink"];
+          var hintImageLink = jsonObject.ContainsKey("hintImageLink") ? jsonObject["hintImageLink"] : null;
+          var hintVideoLink = jsonObject.ContainsKey("hintVideoLink") ? jsonObject["hintVideoLink"] : null;
 
           // check if userId corresponds to phoneNumber
           var userIdParsed = Convert.ToInt32(userId);
@@ -255,8 +256,8 @@ namespace RestWcfApplication.Root.Want
         }
 
         var hint = jsonObject["hint"];
-        var hintImageLink = jsonObject["hintImageLink"];
-        var hintVideoLink = jsonObject["hintVideoLink"];
+        var hintImageLink = jsonObject.ContainsKey("hintImageLink") ? jsonObject["hintImageLink"] : null;
+        var hintVideoLink = jsonObject.ContainsKey("hintVideoLink") ? jsonObject["hintVideoLink"] : null;
 
         using (var context = new Entities())
         {
@@ -424,7 +425,10 @@ namespace RestWcfApplication.Root.Want
           return CommManager.SendMessage(toSend);
         }
 
-        var messageText = jsonObject["text"];
+        var messageText = jsonObject.ContainsKey("text") ? jsonObject["text"] : null;
+        var messageImageLink = jsonObject.ContainsKey("imageLink") ? jsonObject["imageLink"] : null;
+        var messageVideoLink = jsonObject.ContainsKey("videoLink") ? jsonObject["videoLink"] : null;
+        var thumbnailImage = jsonObject.ContainsKey("ThumbnailImage") ? Convert.FromBase64String(jsonObject["ThumbnailImage"]) : null;
 
         using (var context = new Entities())
         {
@@ -463,7 +467,10 @@ namespace RestWcfApplication.Root.Want
           var newDate = DateTime.UtcNow.ToString("u");
           var newHint = new DB.Hint
           {
-            Text = messageText
+            Text = messageText,
+            PictureLink = messageImageLink,
+            VideoLink = messageVideoLink,
+            ThumbnailImage = thumbnailImage
           };
           var newMessage = new DB.Message()
           {

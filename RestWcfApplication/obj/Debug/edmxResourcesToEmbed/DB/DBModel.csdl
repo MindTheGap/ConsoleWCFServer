@@ -197,6 +197,7 @@
     <Property Name="PictureLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
     <Property Name="VideoLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
     <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
+    <Property Name="ThumbnailImage" Type="Binary" MaxLength="Max" FixedLength="false" />
   </EntityType>
   <Association Name="FK_Message_Hint">
     <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />

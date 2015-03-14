@@ -35,17 +35,17 @@ namespace RestWcfApplication.Root.Update
       {
         dynamic toSend = new ExpandoObject();
 
-        //var reader = new StreamReader(stream);
-        //var text = reader.ReadToEnd();
+        var reader = new StreamReader(stream);
+        var text = reader.ReadToEnd();
 
-        //var dictionary = JsonConvert.DeserializeObject<Dictionary<string, int>>(text);
-        //if (dictionary == null)
-        //{
-        //  toSend.Type = EMessagesTypesToClient.Error;
-        //  toSend.text = text;
-        //  toSend.ErrorInfo = ErrorInfo.BadArgumentsLength.ToString("d");
-        //  return CommManager.SendMessage(toSend);
-        //}
+        var dictionary = JsonConvert.DeserializeObject<Dictionary<string, int>>(text);
+        if (dictionary == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.Error = ErrorDetails.BadArguments;
+          return CommManager.SendMessage(toSend);
+        }
 
         var userIdParsed = int.Parse(userId);
 
@@ -68,12 +68,9 @@ namespace RestWcfApplication.Root.Update
           foreach (var initialMessage in context.FirstMessages.Include("Message").Include("SourceUser").Include("TargetUser").Include("Message.Hint")
             .Where(m => m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
           {
+            var startingMessageId = dictionary.ContainsKey(initialMessage.Id.ToString("D")) ? dictionary[initialMessage.Id.ToString("D")] : -1;
             var unreadMessages = context.Messages.Include("SourceUser").Include("TargetUser").Include("Hint")
-              .Where(m => 
-                (m.ReceivedState == (int)EMessageReceivedState.MessageStateSentToServer
-                && m.TargetUserId == userIdParsed)
-                || (m.ReceivedState == (int)EMessageReceivedState.MessageStateReadByClient
-                && m.SourceUserId == userIdParsed)).ToList();
+              .Where(m => m.Id > startingMessageId).ToList();
             if (unreadMessages.Count > 0)
             {
               unreadMessages.ForEach(m =>
@@ -82,7 +79,7 @@ namespace RestWcfApplication.Root.Update
                 {
                   m.ReceivedState = (int) EMessageReceivedState.MessageStateSentToClient;
                 }
-                else // == MessageStateReadByClient
+                else if (m.ReceivedState == (int)EMessageReceivedState.MessageStateReadByClient)
                 {
                   m.ReceivedState = (int)EMessageReceivedState.MessageStateReadByClientAck;
                 }
@@ -133,17 +130,22 @@ namespace RestWcfApplication.Root.Update
 
         var userIdParsed = int.Parse(userId);
         var initialMessageId = dictionary["initialMessageId"];
-        var maxChatMessageId = dictionary["maxChatMessageId"];
+        var maxChatMessageId = dictionary.ContainsKey("maxChatMessageId") ? dictionary["maxChatMessageId"] : -1;
+        var chatMessageId = dictionary.ContainsKey("chatMessageId") ? dictionary["chatMessageId"] : -1;
 
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
           var user = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (user != null)
+          if (user == null)
           {
-            user.LastSeen = DateTime.Now.ToString("u");
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
+            return CommManager.SendMessage(toSend);
           }
+
+          user.LastSeen = DateTime.Now.ToString("u");
 
           var initialMessage = context.FirstMessages.SingleOrDefault(m => m.Id == initialMessageId);
           if (initialMessage == null)
@@ -160,20 +162,25 @@ namespace RestWcfApplication.Root.Update
 
           var sendPush = false;
           var userMessages =
-            context.Messages.Where(m => m.ReceivedState < (int)EMessageReceivedState.MessageStateReadByClient
-              && m.Id <= maxChatMessageId
+            context.Messages.Include("Hint").Where(m => m.ReceivedState < (int)EMessageReceivedState.MessageStateReadByClient
+              && ((maxChatMessageId > -1 && m.Id <= maxChatMessageId) || (chatMessageId > -1 && m.Id == chatMessageId))
               && m.TargetUserId == userIdParsed && m.SourceUserId == realTargetUserId);
           foreach (var userMessage in userMessages)
           {
-            userMessage.ReceivedState = (int)EMessageReceivedState.MessageStateReadByClient;
-            sendPush = true;
+            // check for text message or it's a specific media message
+            if (chatMessageId > -1 || (userMessage.Hint.PictureLink == null && userMessage.Hint.VideoLink == null))
+            {
+              userMessage.ReceivedState = (int)EMessageReceivedState.MessageStateReadByClient;
+              sendPush = true;
+            }
           }
 
           context.SaveChanges();
 
           if (sendPush && realTargetUser != null && realTargetUser.DeviceId != null)
           {
-            PushManager.PushToIos(realTargetUser.DeviceId); // send empty push for client to only update the UI and not get an actual message
+            var userName = user.FirstName != null ? user.FirstName + " " + user.LastName : user.DisplayName;
+            PushManager.PushToIos(realTargetUser.DeviceId, string.Format("{0} just read your message!", userName));
           }
 
           toSend.Type = EMessagesTypesToClient.Ok;

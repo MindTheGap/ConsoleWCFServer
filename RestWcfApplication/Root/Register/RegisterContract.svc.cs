@@ -173,13 +173,13 @@ namespace RestWcfApplication.Root.Register
           return CommManager.SendMessage(toSend);
         }
 
-        var name = jsonObject["name"];
-        var firstName = jsonObject["firstName"];
-        var lastName = jsonObject["lastName"];
-        var facebookUserId = jsonObject["facebookUserId"];
-        var email = jsonObject["email"];
-        var deviceId = jsonObject["deviceId"];
-        var contacts = jsonObject["contacts"];
+        var name = jsonObject.ContainsKey("name") ? jsonObject["name"] : null;
+        var firstName = jsonObject.ContainsKey("firstName") ? jsonObject["firstName"] : null;
+        var lastName = jsonObject.ContainsKey("lastName") ? jsonObject["lastName"] : null;
+        var facebookUserId = jsonObject.ContainsKey("facebookUserId") ? jsonObject["facebookUserId"] : null;
+        var email = jsonObject.ContainsKey("email") ? jsonObject["email"] : null;
+        var deviceId = jsonObject.ContainsKey("deviceId") ? jsonObject["deviceId"] : null;
+        var contacts = jsonObject.ContainsKey("contacts") ? jsonObject["contacts"] : null;
 
         using (var context = new Entities())
         {
@@ -195,12 +195,12 @@ namespace RestWcfApplication.Root.Register
             return CommManager.SendMessage(toSend);
           }
 
-          sourceUser.DisplayName = name;
-          sourceUser.FirstName = firstName;
-          sourceUser.LastName = lastName;
-          sourceUser.Email = email;
-          sourceUser.FacebookUserId = facebookUserId;
-          sourceUser.DeviceId = deviceId;
+          if (name != null) sourceUser.DisplayName = name;
+          if (firstName != null) sourceUser.FirstName = firstName;
+          if (lastName != null) sourceUser.LastName = lastName;
+          if (email != null) sourceUser.Email = email;
+          if (facebookUserId != null) sourceUser.FacebookUserId = facebookUserId;
+          if (deviceId != null) sourceUser.DeviceId = deviceId;
           sourceUser.LastSeen = DateTime.Now.ToString("u");
 
           var sourceUserName = firstName != null ? firstName + " " + lastName : name;
@@ -216,8 +216,11 @@ namespace RestWcfApplication.Root.Register
                 {
                   if (contactUser.DeviceId != null)
                   {
-                    PushManager.PushToIos(contactUser.DeviceId,
-                      string.Format("{0} just joined IAmInToo! Feel free to be into them!", sourceUserName));
+                    if (!context.Messages.Any(m => m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
+                    {
+                      PushManager.PushToIos(contactUser.DeviceId,
+                        string.Format("{0} just joined IAmInToo! Feel free to be into them!", sourceUserName));
+                    }
                   }
 
                   break;
@@ -225,6 +228,65 @@ namespace RestWcfApplication.Root.Register
               }
             }
           }
+
+          context.SaveChanges();
+
+          toSend.Type = EMessagesTypesToClient.Ok;
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Error = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
+      }
+    }
+
+    public string RegisterUserFbInformation(string userId, Stream stream)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(stream);
+        var text = reader.ReadToEnd();
+
+        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
+        if (jsonObject == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
+          return CommManager.SendMessage(toSend);
+        }
+
+        var firstName = jsonObject["firstName"];
+        var lastName = jsonObject["lastName"];
+        var facebookUserId = jsonObject["facebookUserId"];
+        var email = jsonObject["email"];
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          // check if userId corresponds to phoneNumber
+          var userIdParsed = Convert.ToInt32(userId);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
+          if (sourceUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
+            return CommManager.SendMessage(toSend);
+          }
+
+          sourceUser.FirstName = firstName;
+          sourceUser.LastName = lastName;
+          sourceUser.Email = email;
+          sourceUser.FacebookUserId = facebookUserId;
+          sourceUser.LastSeen = DateTime.Now.ToString("u");
 
           context.SaveChanges();
 

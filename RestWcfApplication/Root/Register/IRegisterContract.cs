@@ -44,6 +44,16 @@ namespace RestWcfApplication.Root.Register
     string RegisterUserInformation(string userId, Stream stream);
 
     /// <summary>
+    /// registers the user to the system and returns his new userId
+    /// </summary>
+    [OperationContract]
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare,
+      UriTemplate = "updateUserFBInformation?userId={userId}")]
+    string RegisterUserFbInformation(string userId, Stream stream);
+
+    /// <summary>
     /// returns "hello" string for testing
     /// </summary>
     /// <returns>"hello"</returns>

@@ -22,6 +22,7 @@
     <Property Name="Text" Type="nvarchar" MaxLength="4000" />
     <Property Name="PictureLink" Type="nvarchar" MaxLength="500" />
     <Property Name="VideoLink" Type="nvarchar" MaxLength="500" />
+    <Property Name="ThumbnailImage" Type="image" />
   </EntityType>
   <EntityType Name="Message">
     <Key>
