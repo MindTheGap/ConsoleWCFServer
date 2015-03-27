@@ -71,6 +71,7 @@ namespace RestWcfApplication.Root.Register
           context.SaveChanges();
 
           toSend.Type = EMessagesTypesToClient.Ok;
+          toSend.User = user;
           return CommManager.SendMessage(toSend);
         }
       }
@@ -180,6 +181,7 @@ namespace RestWcfApplication.Root.Register
         var email = jsonObject.ContainsKey("email") ? jsonObject["email"] : null;
         var deviceId = jsonObject.ContainsKey("deviceId") ? jsonObject["deviceId"] : null;
         var contacts = jsonObject.ContainsKey("contacts") ? jsonObject["contacts"] : null;
+        var profileImageLink = jsonObject.ContainsKey("profileImageLink") ? jsonObject["profileImageLink"] : null;
 
         using (var context = new Entities())
         {
@@ -201,6 +203,7 @@ namespace RestWcfApplication.Root.Register
           if (email != null) sourceUser.Email = email;
           if (facebookUserId != null) sourceUser.FacebookUserId = facebookUserId;
           if (deviceId != null) sourceUser.DeviceId = deviceId;
+          if (profileImageLink != null) sourceUser.ProfileImageLink = profileImageLink;
           sourceUser.LastSeen = DateTime.Now.ToString("u");
 
           var sourceUserName = firstName != null ? firstName + " " + lastName : name;

@@ -73,8 +73,14 @@ namespace RestWcfApplication.Root.Update
               .Where(m => m.Id > startingMessageId).ToList();
             if (unreadMessages.Count > 0)
             {
+              var neededUnreadMessages = new List<Message>();
               unreadMessages.ForEach(m =>
               {
+                if (m.ReceivedState != (int) EMessageReceivedState.MessageStateReadByClientAck)
+                {
+                  neededUnreadMessages.Add(m);
+                }
+
                 if (m.ReceivedState == (int) EMessageReceivedState.MessageStateSentToServer)
                 {
                   m.ReceivedState = (int) EMessageReceivedState.MessageStateSentToClient;
@@ -84,7 +90,7 @@ namespace RestWcfApplication.Root.Update
                   m.ReceivedState = (int)EMessageReceivedState.MessageStateReadByClientAck;
                 }
               });
-              result.Add(new InitialMessageWithUnreadMessages() { InitialMessage = initialMessage, UnreadMessages = unreadMessages});
+              result.Add(new InitialMessageWithUnreadMessages() { InitialMessage = initialMessage, UnreadMessages = neededUnreadMessages });
             }
           }
 
