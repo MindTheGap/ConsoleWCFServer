@@ -66,6 +66,8 @@ D:\Dropbox\Projects\ServerSide\ConsoleWCFServer\RestWcfApplication\bin\zh-Hant\S
 D:\Dropbox\Projects\ServerSide\ConsoleWCFServer\RestWcfApplication\obj\Debug\RestWcfApplication.dll
 D:\Dropbox\Projects\ServerSide\ConsoleWCFServer\RestWcfApplication\obj\Debug\RestWcfApplication.pdb
 D:\Dropbox\Projects\ServerSide\ConsoleWCFServer\RestWcfApplication\obj\Debug\RestWcfApplication.csprojResolveAssemblyReference.cache
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Certifications\HowToNotificationsDev.p12
+D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Certifications\HowToNotificationsProd.p12
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\RestWcfApplication.dll.config
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\RestWcfApplication.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\RestWcfApplication.pdb
@@ -155,5 +157,3 @@ D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.dll
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.pdb
 D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\obj\Debug\RestWcfApplication.csprojResolveAssemblyReference.cache
-D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Certifications\HowToNotificationsProd.p12
-D:\Dropbox\Projects\IAmIn2Code\Server\IAmIn2Service\RestWcfApplication\bin\Certifications\HowToNotificationsDev.p12

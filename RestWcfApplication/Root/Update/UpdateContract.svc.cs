@@ -65,18 +65,20 @@ namespace RestWcfApplication.Root.Update
           user.LastSeen = DateTime.Now.ToString("u");
 
           var result = new List<InitialMessageWithUnreadMessages>();
-          foreach (var initialMessage in context.FirstMessages.Include("Message").Include("SourceUser").Include("TargetUser").Include("Message.Hint")
+          foreach (var initialMessage in context.FirstMessages.Include("Messages").Include("SourceUser").Include("TargetUser")
             .Where(m => m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
           {
             var startingMessageId = dictionary.ContainsKey(initialMessage.Id.ToString("D")) ? dictionary[initialMessage.Id.ToString("D")] : -1;
             var unreadMessages = context.Messages.Include("SourceUser").Include("TargetUser").Include("Hint")
-              .Where(m => m.Id > startingMessageId).ToList();
+              .Where(m => m.Id > startingMessageId && m.FirstMessageId == initialMessage.Id).ToList();
             if (unreadMessages.Count > 0)
             {
               var neededUnreadMessages = new List<Message>();
               unreadMessages.ForEach(m =>
               {
-                if (m.ReceivedState != (int) EMessageReceivedState.MessageStateReadByClientAck)
+                if (m.ReceivedState != (int) EMessageReceivedState.MessageStateReadByClientAck
+                  && (    (m.SystemMessageState != null && m.SourceUserId == userIdParsed)
+                      ||  (m.SystemMessageState == null)    ))
                 {
                   neededUnreadMessages.Add(m);
                 }

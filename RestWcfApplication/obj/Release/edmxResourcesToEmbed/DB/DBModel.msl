@@ -1,39 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
   <EntityContainerMapping StorageEntityContainer="ChildTubeMainDBModelStoreContainer" CdmEntityContainer="Entities">
-    <EntitySetMapping Name="Messages">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
-        <MappingFragment StoreEntitySet="Message">
-          <ScalarProperty Name="ReceivedState" ColumnName="ReceivedState" />
-          <ScalarProperty Name="SystemMessageState" ColumnName="SystemMessageState" />
-          <ScalarProperty Name="HintId" ColumnName="HintId" />
-          <ScalarProperty Name="Date" ColumnName="Date" />
-          <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
-          <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
-          <ScalarProperty Name="Id" ColumnName="Id" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
     <EntitySetMapping Name="Tokens">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.Token">
         <MappingFragment StoreEntitySet="Token">
           <ScalarProperty Name="Code" ColumnName="Code" />
           <ScalarProperty Name="UserId" ColumnName="UserId" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
-    <EntitySetMapping Name="FirstMessages">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
-        <MappingFragment StoreEntitySet="FirstMessage">
-          <ScalarProperty Name="TargetUserDeleted" ColumnName="TargetUserDeleted" />
-          <ScalarProperty Name="SourceUserDeleted" ColumnName="SourceUserDeleted" />
-          <ScalarProperty Name="MatchFound" ColumnName="MatchFound" />
-          <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
-          <ScalarProperty Name="LastMessageId" ColumnName="LastMessageId" />
-          <ScalarProperty Name="Date" ColumnName="Date" />
-          <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
-          <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
-          <ScalarProperty Name="Id" ColumnName="Id" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -63,6 +35,34 @@
           <ScalarProperty Name="Email" ColumnName="Email" />
           <ScalarProperty Name="LastName" ColumnName="LastName" />
           <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="FirstMessages">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
+        <MappingFragment StoreEntitySet="FirstMessage">
+          <ScalarProperty Name="TargetUserDeleted" ColumnName="TargetUserDeleted" />
+          <ScalarProperty Name="SourceUserDeleted" ColumnName="SourceUserDeleted" />
+          <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
+          <ScalarProperty Name="MatchFound" ColumnName="MatchFound" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
+          <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Messages">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
+        <MappingFragment StoreEntitySet="Message">
+          <ScalarProperty Name="HintId" ColumnName="HintId" />
+          <ScalarProperty Name="SystemMessageState" ColumnName="SystemMessageState" />
+          <ScalarProperty Name="ReceivedState" ColumnName="ReceivedState" />
+          <ScalarProperty Name="Date" ColumnName="Date" />
+          <ScalarProperty Name="FirstMessageId" ColumnName="FirstMessageId" />
+          <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
+          <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
           <ScalarProperty Name="Id" ColumnName="Id" />
         </MappingFragment>
       </EntityTypeMapping>

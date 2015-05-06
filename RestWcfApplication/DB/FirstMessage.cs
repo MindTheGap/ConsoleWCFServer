@@ -14,18 +14,22 @@ namespace RestWcfApplication.DB
     
     public partial class FirstMessage
     {
+        public FirstMessage()
+        {
+            this.Messages = new HashSet<Message>();
+        }
+    
         public int Id { get; set; }
         public int SourceUserId { get; set; }
         public int TargetUserId { get; set; }
         public string Date { get; set; }
-        public int LastMessageId { get; set; }
-        public string SubjectName { get; set; }
         public bool MatchFound { get; set; }
+        public string SubjectName { get; set; }
         public bool SourceUserDeleted { get; set; }
         public bool TargetUserDeleted { get; set; }
     
-        public virtual Message Message { get; set; }
         public virtual User SourceUser { get; set; }
         public virtual User TargetUser { get; set; }
+        public virtual ICollection<Message> Messages { get; set; }
     }
 }

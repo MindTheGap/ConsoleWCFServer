@@ -18,11 +18,10 @@ namespace RestWcfApplication.Root.Want
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class WantContract : IWantContract
   {
-    private const string DefaultClue = @"I need another clue...";
     private const string DefaultEmptyMessage = @"Guess Who...";
     private const string MatchFound = "Match Found";
-    private const string OneSideIsIn = "Waiting for other party to be in too";
-    private const string SentSms = "Sent SMS, Waiting for the other party to install the application";
+    private const string OneSideIsIn = "Waiting for the other party to be in too. Feel free to send them clues and help them out";
+    private const string SentSms = "We've sent a SMS and are now waiting for the other party to install the application";
 
     private bool IsStringEmpty(string s)
     {
@@ -91,7 +90,6 @@ namespace RestWcfApplication.Root.Want
             var newInitialMessage = new DB.FirstMessage()
             {
               Date = newDate,
-              Message = newMessage,
               SourceUserId = userIdParsed,
               SubjectName = @""
             };
@@ -100,6 +98,7 @@ namespace RestWcfApplication.Root.Want
 
             initialMessage = newInitialMessage;
           }
+          newMessage.FirstMessage = initialMessage;
 
           context.Hints.Add(newHint);
           context.Messages.Add(newMessage);
@@ -129,6 +128,7 @@ namespace RestWcfApplication.Root.Want
             {
               SourceUserId = userIdParsed,
               TargetUser = newTargetUser,
+              FirstMessage = initialMessage,
               Hint = newSystemMessageHintSms,
               Date = newDate,
               SystemMessageState = 1,
@@ -170,6 +170,7 @@ namespace RestWcfApplication.Root.Want
             {
               SourceUserId = userIdParsed,
               TargetUser = targetUser,
+              FirstMessage = initialMessage,
               Hint = newSystemMessageHintMatch,
               Date = newDate,
               SystemMessageState = 1,
@@ -207,6 +208,7 @@ namespace RestWcfApplication.Root.Want
           {
             SourceUserId = userIdParsed,
             TargetUser = targetUser,
+            FirstMessage = initialMessage,
             Hint = newSystemMessageHint,
             Date = newDate,
             SystemMessageState = 1,
@@ -308,7 +310,6 @@ namespace RestWcfApplication.Root.Want
             firstMessage = new FirstMessage()
             {
               Date = newDate,
-              Message = newMessage,
               SourceUserId = userIdParsed,
               TargetUserId = targetUser.Id,
               SubjectName = @""
@@ -316,6 +317,7 @@ namespace RestWcfApplication.Root.Want
 
             context.FirstMessages.Add(firstMessage);
           }
+          newMessage.FirstMessage = firstMessage;
 
           context.Hints.Add(newHint);
           context.Messages.Add(newMessage);
@@ -339,6 +341,7 @@ namespace RestWcfApplication.Root.Want
             {
               SourceUserId = userIdParsed,
               TargetUser = targetUser,
+              FirstMessage = firstMessage,
               Hint = newSystemMessageHintMatch,
               Date = newDate,
               SystemMessageState = 1,
@@ -377,6 +380,7 @@ namespace RestWcfApplication.Root.Want
           {
             SourceUserId = userIdParsed,
             TargetUser = targetUser,
+            FirstMessage = firstMessage,
             Hint = newSystemMessageHint,
             Date = newDate,
             SystemMessageState = 1,
@@ -476,6 +480,7 @@ namespace RestWcfApplication.Root.Want
           {
             SourceUserId = userIdParsed,
             TargetUserId = targetUser.Id,
+            FirstMessage = firstMessage,
             Hint = newHint,
             Date = newDate,
             ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
@@ -483,7 +488,6 @@ namespace RestWcfApplication.Root.Want
 
           context.Hints.Add(newHint);
           context.Messages.Add(newMessage);
-          firstMessage.Message = newMessage;
 
           // target user does not want source user yet so:
           //  sending target user the message from source user

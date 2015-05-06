@@ -8,7 +8,6 @@
     <Property Name="SourceUserId" Type="int" Nullable="false" />
     <Property Name="TargetUserId" Type="int" Nullable="false" />
     <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
-    <Property Name="LastMessageId" Type="int" Nullable="false" />
     <Property Name="MatchFound" Type="bit" Nullable="false" />
     <Property Name="SubjectName" Type="nvarchar" MaxLength="500" />
     <Property Name="SourceUserDeleted" Type="bit" Nullable="false" />
@@ -31,6 +30,7 @@
     <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
     <Property Name="SourceUserId" Type="int" Nullable="false" />
     <Property Name="TargetUserId" Type="int" Nullable="false" />
+    <Property Name="FirstMessageId" Type="int" Nullable="false" />
     <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
     <Property Name="ReceivedState" Type="int" Nullable="false" />
     <Property Name="SystemMessageState" Type="int" />
@@ -61,18 +61,6 @@
     <Property Name="VerificationCode" Type="nvarchar" MaxLength="50" />
     <Property Name="Verified" Type="bit" Nullable="false" />
   </EntityType>
-  <Association Name="FK_FirstMessage_Message">
-    <End Role="Message" Type="Self.Message" Multiplicity="1" />
-    <End Role="FirstMessage" Type="Self.FirstMessage" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Message">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="FirstMessage">
-        <PropertyRef Name="LastMessageId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <Association Name="FK_FirstMessage_SourceUser">
     <End Role="User" Type="Self.User" Multiplicity="1" />
     <End Role="FirstMessage" Type="Self.FirstMessage" Multiplicity="*" />
@@ -94,6 +82,18 @@
       </Principal>
       <Dependent Role="FirstMessage">
         <PropertyRef Name="TargetUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Message_FirstMessage">
+    <End Role="FirstMessage" Type="Self.FirstMessage" Multiplicity="1" />
+    <End Role="Message" Type="Self.Message" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="FirstMessage">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Message">
+        <PropertyRef Name="FirstMessageId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -139,10 +139,6 @@
     <EntitySet Name="Message" EntityType="Self.Message" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Token" EntityType="Self.Token" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
-    <AssociationSet Name="FK_FirstMessage_Message" Association="Self.FK_FirstMessage_Message">
-      <End Role="Message" EntitySet="Message" />
-      <End Role="FirstMessage" EntitySet="FirstMessage" />
-    </AssociationSet>
     <AssociationSet Name="FK_FirstMessage_SourceUser" Association="Self.FK_FirstMessage_SourceUser">
       <End Role="User" EntitySet="User" />
       <End Role="FirstMessage" EntitySet="FirstMessage" />
@@ -150,6 +146,10 @@
     <AssociationSet Name="FK_FirstMessage_TargetUser" Association="Self.FK_FirstMessage_TargetUser">
       <End Role="User" EntitySet="User" />
       <End Role="FirstMessage" EntitySet="FirstMessage" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Message_FirstMessage" Association="Self.FK_Message_FirstMessage">
+      <End Role="FirstMessage" EntitySet="FirstMessage" />
+      <End Role="Message" EntitySet="Message" />
     </AssociationSet>
     <AssociationSet Name="FK_Message_Hint" Association="Self.FK_Message_Hint">
       <End Role="Hint" EntitySet="Hint" />

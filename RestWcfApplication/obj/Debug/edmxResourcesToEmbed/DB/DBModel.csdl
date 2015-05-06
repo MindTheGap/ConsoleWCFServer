@@ -52,19 +52,11 @@
       <Parameter Name="Email" Mode="In" Type="String" />
       <Parameter Name="Activity" Mode="In" Type="Int32" />
     </FunctionImport>
-    <EntitySet Name="Messages" EntityType="ChildTubeMainDBModel.Message" />
     <EntitySet Name="Tokens" EntityType="ChildTubeMainDBModel.Token" />
-    <EntitySet Name="FirstMessages" EntityType="ChildTubeMainDBModel.FirstMessage" />
-    <AssociationSet Name="FK_FirstMessage_Message" Association="ChildTubeMainDBModel.FK_FirstMessage_Message">
-      <End Role="Message" EntitySet="Messages" />
-      <End Role="FirstMessage" EntitySet="FirstMessages" />
-    </AssociationSet>
     <EntitySet Name="Hints" EntityType="ChildTubeMainDBModel.Hint" />
-    <AssociationSet Name="FK_Message_Hint" Association="ChildTubeMainDBModel.FK_Message_Hint">
-      <End Role="Hint" EntitySet="Hints" />
-      <End Role="Message" EntitySet="Messages" />
-    </AssociationSet>
     <EntitySet Name="Users" EntityType="ChildTubeMainDBModel.User" />
+    <EntitySet Name="FirstMessages" EntityType="ChildTubeMainDBModel.FirstMessage" />
+    <EntitySet Name="Messages" EntityType="ChildTubeMainDBModel.Message" />
     <AssociationSet Name="FK_FirstMessage_SourceUser" Association="ChildTubeMainDBModel.FK_FirstMessage_SourceUser">
       <End Role="User" EntitySet="Users" />
       <End Role="FirstMessage" EntitySet="FirstMessages" />
@@ -72,6 +64,14 @@
     <AssociationSet Name="FK_FirstMessage_TargetUser" Association="ChildTubeMainDBModel.FK_FirstMessage_TargetUser">
       <End Role="User" EntitySet="Users" />
       <End Role="FirstMessage" EntitySet="FirstMessages" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Message_FirstMessage" Association="ChildTubeMainDBModel.FK_Message_FirstMessage">
+      <End Role="FirstMessage" EntitySet="FirstMessages" />
+      <End Role="Message" EntitySet="Messages" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Message_Hint" Association="ChildTubeMainDBModel.FK_Message_Hint">
+      <End Role="Hint" EntitySet="Hints" />
+      <End Role="Message" EntitySet="Messages" />
     </AssociationSet>
     <AssociationSet Name="FK_Message_SourceUser" Association="ChildTubeMainDBModel.FK_Message_SourceUser">
       <End Role="User" EntitySet="Users" />
@@ -136,22 +136,6 @@
     <Property Type="String" Name="Email" Nullable="false" MaxLength="100" />
     <Property Type="Int32" Name="Activity" Nullable="true" />
   </ComplexType>
-  <EntityType Name="Message">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="SourceUserId" Type="Int32" Nullable="false" />
-    <Property Name="TargetUserId" Type="Int32" Nullable="false" />
-    <Property Name="Date" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-    <Property Name="HintId" Type="Int32" />
-    <NavigationProperty Name="FirstMessages" Relationship="ChildTubeMainDBModel.FK_FirstMessage_Message" FromRole="Message" ToRole="FirstMessage" />
-    <Property Name="SystemMessageState" Type="Int32" />
-    <NavigationProperty Name="Hint" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
-    <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="Message" ToRole="User" />
-    <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="Message" ToRole="User" />
-    <Property Name="ReceivedState" Type="Int32" Nullable="false" />
-  </EntityType>
   <EntityType Name="Token">
     <Key>
       <PropertyRef Name="UserId" />
@@ -159,35 +143,6 @@
     <Property Name="UserId" Type="Int32" Nullable="false" />
     <Property Name="Code" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
   </EntityType>
-  <EntityType Name="FirstMessage">
-    <Key>
-      <PropertyRef Name="Id" />
-    </Key>
-    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-    <Property Name="SourceUserId" Type="Int32" Nullable="false" />
-    <Property Name="TargetUserId" Type="Int32" Nullable="false" />
-    <Property Name="Date" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-    <Property Name="LastMessageId" Type="Int32" Nullable="false" />
-    <Property Name="SubjectName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-    <NavigationProperty Name="Message" Relationship="ChildTubeMainDBModel.FK_FirstMessage_Message" FromRole="FirstMessage" ToRole="Message" />
-    <Property Name="MatchFound" Type="Boolean" Nullable="false" />
-    <Property Name="SourceUserDeleted" Type="Boolean" Nullable="false" />
-    <Property Name="TargetUserDeleted" Type="Boolean" Nullable="false" />
-    <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="FirstMessage" ToRole="User" />
-    <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="FirstMessage" ToRole="User" />
-  </EntityType>
-  <Association Name="FK_FirstMessage_Message">
-    <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="1" />
-    <End Type="ChildTubeMainDBModel.FirstMessage" Role="FirstMessage" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Message">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="FirstMessage">
-        <PropertyRef Name="LastMessageId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <EntityType Name="Hint">
     <Key>
       <PropertyRef Name="Id" />
@@ -196,21 +151,9 @@
     <Property Name="Text" Type="String" MaxLength="4000" FixedLength="false" Unicode="true" />
     <Property Name="PictureLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
     <Property Name="VideoLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-    <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
     <Property Name="ThumbnailImage" Type="Binary" MaxLength="Max" FixedLength="false" />
+    <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
   </EntityType>
-  <Association Name="FK_Message_Hint">
-    <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
-    <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="Hint">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Message">
-        <PropertyRef Name="HintId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
   <EntityType Name="User">
     <Key>
       <PropertyRef Name="Id" />
@@ -226,12 +169,45 @@
     <Property Name="LastSeen" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
     <Property Name="VerificationCode" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
     <Property Name="Verified" Type="Boolean" Nullable="false" />
-    <NavigationProperty Name="FirstMessagesFromSourceUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="User" ToRole="FirstMessage" />
-    <NavigationProperty Name="FirstMessagesFromTargetUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="User" ToRole="FirstMessage" />
-    <NavigationProperty Name="MessagesAsSourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
-    <NavigationProperty Name="MessagesAsTargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
     <Property Name="DeviceId" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
     <Property Name="DisplayName" Type="String" MaxLength="60" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="FirstMessages" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="User" ToRole="FirstMessage" />
+    <NavigationProperty Name="FirstMessages1" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="User" ToRole="FirstMessage" />
+    <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
+    <NavigationProperty Name="Messages1" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
+  </EntityType>
+  <EntityType Name="FirstMessage">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="SourceUserId" Type="Int32" Nullable="false" />
+    <Property Name="TargetUserId" Type="Int32" Nullable="false" />
+    <Property Name="Date" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="MatchFound" Type="Boolean" Nullable="false" />
+    <Property Name="SubjectName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="SourceUserDeleted" Type="Boolean" Nullable="false" />
+    <Property Name="TargetUserDeleted" Type="Boolean" Nullable="false" />
+    <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="FirstMessage" ToRole="User" />
+    <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="FirstMessage" ToRole="User" />
+    <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_FirstMessage" FromRole="FirstMessage" ToRole="Message" />
+  </EntityType>
+  <EntityType Name="Message">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="SourceUserId" Type="Int32" Nullable="false" />
+    <Property Name="TargetUserId" Type="Int32" Nullable="false" />
+    <Property Name="FirstMessageId" Type="Int32" Nullable="false" />
+    <Property Name="Date" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="ReceivedState" Type="Int32" Nullable="false" />
+    <Property Name="SystemMessageState" Type="Int32" />
+    <Property Name="HintId" Type="Int32" />
+    <NavigationProperty Name="FirstMessage" Relationship="ChildTubeMainDBModel.FK_Message_FirstMessage" FromRole="Message" ToRole="FirstMessage" />
+    <NavigationProperty Name="Hint" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
+    <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="Message" ToRole="User" />
+    <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="Message" ToRole="User" />
   </EntityType>
   <Association Name="FK_FirstMessage_SourceUser">
     <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
@@ -254,6 +230,30 @@
       </Principal>
       <Dependent Role="FirstMessage">
         <PropertyRef Name="TargetUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Message_FirstMessage">
+    <End Type="ChildTubeMainDBModel.FirstMessage" Role="FirstMessage" Multiplicity="1" />
+    <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="FirstMessage">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Message">
+        <PropertyRef Name="FirstMessageId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Message_Hint">
+    <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
+    <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Hint">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Message">
+        <PropertyRef Name="HintId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
