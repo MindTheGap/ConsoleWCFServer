@@ -58,6 +58,7 @@ namespace RestWcfApplication.Root.Update
           if (user == null)
           {
             toSend.Type = EMessagesTypesToClient.Error;
+            toSend.FatalError = "true";
             toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
             return CommManager.SendMessage(toSend);
           }
@@ -97,15 +98,6 @@ namespace RestWcfApplication.Root.Update
           }
 
           context.SaveChanges();
-
-          foreach (var initialMessageWithUnreadMessages in result)
-          {
-            foreach (var message in initialMessageWithUnreadMessages.UnreadMessages)
-            {
-              message.SourceUser.PhoneNumber = string.Empty;
-              message.TargetUser.PhoneNumber = string.Empty;
-            }
-          }
 
           toSend.Type = EMessagesTypesToClient.MultipleMessages;
           toSend.MultipleMessages = result;
@@ -201,7 +193,7 @@ namespace RestWcfApplication.Root.Update
       }
     }
 
-    public string GetUserContactsLastSeen(string userId, Stream stream)
+    public string GetUserContactsLastSeenAndProfileImageLinks(string userId, Stream stream)
     {
       try
       {
@@ -233,30 +225,23 @@ namespace RestWcfApplication.Root.Update
             context.SaveChanges();
           }
 
-          var resultList = new List<string>();
+          var resultList = new Dictionary<string,List<string>>();
           foreach (var contactPhoneNumberList in contactsList)
           {
-            var foundContact = false;
             foreach (var phoneNumber in contactPhoneNumberList)
             {
               var contact = context.Users.SingleOrDefault(u => u.PhoneNumber == phoneNumber);
 
               if (contact != null)
               {
-                resultList.Add(contact.LastSeen);
-                foundContact = true;
+                resultList[phoneNumber] = new List<string>() {contact.LastSeen,contact.ProfileImageLink};
                 break;
               }
             }
-
-            if (!foundContact)
-            {
-              resultList.Add("0");
-            }
           }
 
-          toSend.Type = EMessagesTypesToClient.StringsList;
-          toSend.StringsList = resultList;
+          toSend.Type = EMessagesTypesToClient.Ok;
+          toSend.MultipleMessages = resultList;
           return CommManager.SendMessage(toSend);
         }
       }

@@ -194,6 +194,9 @@
     <Compile Include="DB\Message.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="DB\Notification.cs">
+      <DependentUpon>DBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="DB\prEpisodeInsert_Result.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>

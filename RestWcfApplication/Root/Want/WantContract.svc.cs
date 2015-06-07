@@ -113,7 +113,7 @@ namespace RestWcfApplication.Root.Want
           {
             // target user doesn't exist in the system yet
             // sending him an invitation sms
-            //Twilio.Twilio.SendInvitationMessage(sourceUser.FirstName + " " + sourceUser.LastName, targetPhoneNumber);
+            Twilio.Twilio.SendInvitationMessage(sourceUser.FirstName + " " + sourceUser.LastName, targetPhoneNumber);
 
             var newTargetUser = new DB.User() { PhoneNumber = targetPhoneNumber };
 
@@ -182,7 +182,7 @@ namespace RestWcfApplication.Root.Want
 
             context.SaveChanges();
 
-            targetUser.PhoneNumber = string.Empty;
+            //targetUser.PhoneNumber = string.Empty;
 
             if (targetUser.DeviceId != null)
             {
@@ -219,7 +219,7 @@ namespace RestWcfApplication.Root.Want
 
           context.SaveChanges();
 
-          targetUser.PhoneNumber = string.Empty;
+          //targetUser.PhoneNumber = string.Empty;
 
           if (targetUser.DeviceId != null)
           {
@@ -354,7 +354,7 @@ namespace RestWcfApplication.Root.Want
 
             context.SaveChanges();
 
-            targetUser.PhoneNumber = string.Empty;
+            //targetUser.PhoneNumber = string.Empty;
 
             if (targetUser.DeviceId != null)
             {
@@ -391,7 +391,7 @@ namespace RestWcfApplication.Root.Want
 
           context.SaveChanges();
 
-          targetUser.PhoneNumber = string.Empty;
+          //targetUser.PhoneNumber = string.Empty;
 
           if (targetUser.DeviceId != null)
           {
@@ -494,7 +494,7 @@ namespace RestWcfApplication.Root.Want
 
           context.SaveChanges();
 
-          targetUser.PhoneNumber = string.Empty;
+          //targetUser.PhoneNumber = string.Empty;
 
           if (targetUser.DeviceId != null)
           {

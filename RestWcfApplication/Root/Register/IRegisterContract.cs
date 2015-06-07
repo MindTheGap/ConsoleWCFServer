@@ -68,6 +68,12 @@ namespace RestWcfApplication.Root.Register
     [WebGet(UriTemplate = "truncateAll")]
     string TruncateAll();
 
+    /// <summary>
+    /// </summary>
+    /// <returns></returns>
+    [OperationContract]
+    [WebGet(UriTemplate = "truncateUsers")]
+    string TruncateUsers();
 
     /// <summary>
     /// returns "hello" string for testing

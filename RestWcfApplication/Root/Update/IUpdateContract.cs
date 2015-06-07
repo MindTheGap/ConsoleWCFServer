@@ -27,7 +27,7 @@ namespace RestWcfApplication.Root.Update
     string ReadUserChatMessages(string userId, Stream stream);
 
     [OperationContract]
-    [WebInvoke(Method = "POST", UriTemplate = "getUserContactsLastSeen?userId={userId}")]
-    string GetUserContactsLastSeen(string userId, Stream stream);
+    [WebInvoke(Method = "POST", UriTemplate = "getUserContactsLastSeenAndProfileImageLinks?userId={userId}")]
+    string GetUserContactsLastSeenAndProfileImageLinks(string userId, Stream stream);
   }
 }

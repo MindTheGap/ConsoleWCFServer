@@ -121,7 +121,7 @@ namespace RestWcfApplication.Root.Register
             //{
             user.Verified = false;
 
-            //verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
+            verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
 
             user.VerificationCode = verificationCode.ToString("d");
             context.SaveChanges();
@@ -133,7 +133,7 @@ namespace RestWcfApplication.Root.Register
             //}
           }
 
-          //verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
+          verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
 
           var newUser = new User()
           {
@@ -317,9 +317,37 @@ namespace RestWcfApplication.Root.Register
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          context.Database.ExecuteSqlCommand("DELETE FROM FirstMessage");
           context.Database.ExecuteSqlCommand("DELETE FROM Message");
+          context.Database.ExecuteSqlCommand("DELETE FROM FirstMessage");
           context.Database.ExecuteSqlCommand("DELETE FROM Hint");
+
+          context.SaveChanges();
+
+          toSend.Type = EMessagesTypesToClient.Ok;
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Exception = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
+      }
+    }
+
+    public string TruncateUsers()
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          context.Database.ExecuteSqlCommand("DELETE FROM [User]");
 
           context.SaveChanges();
 

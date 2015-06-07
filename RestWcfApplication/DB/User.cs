@@ -16,10 +16,11 @@ namespace RestWcfApplication.DB
     {
         public User()
         {
-            this.FirstMessages = new HashSet<FirstMessage>();
-            this.FirstMessages1 = new HashSet<FirstMessage>();
-            this.Messages = new HashSet<Message>();
-            this.Messages1 = new HashSet<Message>();
+            this.SourceUserFirstMessages = new HashSet<FirstMessage>();
+            this.TargetUserFirstMessages = new HashSet<FirstMessage>();
+            this.SourceUserMessages = new HashSet<Message>();
+            this.TargetUserMessages = new HashSet<Message>();
+            this.Notifications = new HashSet<Notification>();
         }
     
         public int Id { get; set; }
@@ -35,10 +36,12 @@ namespace RestWcfApplication.DB
         public bool Verified { get; set; }
         public string DeviceId { get; set; }
         public string DisplayName { get; set; }
+        public int Coins { get; set; }
     
-        public virtual ICollection<FirstMessage> FirstMessages { get; set; }
-        public virtual ICollection<FirstMessage> FirstMessages1 { get; set; }
-        public virtual ICollection<Message> Messages { get; set; }
-        public virtual ICollection<Message> Messages1 { get; set; }
+        public virtual ICollection<FirstMessage> SourceUserFirstMessages { get; set; }
+        public virtual ICollection<FirstMessage> TargetUserFirstMessages { get; set; }
+        public virtual ICollection<Message> SourceUserMessages { get; set; }
+        public virtual ICollection<Message> TargetUserMessages { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
     }
 }

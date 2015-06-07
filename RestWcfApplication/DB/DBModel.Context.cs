@@ -32,6 +32,7 @@ namespace RestWcfApplication.DB
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<FirstMessage> FirstMessages { get; set; }
         public virtual DbSet<Message> Messages { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
     
         public virtual int prEpisodeDelete(Nullable<int> episodeID)
         {
