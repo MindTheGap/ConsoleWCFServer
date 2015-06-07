@@ -48,6 +48,9 @@ namespace RestWcfApplication.Root.Update
         }
 
         var userIdParsed = int.Parse(userId);
+        var startingNotificationId = dictionary.ContainsKey("startingNotificationId")
+          ? dictionary["startingNotificationId"]
+          : -1;
 
         using (var context = new Entities())
         {
@@ -97,10 +100,15 @@ namespace RestWcfApplication.Root.Update
             }
           }
 
+          var notifications = context.Notifications.Where(n => n.UserId == userIdParsed && n.Id > startingNotificationId).ToList();
+          ;
+
           context.SaveChanges();
 
           toSend.Type = EMessagesTypesToClient.MultipleMessages;
           toSend.MultipleMessages = result;
+          toSend.Notifications = notifications;
+            
           return CommManager.SendMessage(toSend);
         }
       }
