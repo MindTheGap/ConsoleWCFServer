@@ -16,8 +16,10 @@
         <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_Hint" />
         <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_SourceUser" />
         <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_TargetUser" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.Notification" Width="1.5" PointX="4" PointY="0.5" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.Notification" Width="1.5" PointX="3.375" PointY="0.5" />
         <AssociationConnector Association="ChildTubeMainDBModel.FK_Notification_User" />
+        <AssociationConnector Association="ChildTubeMainDBModel.FK_Notification_SenderUser" />
+        <EntityTypeShape EntityType="ChildTubeMainDBModel.Product" Width="1.5" PointX="5.375" PointY="7.75" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

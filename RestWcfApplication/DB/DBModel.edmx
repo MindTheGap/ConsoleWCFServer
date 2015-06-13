@@ -48,7 +48,19 @@
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="UserId" Type="int" Nullable="false" />
           <Property Name="Text" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="SenderUserId" Type="int" />
           <Property Name="CoinAmount" Type="int" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProductId" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Price" Type="int" Nullable="false" />
+          <Property Name="CoinsAmount" Type="int" Nullable="false" />
+          <Property Name="LocalizedTitle" Type="nvarchar" MaxLength="50" />
+          <Property Name="LocalizedDesciption" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Token">
           <Key>
@@ -74,7 +86,7 @@
           <Property Name="DeviceId" Type="varchar" MaxLength="64" />
           <Property Name="VerificationCode" Type="nvarchar" MaxLength="50" />
           <Property Name="Verified" Type="bit" Nullable="false" />
-          <Property Name="Coins" Type="int" Nullable="false" />
+          <Property Name="Coins" Type="bigint" Nullable="false" />
         </EntityType>
         <Association Name="FK_FirstMessage_SourceUser">
           <End Role="User" Type="Self.User" Multiplicity="1" />
@@ -148,6 +160,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Notification_SenderUser">
+          <End Role="User" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Notification" Type="Self.Notification" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Notification">
+              <PropertyRef Name="SenderUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Notification_User">
           <End Role="User" Type="Self.User" Multiplicity="1" />
           <End Role="Notification" Type="Self.Notification" Multiplicity="*" />
@@ -165,6 +189,7 @@
           <EntitySet Name="Hint" EntityType="Self.Hint" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Message" EntityType="Self.Message" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Notification" EntityType="Self.Notification" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Token" EntityType="Self.Token" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_FirstMessage_SourceUser" Association="Self.FK_FirstMessage_SourceUser">
@@ -190,6 +215,10 @@
           <AssociationSet Name="FK_Message_TargetUser" Association="Self.FK_Message_TargetUser">
             <End Role="User" EntitySet="User" />
             <End Role="Message" EntitySet="Message" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Notification_SenderUser" Association="Self.FK_Notification_SenderUser">
+            <End Role="User" EntitySet="User" />
+            <End Role="Notification" EntitySet="Notification" />
           </AssociationSet>
           <AssociationSet Name="FK_Notification_User" Association="Self.FK_Notification_User">
             <End Role="User" EntitySet="User" />
@@ -286,6 +315,11 @@
             <End Role="User" EntitySet="Users" />
             <End Role="Notification" EntitySet="Notifications" />
           </AssociationSet>
+          <AssociationSet Name="FK_Notification_SenderUser" Association="ChildTubeMainDBModel.FK_Notification_SenderUser">
+            <End Role="User" EntitySet="Users" />
+            <End Role="Notification" EntitySet="Notifications" />
+          </AssociationSet>
+          <EntitySet Name="Products" EntityType="ChildTubeMainDBModel.Product" />
           </EntityContainer>
         <ComplexType Name="prEpisodeInsert_Result">
           <Property Type="Int32" Name="EpisodeID" Nullable="false" />
@@ -382,6 +416,7 @@
           <NavigationProperty Name="TargetUserMessages" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
           <Property Name="Coins" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Notifications" Relationship="ChildTubeMainDBModel.FK_Notification_User" FromRole="User" ToRole="Notification" />
+          <NavigationProperty Name="SenderUserNotifications" Relationship="ChildTubeMainDBModel.FK_Notification_SenderUser" FromRole="User" ToRole="Notification" />
         </EntityType>
         <EntityType Name="FirstMessage">
           <Key>
@@ -497,6 +532,8 @@
           <Property Name="Text" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="CoinAmount" Type="Int32" />
           <NavigationProperty Name="User" Relationship="ChildTubeMainDBModel.FK_Notification_User" FromRole="Notification" ToRole="User" />
+          <Property Name="SenderUserId" Type="Int32" />
+          <NavigationProperty Name="SenderUser" Relationship="ChildTubeMainDBModel.FK_Notification_SenderUser" FromRole="Notification" ToRole="User" />
         </EntityType>
         <Association Name="FK_Notification_User">
           <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
@@ -510,6 +547,29 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Notification_SenderUser">
+          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="ChildTubeMainDBModel.Notification" Role="Notification" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Notification">
+              <PropertyRef Name="SenderUserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProductId" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Price" Type="Int32" Nullable="false" />
+          <Property Name="CoinsAmount" Type="Int32" Nullable="false" />
+          <Property Name="LocalizedTitle" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="LocalizedDesciption" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -586,9 +646,22 @@
           <EntitySetMapping Name="Notifications">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.Notification">
               <MappingFragment StoreEntitySet="Notification">
+                <ScalarProperty Name="SenderUserId" ColumnName="SenderUserId" />
                 <ScalarProperty Name="CoinAmount" ColumnName="CoinAmount" />
                 <ScalarProperty Name="Text" ColumnName="Text" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Products">
+            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Product">
+              <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="LocalizedDesciption" ColumnName="LocalizedDesciption" />
+                <ScalarProperty Name="LocalizedTitle" ColumnName="LocalizedTitle" />
+                <ScalarProperty Name="CoinsAmount" ColumnName="CoinsAmount" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="ProductId" ColumnName="ProductId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -157,6 +157,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="Root\Guess\GuessContract.svc" />
+    <Content Include="Root\IAP\IAPContract.svc" />
     <Content Include="Root\Update\UpdateContract.svc" />
     <Content Include="Root\Want\WantContract.svc" />
     <Content Include="Root\Register\RegisterContract.svc" />
@@ -206,6 +208,9 @@
     <Compile Include="DB\prEpisodeUpdate_Result.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="DB\Product.cs">
+      <DependentUpon>DBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="DB\prTVSeriesInsert_Result.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
@@ -235,6 +240,14 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PushSharp\PushManager.cs" />
+    <Compile Include="Root\Guess\GuessContract.svc.cs">
+      <DependentUpon>GuessContract.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Root\Guess\IGuessContract.cs" />
+    <Compile Include="Root\IAP\IAPContract.svc.cs">
+      <DependentUpon>IAPContract.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Root\IAP\IIAPContract.cs" />
     <Compile Include="Root\Update\IUpdateContract.cs" />
     <Compile Include="Root\Update\UpdateContract.svc.cs">
       <DependentUpon>UpdateContract.svc</DependentUpon>

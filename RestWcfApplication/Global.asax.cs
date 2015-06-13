@@ -6,6 +6,8 @@ using System.Web;
 using System.Web.Routing;
 using System.Web.Security;
 using System.Web.SessionState;
+using RestWcfApplication.Root.Guess;
+using RestWcfApplication.Root.IAP;
 using RestWcfApplication.Root.Register;
 using RestWcfApplication.Root.Update;
 using RestWcfApplication.Root.Want;
@@ -20,6 +22,8 @@ namespace RestWcfApplication
       RouteTable.Routes.Add(new ServiceRoute("want", new WebServiceHostFactory(), typeof(WantContract)));
       RouteTable.Routes.Add(new ServiceRoute("register", new WebServiceHostFactory(), typeof(RegisterContract)));
       RouteTable.Routes.Add(new ServiceRoute("update", new WebServiceHostFactory(), typeof(UpdateContract)));
+      RouteTable.Routes.Add(new ServiceRoute("guess", new WebServiceHostFactory(), typeof(GuessContract)));
+      RouteTable.Routes.Add(new ServiceRoute("iap", new WebServiceHostFactory(), typeof(IAPContract)));
     }
 
     protected void Session_Start(object sender, EventArgs e)

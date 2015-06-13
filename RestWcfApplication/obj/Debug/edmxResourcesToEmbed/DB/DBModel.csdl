@@ -81,6 +81,16 @@
       <End Role="User" EntitySet="Users" />
       <End Role="Message" EntitySet="Messages" />
     </AssociationSet>
+    <EntitySet Name="Notifications" EntityType="ChildTubeMainDBModel.Notification" />
+    <AssociationSet Name="FK_Notification_User" Association="ChildTubeMainDBModel.FK_Notification_User">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Notification" EntitySet="Notifications" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Notification_SenderUser" Association="ChildTubeMainDBModel.FK_Notification_SenderUser">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Notification" EntitySet="Notifications" />
+    </AssociationSet>
+    <EntitySet Name="Products" EntityType="ChildTubeMainDBModel.Product" />
   </EntityContainer>
   <ComplexType Name="prEpisodeInsert_Result">
     <Property Type="Int32" Name="EpisodeID" Nullable="false" />
@@ -171,10 +181,13 @@
     <Property Name="Verified" Type="Boolean" Nullable="false" />
     <Property Name="DeviceId" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
     <Property Name="DisplayName" Type="String" MaxLength="60" FixedLength="false" Unicode="true" />
-    <NavigationProperty Name="FirstMessages" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="User" ToRole="FirstMessage" />
-    <NavigationProperty Name="FirstMessages1" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="User" ToRole="FirstMessage" />
-    <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
-    <NavigationProperty Name="Messages1" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
+    <NavigationProperty Name="SourceUserFirstMessages" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="User" ToRole="FirstMessage" />
+    <NavigationProperty Name="TargetUserFirstMessages" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="User" ToRole="FirstMessage" />
+    <NavigationProperty Name="SourceUserMessages" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
+    <NavigationProperty Name="TargetUserMessages" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
+    <Property Name="Coins" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Notifications" Relationship="ChildTubeMainDBModel.FK_Notification_User" FromRole="User" ToRole="Notification" />
+    <NavigationProperty Name="SenderUserNotifications" Relationship="ChildTubeMainDBModel.FK_Notification_SenderUser" FromRole="User" ToRole="Notification" />
   </EntityType>
   <EntityType Name="FirstMessage">
     <Key>
@@ -281,4 +294,51 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <EntityType Name="Notification">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="UserId" Type="Int32" Nullable="false" />
+    <Property Name="Text" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+    <Property Name="CoinAmount" Type="Int32" />
+    <NavigationProperty Name="User" Relationship="ChildTubeMainDBModel.FK_Notification_User" FromRole="Notification" ToRole="User" />
+    <Property Name="SenderUserId" Type="Int32" />
+    <NavigationProperty Name="SenderUser" Relationship="ChildTubeMainDBModel.FK_Notification_SenderUser" FromRole="Notification" ToRole="User" />
+  </EntityType>
+  <Association Name="FK_Notification_User">
+    <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
+    <End Type="ChildTubeMainDBModel.Notification" Role="Notification" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Notification">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Notification_SenderUser">
+    <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="0..1" />
+    <End Type="ChildTubeMainDBModel.Notification" Role="Notification" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Notification">
+        <PropertyRef Name="SenderUserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="Product">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ProductId" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="Price" Type="Int32" Nullable="false" />
+    <Property Name="CoinsAmount" Type="Int32" Nullable="false" />
+    <Property Name="LocalizedTitle" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+    <Property Name="LocalizedDesciption" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+  </EntityType>
 </Schema>

@@ -68,6 +68,15 @@ namespace RestWcfApplication.Root.Register
           user.LastSeen = DateTime.Now.ToString("u");
           user.Verified = true;
 
+          if (!user.Notifications.Any())
+          {
+            var newNotification = new DB.Notification();
+            newNotification.UserId = user.Id;
+            newNotification.Text = "Welcome to IAmInToo!";
+
+            context.Notifications.Add(newNotification);
+          }
+
           context.SaveChanges();
 
           toSend.Type = EMessagesTypesToClient.Ok;
@@ -317,6 +326,7 @@ namespace RestWcfApplication.Root.Register
         {
           context.Configuration.ProxyCreationEnabled = false;
 
+          context.Database.ExecuteSqlCommand("DELETE FROM Notification");
           context.Database.ExecuteSqlCommand("DELETE FROM Message");
           context.Database.ExecuteSqlCommand("DELETE FROM FirstMessage");
           context.Database.ExecuteSqlCommand("DELETE FROM Hint");

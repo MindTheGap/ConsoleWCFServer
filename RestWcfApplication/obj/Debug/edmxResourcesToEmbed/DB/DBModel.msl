@@ -23,6 +23,7 @@
     <EntitySetMapping Name="Users">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
         <MappingFragment StoreEntitySet="User">
+          <ScalarProperty Name="Coins" ColumnName="Coins" />
           <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
           <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
           <ScalarProperty Name="Verified" ColumnName="Verified" />
@@ -63,6 +64,29 @@
           <ScalarProperty Name="FirstMessageId" ColumnName="FirstMessageId" />
           <ScalarProperty Name="TargetUserId" ColumnName="TargetUserId" />
           <ScalarProperty Name="SourceUserId" ColumnName="SourceUserId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Notifications">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Notification">
+        <MappingFragment StoreEntitySet="Notification">
+          <ScalarProperty Name="SenderUserId" ColumnName="SenderUserId" />
+          <ScalarProperty Name="CoinAmount" ColumnName="CoinAmount" />
+          <ScalarProperty Name="Text" ColumnName="Text" />
+          <ScalarProperty Name="UserId" ColumnName="UserId" />
+          <ScalarProperty Name="Id" ColumnName="Id" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Products">
+      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Product">
+        <MappingFragment StoreEntitySet="Product">
+          <ScalarProperty Name="LocalizedDesciption" ColumnName="LocalizedDesciption" />
+          <ScalarProperty Name="LocalizedTitle" ColumnName="LocalizedTitle" />
+          <ScalarProperty Name="CoinsAmount" ColumnName="CoinsAmount" />
+          <ScalarProperty Name="Price" ColumnName="Price" />
+          <ScalarProperty Name="ProductId" ColumnName="ProductId" />
           <ScalarProperty Name="Id" ColumnName="Id" />
         </MappingFragment>
       </EntityTypeMapping>

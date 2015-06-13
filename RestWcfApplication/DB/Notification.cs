@@ -18,7 +18,9 @@ namespace RestWcfApplication.DB
         public int UserId { get; set; }
         public string Text { get; set; }
         public Nullable<int> CoinAmount { get; set; }
+        public Nullable<int> SenderUserId { get; set; }
     
         public virtual User User { get; set; }
+        public virtual User SenderUser { get; set; }
     }
 }
