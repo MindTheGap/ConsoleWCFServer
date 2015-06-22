@@ -65,6 +65,7 @@ namespace RestWcfApplication.Root.Want
           }
 
           sourceUser.LastSeen = DateTime.Now.ToString("u");
+          sourceUser.Coins += 5;
 
           var hintNotUsed = IsStringEmpty(hint) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
           var initialMessage =
@@ -142,6 +143,7 @@ namespace RestWcfApplication.Root.Want
             context.SaveChanges();
 
             toSend.Type = (int)EMessagesTypesToClient.Ok;
+            toSend.Coins = sourceUser.Coins;
             toSend.InitialMessage = initialMessage;
             toSend.SystemMessage = newSystemMessageSms;
             toSend.ChatMessage = newMessage;
@@ -190,6 +192,7 @@ namespace RestWcfApplication.Root.Want
             }
 
             toSend.Type = (int)EMessagesTypesToClient.Ok;
+            toSend.Coins = sourceUser.Coins;
             toSend.ChatMessage = newMessage;
             toSend.SystemMessage = newSystemMessageMatch;
             toSend.InitialMessage = initialMessage;
@@ -227,6 +230,7 @@ namespace RestWcfApplication.Root.Want
           }
 
           toSend.Type = (int)EMessagesTypesToClient.Ok;
+          toSend.Coins = sourceUser.Coins;
           toSend.ChatMessage = newMessage;
           toSend.SystemMessage = newSystemMessage;
           toSend.InitialMessage = initialMessage;
@@ -276,6 +280,7 @@ namespace RestWcfApplication.Root.Want
           }
 
           sourceUser.LastSeen = DateTime.Now.ToString("u");
+          sourceUser.Coins += 5;
 
           var targetUser = context.Users.FirstOrDefault(u => u.FacebookUserId == facebookId);
           if (targetUser == null)
@@ -362,6 +367,7 @@ namespace RestWcfApplication.Root.Want
             }
 
             toSend.Type = (int) EMessagesTypesToClient.Ok;
+            toSend.Coins = sourceUser.Coins;
             toSend.ChatMessage = newMessage;
             toSend.SystemMessage = newSystemMessageMatch;
             toSend.InitialMessage = firstMessage;
@@ -399,6 +405,7 @@ namespace RestWcfApplication.Root.Want
           }
 
           toSend.Type = (int)EMessagesTypesToClient.Ok;
+          toSend.Coins = sourceUser.Coins;
           toSend.ChatMessage = newMessage;
           toSend.SystemMessage = newSystemMessage;
           toSend.InitialMessage = firstMessage;
@@ -459,6 +466,15 @@ namespace RestWcfApplication.Root.Want
             return CommManager.SendMessage(toSend);
           }
 
+          if (firstMessage.SourceUserId == userIdParsed)
+          {
+            sourceUser.Coins += 2;
+          }
+          else
+          {
+            sourceUser.Coins -= 2;
+          }
+
           var targetUserId = firstMessage.SourceUserId == userIdParsed ? firstMessage.TargetUserId : firstMessage.SourceUserId;
           var targetUser = context.Users.SingleOrDefault(u => u.Id == targetUserId);
           if (targetUser == null)
@@ -502,6 +518,7 @@ namespace RestWcfApplication.Root.Want
           }
 
           toSend.Type = (int)EMessagesTypesToClient.Ok;
+          toSend.Coins = sourceUser.Coins;
           toSend.Message = newMessage;
           return CommManager.SendMessage(toSend);
         }

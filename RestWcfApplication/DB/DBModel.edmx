@@ -17,6 +17,8 @@
           <Property Name="SubjectName" Type="nvarchar" MaxLength="500" />
           <Property Name="SourceUserDeleted" Type="bit" Nullable="false" />
           <Property Name="TargetUserDeleted" Type="bit" Nullable="false" />
+          <Property Name="LastTimeSourceUserTyped" Type="datetime" />
+          <Property Name="LastTimeTargetUserTyped" Type="datetime" />
         </EntityType>
         <EntityType Name="Hint">
           <Key>
@@ -57,10 +59,7 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="ProductId" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="Price" Type="int" Nullable="false" />
           <Property Name="CoinsAmount" Type="int" Nullable="false" />
-          <Property Name="LocalizedTitle" Type="nvarchar" MaxLength="50" />
-          <Property Name="LocalizedDesciption" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Token">
           <Key>
@@ -433,6 +432,8 @@
           <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="FirstMessage" ToRole="User" />
           <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="FirstMessage" ToRole="User" />
           <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_FirstMessage" FromRole="FirstMessage" ToRole="Message" />
+          <Property Name="LastTimeSourceUserTyped" Type="DateTime" Precision="3" />
+          <Property Name="LastTimeTargetUserTyped" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="Message">
           <Key>
@@ -565,10 +566,7 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="ProductId" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Price" Type="Int32" Nullable="false" />
           <Property Name="CoinsAmount" Type="Int32" Nullable="false" />
-          <Property Name="LocalizedTitle" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="LocalizedDesciption" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -618,6 +616,8 @@
           <EntitySetMapping Name="FirstMessages">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
               <MappingFragment StoreEntitySet="FirstMessage">
+                <ScalarProperty Name="LastTimeTargetUserTyped" ColumnName="LastTimeTargetUserTyped" />
+                <ScalarProperty Name="LastTimeSourceUserTyped" ColumnName="LastTimeSourceUserTyped" />
                 <ScalarProperty Name="TargetUserDeleted" ColumnName="TargetUserDeleted" />
                 <ScalarProperty Name="SourceUserDeleted" ColumnName="SourceUserDeleted" />
                 <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
@@ -657,10 +657,7 @@
           <EntitySetMapping Name="Products">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.Product">
               <MappingFragment StoreEntitySet="Product">
-                <ScalarProperty Name="LocalizedDesciption" ColumnName="LocalizedDesciption" />
-                <ScalarProperty Name="LocalizedTitle" ColumnName="LocalizedTitle" />
                 <ScalarProperty Name="CoinsAmount" ColumnName="CoinsAmount" />
-                <ScalarProperty Name="Price" ColumnName="Price" />
                 <ScalarProperty Name="ProductId" ColumnName="ProductId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>

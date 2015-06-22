@@ -23,6 +23,8 @@ namespace RestWcfApplication.Root.Register
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
   public class RegisterContract : IRegisterContract
   {
+    private const int DefaultCoinsForNewUsers = 0;
+
     public string VerifyValidationCode(Stream stream)
     {
       try
@@ -147,6 +149,7 @@ namespace RestWcfApplication.Root.Register
           var newUser = new User()
           {
             PhoneNumber = phoneNumber, 
+            Coins = DefaultCoinsForNewUsers,
             Verified = false, 
             VerificationCode = verificationCode.ToString("d")
           };

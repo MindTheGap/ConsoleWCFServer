@@ -75,14 +75,20 @@ namespace RestWcfApplication.Root.Update
             var startingMessageId = dictionary.ContainsKey(initialMessage.Id.ToString("D")) ? dictionary[initialMessage.Id.ToString("D")] : -1;
             var unreadMessages = context.Messages.Include("SourceUser").Include("TargetUser").Include("Hint")
               .Where(m => m.Id > startingMessageId && m.FirstMessageId == initialMessage.Id).ToList();
+
+            var initialMessageResult = new InitialMessageWithUnreadMessages()
+            {
+              InitialMessage = initialMessage
+            };
+
             if (unreadMessages.Count > 0)
             {
               var neededUnreadMessages = new List<Message>();
               unreadMessages.ForEach(m =>
               {
                 if (m.ReceivedState != (int) EMessageReceivedState.MessageStateReadByClientAck
-                  && (    (m.SystemMessageState != null && m.SourceUserId == userIdParsed)
-                      ||  (m.SystemMessageState == null)    ))
+                    && ((m.SystemMessageState != null && m.SourceUserId == userIdParsed)
+                        || (m.SystemMessageState == null)))
                 {
                   neededUnreadMessages.Add(m);
                 }
@@ -91,13 +97,16 @@ namespace RestWcfApplication.Root.Update
                 {
                   m.ReceivedState = (int) EMessageReceivedState.MessageStateSentToClient;
                 }
-                else if (m.ReceivedState == (int)EMessageReceivedState.MessageStateReadByClient)
+                else if (m.ReceivedState == (int) EMessageReceivedState.MessageStateReadByClient)
                 {
-                  m.ReceivedState = (int)EMessageReceivedState.MessageStateReadByClientAck;
+                  m.ReceivedState = (int) EMessageReceivedState.MessageStateReadByClientAck;
                 }
               });
-              result.Add(new InitialMessageWithUnreadMessages() { InitialMessage = initialMessage, UnreadMessages = neededUnreadMessages });
+
+              initialMessageResult.UnreadMessages = neededUnreadMessages;
             }
+
+            result.Add(initialMessageResult);
           }
 
           var notifications = context.Notifications.Where(n => n.UserId == userIdParsed && n.Id > startingNotificationId).ToList();

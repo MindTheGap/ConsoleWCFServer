@@ -204,6 +204,8 @@
     <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="FirstMessage" ToRole="User" />
     <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="FirstMessage" ToRole="User" />
     <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_FirstMessage" FromRole="FirstMessage" ToRole="Message" />
+    <Property Name="LastTimeSourceUserTyped" Type="DateTime" Precision="3" />
+    <Property Name="LastTimeTargetUserTyped" Type="DateTime" Precision="3" />
   </EntityType>
   <EntityType Name="Message">
     <Key>
@@ -336,9 +338,6 @@
     </Key>
     <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
     <Property Name="ProductId" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-    <Property Name="Price" Type="Int32" Nullable="false" />
     <Property Name="CoinsAmount" Type="Int32" Nullable="false" />
-    <Property Name="LocalizedTitle" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-    <Property Name="LocalizedDesciption" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
   </EntityType>
 </Schema>

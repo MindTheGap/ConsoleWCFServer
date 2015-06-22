@@ -12,5 +12,6 @@ namespace RestWcfApplication.DB
     public const string UserIdDoesNotExist = "UserID does not exist";
     public const string BadVerificationCode = "Bad verification code";
     public const string BadArguments = "Bad arguments";
+    public const string InsufficientFunds = "Insufficient Funds";
   }
 }

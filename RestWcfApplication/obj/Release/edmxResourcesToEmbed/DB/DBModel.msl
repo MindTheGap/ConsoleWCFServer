@@ -43,6 +43,8 @@
     <EntitySetMapping Name="FirstMessages">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
         <MappingFragment StoreEntitySet="FirstMessage">
+          <ScalarProperty Name="LastTimeTargetUserTyped" ColumnName="LastTimeTargetUserTyped" />
+          <ScalarProperty Name="LastTimeSourceUserTyped" ColumnName="LastTimeSourceUserTyped" />
           <ScalarProperty Name="TargetUserDeleted" ColumnName="TargetUserDeleted" />
           <ScalarProperty Name="SourceUserDeleted" ColumnName="SourceUserDeleted" />
           <ScalarProperty Name="SubjectName" ColumnName="SubjectName" />
@@ -82,10 +84,7 @@
     <EntitySetMapping Name="Products">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.Product">
         <MappingFragment StoreEntitySet="Product">
-          <ScalarProperty Name="LocalizedDesciption" ColumnName="LocalizedDesciption" />
-          <ScalarProperty Name="LocalizedTitle" ColumnName="LocalizedTitle" />
           <ScalarProperty Name="CoinsAmount" ColumnName="CoinsAmount" />
-          <ScalarProperty Name="Price" ColumnName="Price" />
           <ScalarProperty Name="ProductId" ColumnName="ProductId" />
           <ScalarProperty Name="Id" ColumnName="Id" />
         </MappingFragment>

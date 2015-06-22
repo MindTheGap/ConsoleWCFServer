@@ -16,9 +16,6 @@ namespace RestWcfApplication.DB
     {
         public int Id { get; set; }
         public string ProductId { get; set; }
-        public int Price { get; set; }
         public int CoinsAmount { get; set; }
-        public string LocalizedTitle { get; set; }
-        public string LocalizedDesciption { get; set; }
     }
 }

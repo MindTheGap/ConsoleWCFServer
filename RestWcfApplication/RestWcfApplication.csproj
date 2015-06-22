@@ -157,7 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
-    <Content Include="Root\Guess\GuessContract.svc" />
+    <Content Include="Root\UserAction\UserActionContract.svc" />
     <Content Include="Root\IAP\IAPContract.svc" />
     <Content Include="Root\Update\UpdateContract.svc" />
     <Content Include="Root\Want\WantContract.svc" />
@@ -240,10 +240,10 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PushSharp\PushManager.cs" />
-    <Compile Include="Root\Guess\GuessContract.svc.cs">
-      <DependentUpon>GuessContract.svc</DependentUpon>
+    <Compile Include="Root\UserAction\UserActionContract.svc.cs">
+      <DependentUpon>UserActionContract.svc</DependentUpon>
     </Compile>
-    <Compile Include="Root\Guess\IGuessContract.cs" />
+    <Compile Include="Root\UserAction\IUserActionContract.cs" />
     <Compile Include="Root\IAP\IAPContract.svc.cs">
       <DependentUpon>IAPContract.svc</DependentUpon>
     </Compile>
