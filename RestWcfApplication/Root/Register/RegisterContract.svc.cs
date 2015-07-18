@@ -70,16 +70,9 @@ namespace RestWcfApplication.Root.Register
           user.LastSeen = DateTime.Now.ToString("u");
           user.Verified = true;
 
-          if (!user.Notifications.Any())
-          {
-            var newNotification = new DB.Notification();
-            newNotification.UserId = user.Id;
-            newNotification.Text = "Welcome to IAmInToo!";
-
-            context.Notifications.Add(newNotification);
-          }
-
           context.SaveChanges();
+
+          GC.Collect();
 
           toSend.Type = EMessagesTypesToClient.Ok;
           toSend.User = user;
@@ -137,6 +130,8 @@ namespace RestWcfApplication.Root.Register
             user.VerificationCode = verificationCode.ToString("d");
             context.SaveChanges();
 
+            GC.Collect();
+
             toSend.Type = EMessagesTypesToClient.SystemMessage;
             toSend.SystemMessage = ESystemMessageState.VerificationCodeSent;
             toSend.UserId = user.Id.ToString("d");
@@ -155,6 +150,8 @@ namespace RestWcfApplication.Root.Register
           };
           context.Users.Add(newUser);
           context.SaveChanges();
+
+          GC.Collect();
 
           toSend.Type = EMessagesTypesToClient.SystemMessage;
           toSend.SystemMessage = ESystemMessageState.RegisterSuccessfully | ESystemMessageState.VerificationCodeSent;
@@ -244,7 +241,20 @@ namespace RestWcfApplication.Root.Register
             }
           }
 
+          if (!context.Notifications.Any(n => n.UserId == userIdParsed))
+          {
+            var newNotification = new DB.Notification
+            {
+              UserId = sourceUser.Id, 
+              Text = "Welcome to IAmInToo!"
+            };
+
+            context.Notifications.Add(newNotification);
+          }
+
           context.SaveChanges();
+
+          GC.Collect();
 
           toSend.Type = EMessagesTypesToClient.Ok;
           return CommManager.SendMessage(toSend);
@@ -304,6 +314,8 @@ namespace RestWcfApplication.Root.Register
           sourceUser.LastSeen = DateTime.Now.ToString("u");
 
           context.SaveChanges();
+
+          GC.Collect();
 
           toSend.Type = EMessagesTypesToClient.Ok;
           return CommManager.SendMessage(toSend);

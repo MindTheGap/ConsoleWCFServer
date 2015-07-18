@@ -24,6 +24,7 @@ namespace RestWcfApplication.DB
         public string PictureLink { get; set; }
         public string VideoLink { get; set; }
         public byte[] ThumbnailImage { get; set; }
+        public string Size { get; set; }
     
         public virtual ICollection<Message> Messages { get; set; }
     }

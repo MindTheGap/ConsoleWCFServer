@@ -29,6 +29,8 @@ namespace RestWcfApplication.DB
         public bool TargetUserDeleted { get; set; }
         public Nullable<System.DateTime> LastTimeSourceUserTyped { get; set; }
         public Nullable<System.DateTime> LastTimeTargetUserTyped { get; set; }
+        public int MaximumGuesses { get; set; }
+        public int GuessesUsed { get; set; }
     
         public virtual User SourceUser { get; set; }
         public virtual User TargetUser { get; set; }

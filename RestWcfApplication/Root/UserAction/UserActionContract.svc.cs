@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.ServiceModel.Activation;
@@ -69,6 +70,14 @@ namespace RestWcfApplication.Root.UserAction
             return CommManager.SendMessage(toSend);
           }
 
+          var initialMessage = context.FirstMessages.FirstOrDefault(f => f.SourceUserId == targetUserId && f.TargetUserId == userIdParsed);
+          if (initialMessage == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorDetails.BadArguments;
+            return CommManager.SendMessage(toSend);
+          }
+
           if (sourceUser.Coins < 5)
           {
             toSend.Type = EMessagesTypesToClient.Error;
@@ -77,34 +86,161 @@ namespace RestWcfApplication.Root.UserAction
           }
 
           sourceUser.Coins -= 5;
+          initialMessage.GuessesUsed++;
 
           Notification newNotification;
           if (phoneNumbers.Contains(targetUser.PhoneNumber))
           {
             success = true;
 
-            var initialMessage =
-              context.FirstMessages.FirstOrDefault(
-                f => f.SourceUserId == targetUserId && f.TargetUserId == userIdParsed);
-            if (initialMessage != null)
-            {
-              initialMessage.MatchFound = true;
-            }
+            initialMessage.MatchFound = true;
 
-            newNotification = new Notification();
-            newNotification.UserId = targetUserId;
             var fullName = GetFullNameOrPhoneNumber(targetUser);
-            newNotification.Text = string.Format("You guessed {0} correctly!", fullName);
+            newNotification = new Notification
+            {
+              UserId = targetUserId,
+              Text = string.Format("You guessed {0} correctly!", fullName)
+            };
 
             context.Notifications.Add(newNotification);
           }
           else
           {
-            newNotification = new Notification();
-            newNotification.UserId = targetUserId;
-            newNotification.SenderUserId = userIdParsed;
             var fullName = GetFullNameOrPhoneNumber(sourceUser);
-            newNotification.Text = string.Format("{0} guessed you while trying to guess someone else", fullName);
+            newNotification = new Notification
+            {
+              UserId = targetUserId,
+              SenderUserId = userIdParsed,
+              Text = string.Format("{0} guessed someone else while trying to guess you", fullName)
+            };
+
+            context.Notifications.Add(newNotification);
+          }
+
+          context.SaveChanges();
+
+          if (targetUser.DeviceId != null)
+          {
+            PushManager.PushToIos(targetUser.DeviceId, "You have a new notification!");
+          }
+
+          toSend.Success = success;
+          if (success)
+          {
+            toSend.Notification = newNotification;
+          }
+          toSend.Coins = sourceUser.Coins;
+          toSend.Type = EMessagesTypesToClient.Ok;
+          return CommManager.SendMessage(toSend);
+        }
+      }
+      catch (Exception e)
+      {
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Error = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
+      }
+    }
+
+    public string GuessFacebookContactUser(string userId, Stream stream)
+    {
+      try
+      {
+        dynamic toSend = new ExpandoObject();
+
+        var reader = new StreamReader(stream);
+        var text = reader.ReadToEnd();
+
+        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
+        if (jsonObject == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.text = text;
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
+          return CommManager.SendMessage(toSend);
+        }
+
+        var targetUserId = (int)jsonObject["targetUserId"];
+        var facebookObjectId = jsonObject["facebookObjectId"];
+
+        if (facebookObjectId == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
+          return CommManager.SendMessage(toSend);
+        }
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          // check if userId corresponds to phoneNumber
+          var userIdParsed = Convert.ToInt32(userId);
+          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
+          if (sourceUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
+            return CommManager.SendMessage(toSend);
+          }
+
+          sourceUser.LastSeen = DateTime.Now.ToString("u");
+
+          var success = false;
+
+          var targetUser = context.Users.SingleOrDefault(u => u.Id == targetUserId);
+          if (targetUser == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorDetails.BadArguments;
+            return CommManager.SendMessage(toSend);
+          }
+
+          var initialMessage = context.FirstMessages.FirstOrDefault(f => f.SourceUserId == targetUserId && f.TargetUserId == userIdParsed);
+          if (initialMessage == null)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorDetails.BadArguments;
+            return CommManager.SendMessage(toSend);
+          }
+
+          if (sourceUser.Coins < 5)
+          {
+            toSend.Type = EMessagesTypesToClient.Error;
+            toSend.ErrorInfo = ErrorDetails.InsufficientFunds;
+            return CommManager.SendMessage(toSend);
+          }
+
+          sourceUser.Coins -= 5;
+          initialMessage.GuessesUsed++;
+
+          Notification newNotification;
+          if (facebookObjectId == targetUser.FacebookUserId)
+          {
+            success = true;
+
+            initialMessage.MatchFound = true;
+
+            var fullName = GetFullNameOrPhoneNumber(targetUser);
+            newNotification = new Notification
+            {
+              UserId = targetUserId,
+              Text = string.Format("You guessed {0} correctly!", fullName)
+            };
+
+            context.Notifications.Add(newNotification);
+          }
+          else
+          {
+            var fullName = GetFullNameOrPhoneNumber(sourceUser);
+            newNotification = new Notification
+            {
+              UserId = targetUserId,
+              SenderUserId = userIdParsed,
+              Text = string.Format("{0} guessed someone else while trying to guess you", fullName)
+            };
 
             context.Notifications.Add(newNotification);
           }
@@ -259,7 +395,9 @@ namespace RestWcfApplication.Root.UserAction
           return CommManager.SendMessage(toSend);
         }
 
+        var provider = CultureInfo.InvariantCulture;
         var initialMessageId = (int)jsonObject["initialMessageId"];
+        DateTime currentTime = DateTime.ParseExact(jsonObject["currentTime"], "yyyy-MM-dd-HH-mm-ss", provider);
 
         using (var context = new Entities())
         {
@@ -287,11 +425,11 @@ namespace RestWcfApplication.Root.UserAction
 
           if (initialMessage.SourceUserId == userIdParsed)
           {
-            initialMessage.LastTimeSourceUserTyped = DateTime.Now;
+            initialMessage.LastTimeSourceUserTyped = currentTime;
           }
           else
           {
-            initialMessage.LastTimeTargetUserTyped = DateTime.Now;
+            initialMessage.LastTimeTargetUserTyped = currentTime;
           }
 
           var targetUserId = initialMessage.SourceUserId == userIdParsed

@@ -15,6 +15,8 @@
           <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="MatchFound" Type="bit" Nullable="false" />
           <Property Name="SubjectName" Type="nvarchar" MaxLength="500" />
+          <Property Name="MaximumGuesses" Type="int" Nullable="false" />
+          <Property Name="GuessesUsed" Type="int" Nullable="false" />
           <Property Name="SourceUserDeleted" Type="bit" Nullable="false" />
           <Property Name="TargetUserDeleted" Type="bit" Nullable="false" />
           <Property Name="LastTimeSourceUserTyped" Type="datetime" />
@@ -29,6 +31,7 @@
           <Property Name="PictureLink" Type="nvarchar" MaxLength="500" />
           <Property Name="VideoLink" Type="nvarchar" MaxLength="500" />
           <Property Name="ThumbnailImage" Type="image" />
+          <Property Name="Size" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Message">
           <Key>
@@ -391,6 +394,7 @@
           <Property Name="VideoLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="ThumbnailImage" Type="Binary" MaxLength="Max" FixedLength="false" />
           <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
+          <Property Name="Size" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -434,6 +438,8 @@
           <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_FirstMessage" FromRole="FirstMessage" ToRole="Message" />
           <Property Name="LastTimeSourceUserTyped" Type="DateTime" Precision="3" />
           <Property Name="LastTimeTargetUserTyped" Type="DateTime" Precision="3" />
+          <Property Name="MaximumGuesses" Type="Int32" Nullable="false" />
+          <Property Name="GuessesUsed" Type="Int32" Nullable="false" />
         </EntityType>
         <EntityType Name="Message">
           <Key>
@@ -585,6 +591,7 @@
           <EntitySetMapping Name="Hints">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
               <MappingFragment StoreEntitySet="Hint">
+                <ScalarProperty Name="Size" ColumnName="Size" />
                 <ScalarProperty Name="ThumbnailImage" ColumnName="ThumbnailImage" />
                 <ScalarProperty Name="VideoLink" ColumnName="VideoLink" />
                 <ScalarProperty Name="PictureLink" ColumnName="PictureLink" />
@@ -616,6 +623,8 @@
           <EntitySetMapping Name="FirstMessages">
             <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
               <MappingFragment StoreEntitySet="FirstMessage">
+                <ScalarProperty Name="GuessesUsed" ColumnName="GuessesUsed" />
+                <ScalarProperty Name="MaximumGuesses" ColumnName="MaximumGuesses" />
                 <ScalarProperty Name="LastTimeTargetUserTyped" ColumnName="LastTimeTargetUserTyped" />
                 <ScalarProperty Name="LastTimeSourceUserTyped" ColumnName="LastTimeSourceUserTyped" />
                 <ScalarProperty Name="TargetUserDeleted" ColumnName="TargetUserDeleted" />

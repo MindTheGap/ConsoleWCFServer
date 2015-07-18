@@ -50,6 +50,7 @@ namespace RestWcfApplication.Root.Want
             return CommManager.SendMessage(toSend);
           }
 
+          var guessLimit = jsonObject.ContainsKey("guessLimit") ? int.Parse(jsonObject["guessLimit"]) : 3;
           var hint = jsonObject["hint"];
           var hintImageLink = jsonObject.ContainsKey("hintImageLink") ? jsonObject["hintImageLink"] : null;
           var hintVideoLink = jsonObject.ContainsKey("hintVideoLink") ? jsonObject["hintVideoLink"] : null;
@@ -92,6 +93,8 @@ namespace RestWcfApplication.Root.Want
             {
               Date = newDate,
               SourceUserId = userIdParsed,
+              MaximumGuesses = guessLimit,
+              GuessesUsed = 0,
               SubjectName = @""
             };
 
@@ -142,6 +145,8 @@ namespace RestWcfApplication.Root.Want
 
             context.SaveChanges();
 
+            GC.Collect();
+
             toSend.Type = (int)EMessagesTypesToClient.Ok;
             toSend.Coins = sourceUser.Coins;
             toSend.InitialMessage = initialMessage;
@@ -191,6 +196,8 @@ namespace RestWcfApplication.Root.Want
               PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Match was found!");
             }
 
+            GC.Collect();
+
             toSend.Type = (int)EMessagesTypesToClient.Ok;
             toSend.Coins = sourceUser.Coins;
             toSend.ChatMessage = newMessage;
@@ -228,6 +235,8 @@ namespace RestWcfApplication.Root.Want
           {
             PushSharp.PushManager.PushToIos(targetUser.DeviceId, "Someone is in to you!");
           }
+
+          GC.Collect();
 
           toSend.Type = (int)EMessagesTypesToClient.Ok;
           toSend.Coins = sourceUser.Coins;
@@ -366,6 +375,8 @@ namespace RestWcfApplication.Root.Want
               PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Match was found!");
             }
 
+            GC.Collect();
+
             toSend.Type = (int) EMessagesTypesToClient.Ok;
             toSend.Coins = sourceUser.Coins;
             toSend.ChatMessage = newMessage;
@@ -404,6 +415,8 @@ namespace RestWcfApplication.Root.Want
             PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Someone is in to you!");
           }
 
+          GC.Collect();
+
           toSend.Type = (int)EMessagesTypesToClient.Ok;
           toSend.Coins = sourceUser.Coins;
           toSend.ChatMessage = newMessage;
@@ -440,6 +453,7 @@ namespace RestWcfApplication.Root.Want
         var messageImageLink = jsonObject.ContainsKey("imageLink") ? jsonObject["imageLink"] : null;
         var messageVideoLink = jsonObject.ContainsKey("videoLink") ? jsonObject["videoLink"] : null;
         var thumbnailImage = jsonObject.ContainsKey("ThumbnailImage") ? Convert.FromBase64String(jsonObject["ThumbnailImage"]) : null;
+        var size = jsonObject.ContainsKey("Size") ? jsonObject["Size"] : null;
 
         using (var context = new Entities())
         {
@@ -490,7 +504,8 @@ namespace RestWcfApplication.Root.Want
             Text = messageText,
             PictureLink = messageImageLink,
             VideoLink = messageVideoLink,
-            ThumbnailImage = thumbnailImage
+            ThumbnailImage = thumbnailImage,
+            Size = size
           };
           var newMessage = new DB.Message()
           {
@@ -516,6 +531,8 @@ namespace RestWcfApplication.Root.Want
           {
             PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"You have a new message!");
           }
+
+          GC.Collect();
 
           toSend.Type = (int)EMessagesTypesToClient.Ok;
           toSend.Coins = sourceUser.Coins;

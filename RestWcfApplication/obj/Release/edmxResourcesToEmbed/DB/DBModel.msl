@@ -12,6 +12,7 @@
     <EntitySetMapping Name="Hints">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
         <MappingFragment StoreEntitySet="Hint">
+          <ScalarProperty Name="Size" ColumnName="Size" />
           <ScalarProperty Name="ThumbnailImage" ColumnName="ThumbnailImage" />
           <ScalarProperty Name="VideoLink" ColumnName="VideoLink" />
           <ScalarProperty Name="PictureLink" ColumnName="PictureLink" />
@@ -43,6 +44,8 @@
     <EntitySetMapping Name="FirstMessages">
       <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
         <MappingFragment StoreEntitySet="FirstMessage">
+          <ScalarProperty Name="GuessesUsed" ColumnName="GuessesUsed" />
+          <ScalarProperty Name="MaximumGuesses" ColumnName="MaximumGuesses" />
           <ScalarProperty Name="LastTimeTargetUserTyped" ColumnName="LastTimeTargetUserTyped" />
           <ScalarProperty Name="LastTimeSourceUserTyped" ColumnName="LastTimeSourceUserTyped" />
           <ScalarProperty Name="TargetUserDeleted" ColumnName="TargetUserDeleted" />

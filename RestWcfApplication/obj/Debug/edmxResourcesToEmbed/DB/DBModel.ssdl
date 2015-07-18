@@ -10,6 +10,8 @@
     <Property Name="Date" Type="nvarchar" MaxLength="50" Nullable="false" />
     <Property Name="MatchFound" Type="bit" Nullable="false" />
     <Property Name="SubjectName" Type="nvarchar" MaxLength="500" />
+    <Property Name="MaximumGuesses" Type="int" Nullable="false" />
+    <Property Name="GuessesUsed" Type="int" Nullable="false" />
     <Property Name="SourceUserDeleted" Type="bit" Nullable="false" />
     <Property Name="TargetUserDeleted" Type="bit" Nullable="false" />
     <Property Name="LastTimeSourceUserTyped" Type="datetime" />
@@ -24,6 +26,7 @@
     <Property Name="PictureLink" Type="nvarchar" MaxLength="500" />
     <Property Name="VideoLink" Type="nvarchar" MaxLength="500" />
     <Property Name="ThumbnailImage" Type="image" />
+    <Property Name="Size" Type="nvarchar" MaxLength="50" />
   </EntityType>
   <EntityType Name="Message">
     <Key>

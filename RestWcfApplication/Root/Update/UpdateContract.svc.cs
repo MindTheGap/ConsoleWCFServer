@@ -114,6 +114,8 @@ namespace RestWcfApplication.Root.Update
 
           context.SaveChanges();
 
+          GC.Collect();
+
           toSend.Type = EMessagesTypesToClient.MultipleMessages;
           toSend.MultipleMessages = result;
           toSend.Notifications = notifications;
@@ -200,6 +202,8 @@ namespace RestWcfApplication.Root.Update
             PushManager.PushToIos(realTargetUser.DeviceId, string.Format("{0} just read your message!", userName));
           }
 
+          GC.Collect();
+
           toSend.Type = EMessagesTypesToClient.Ok;
           return CommManager.SendMessage(toSend);
         }
@@ -256,6 +260,8 @@ namespace RestWcfApplication.Root.Update
               }
             }
           }
+
+          GC.Collect();
 
           toSend.Type = EMessagesTypesToClient.Ok;
           toSend.MultipleMessages = resultList;

@@ -24,6 +24,16 @@ namespace RestWcfApplication.Root.UserAction
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
+      UriTemplate = "guessFacebookContactUser?userId={userId}")]
+    string GuessFacebookContactUser(string userId, Stream stream);
+
+    /// <summary>
+    /// registers the user to the system and returns his new userId
+    /// </summary>
+    [OperationContract]
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare,
       UriTemplate = "openChat?userId={userId}")]
     string OpenChat(string userId, Stream stream);
 

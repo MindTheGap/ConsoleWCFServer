@@ -163,6 +163,7 @@
     <Property Name="VideoLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
     <Property Name="ThumbnailImage" Type="Binary" MaxLength="Max" FixedLength="false" />
     <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
+    <Property Name="Size" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
   </EntityType>
   <EntityType Name="User">
     <Key>
@@ -206,6 +207,8 @@
     <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_FirstMessage" FromRole="FirstMessage" ToRole="Message" />
     <Property Name="LastTimeSourceUserTyped" Type="DateTime" Precision="3" />
     <Property Name="LastTimeTargetUserTyped" Type="DateTime" Precision="3" />
+    <Property Name="MaximumGuesses" Type="Int32" Nullable="false" />
+    <Property Name="GuessesUsed" Type="Int32" Nullable="false" />
   </EntityType>
   <EntityType Name="Message">
     <Key>
