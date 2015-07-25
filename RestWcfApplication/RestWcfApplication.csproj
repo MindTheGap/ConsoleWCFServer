@@ -240,6 +240,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PushSharp\PushManager.cs" />
+    <Compile Include="Root\Shared\SharedHelper.cs" />
     <Compile Include="Root\UserAction\UserActionContract.svc.cs">
       <DependentUpon>UserActionContract.svc</DependentUpon>
     </Compile>

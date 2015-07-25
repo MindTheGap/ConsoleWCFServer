@@ -16,21 +16,21 @@ namespace RestWcfApplication.Root.Want
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare, 
       UriTemplate = "iamin?userId={userId}&targetPhoneNumber={targetPhoneNumber}")]
-    string UpdateIWantUserByPhoneNumber(string userId, string targetPhoneNumber, Stream data);
+    string UpdateIWantUserByPhoneNumber(string userId, string targetPhoneNumber, Stream stream);
 
     [OperationContract]
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare, 
       UriTemplate = "iaminfacebook?userId={userId}&facebookId={facebookId}")]
-    string UpdateIWantUserByFacebookId(string userId, string facebookId, Stream data);
+    string UpdateIWantUserByFacebookId(string userId, string facebookId, Stream stream);
 
     [OperationContract]
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
       UriTemplate = "iaminnewmessage?userId={userId}&initialMessageId={initialMessageId}")]
-    string UpdateIWantUserExistingMessage(string userId, string initialMessageId, Stream data);
+    string UpdateIWantUserExistingMessage(string userId, string initialMessageId, Stream stream);
 
     //[OperationContract]
     //[WebInvoke(Method = "POST", UriTemplate = "askforclue?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetUserId={targetUserId}")]

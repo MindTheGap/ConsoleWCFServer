@@ -13,10 +13,13 @@ using Newtonsoft.Json.Linq;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using RestWcfApplication.PushSharp;
+using RestWcfApplication.Root.Shared;
 
 namespace RestWcfApplication.Root.IAP
 {
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
+  [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
+                   ConcurrencyMode = ConcurrencyMode.Multiple)]
   public class IAPContract : IIAPContract
   {
     private const string AppleIapSandboxUrl = "https://sandbox.itunes.apple.com/verifyReceipt";
@@ -26,89 +29,76 @@ namespace RestWcfApplication.Root.IAP
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
-        if (jsonObject == null)
+        Dictionary<string, dynamic> jsonObject;
+        User sourceUser;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
+        var sourceUserId = sourceUser.Id;
         var productId = jsonObject["productId"] as string;
         var transcationId = jsonObject["transcationId"] as string;
         var receiptData = jsonObject["receiptData"] as string;
         if (transcationId == null || productId == null || receiptData == null)
         {
           toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
           toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
-        using (var context = new Entities())
+        var product = SharedHelper.QueryForObject<Product>("Products", p => p.ProductId == productId);
+        if (product == null)
         {
-          context.Configuration.ProxyCreationEnabled = false;
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
+          return CommManager.SendMessage(toSend);
+        }
 
-          // check if userId corresponds to phoneNumber
-          var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (sourceUser == null)
+        var responseJsonObject = CheckTransactionReceipt(AppleIapProductionUrl, receiptData);
+        var statusStr = responseJsonObject["status"].ToString();
+        if (statusStr == "21007")
+        {
+          responseJsonObject = CheckTransactionReceipt(AppleIapSandboxUrl, receiptData);
+          statusStr = responseJsonObject["status"].ToString();
+        }
+
+        if (statusStr != "0")
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.ErrorInfo = string.Format("status code ({0}) is not zero", statusStr);
+          return CommManager.SendMessage(toSend);
+        }
+
+        var result = CheckIapResponseIntegrity(responseJsonObject, product);
+        if (result)
+        {
+          using (var context = new Entities())
           {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
+            context.Configuration.ProxyCreationEnabled = false;
 
-          sourceUser.LastSeen = DateTime.Now.ToString("u");
+            context.Users.Attach(sourceUser);
 
-          var product = context.Products.FirstOrDefault(p => p.ProductId == productId);
-          if (product == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.BadArguments;
-            return CommManager.SendMessage(toSend);
-          }
-
-          var responseJsonObject = CheckTransactionReceipt(AppleIapProductionUrl, receiptData);
-          var statusStr = responseJsonObject["status"].ToString();
-          if (statusStr == "21007")
-          {
-            responseJsonObject = CheckTransactionReceipt(AppleIapSandboxUrl, receiptData);
-            statusStr = responseJsonObject["status"].ToString();
-          }
-
-          if (statusStr != "0")
-          {
-            throw new Exception(string.Format("status code ({0}) is not zero", statusStr));
-          }
-
-          var result = CheckIapResponseIntegrity(responseJsonObject, product);
-          if (result)
-          {
             sourceUser.Coins += product.CoinsAmount;
 
-            var newNotification = new Notification();
-            newNotification.UserId = userIdParsed;
-            newNotification.CoinAmount = product.CoinsAmount;
-            newNotification.Text = string.Format("You purchased {0} coins!", product.CoinsAmount);
+            var newNotification = new Notification
+            {
+              UserId = sourceUserId,
+              CoinAmount = product.CoinsAmount,
+              Text = string.Format("You purchased {0} coins!", product.CoinsAmount)
+            };
 
             context.Notifications.Add(newNotification);
 
             context.SaveChanges();
-
-            toSend.CoinAmount = sourceUser.Coins;
           }
-
-          toSend.responseText = responseJsonObject;
-          toSend.Type = EMessagesTypesToClient.Ok;
-          return CommManager.SendMessage(toSend);
         }
+
+        toSend.CoinAmount = sourceUser.Coins;
+        toSend.responseText = responseJsonObject;
+        toSend.Type = EMessagesTypesToClient.Ok;
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {
@@ -183,46 +173,29 @@ namespace RestWcfApplication.Root.IAP
       return true;
     }
 
-    public string GetAllPurchases(string userId, System.IO.Stream stream)
+    public string GetAllPurchases(string userId, Stream stream)
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
-        if (jsonObject == null)
+        Dictionary<string, dynamic> jsonObject;
+        User sourceUser;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
+        List<string> productIds;
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          // check if userId corresponds to phoneNumber
-          var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (sourceUser == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
-
-          sourceUser.LastSeen = DateTime.Now.ToString("u");
-
-          var productIds = context.Products.Select(p => p.ProductId).ToList();
-
-          toSend.MultipleMessages = productIds;
-          toSend.Type = EMessagesTypesToClient.Ok;
-          return CommManager.SendMessage(toSend);
+          productIds = context.Products.Select(p => p.ProductId).ToList();
         }
+
+        toSend.MultipleMessages = productIds;
+        toSend.Type = EMessagesTypesToClient.Ok;
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {

@@ -15,6 +15,7 @@ using RestSharp.Extensions;
 using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using RestWcfApplication.PushSharp;
+using RestWcfApplication.Root.Shared;
 using Message = RestWcfApplication.DB.Message;
 
 namespace RestWcfApplication.Root.Update
@@ -27,23 +28,19 @@ namespace RestWcfApplication.Root.Update
     
 
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
+  [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
+                   ConcurrencyMode = ConcurrencyMode.Multiple)]
   public class UpdateContract : IUpdateContract
   {
     public string GetAllInitialMessages(string userId, Stream stream)
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var dictionary = JsonConvert.DeserializeObject<Dictionary<string, int>>(text);
-        if (dictionary == null)
+        Dictionary<string, int> dictionary;
+        User sourceUser;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out dictionary, out sourceUser, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.Error = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
@@ -52,27 +49,19 @@ namespace RestWcfApplication.Root.Update
           ? dictionary["startingNotificationId"]
           : -1;
 
+        List<InitialMessageWithUnreadMessages> result;
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          var userList = context.Users.Where(u => u.Id == userIdParsed);
-          var user = userList.FirstOrDefault();
-          if (user == null)
+          result = new List<InitialMessageWithUnreadMessages>();
+          foreach (
+            var initialMessage in context.FirstMessages.Include("Messages").Include("SourceUser").Include("TargetUser")
+              .Where(m => m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
           {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.FatalError = "true";
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
-
-          user.LastSeen = DateTime.Now.ToString("u");
-
-          var result = new List<InitialMessageWithUnreadMessages>();
-          foreach (var initialMessage in context.FirstMessages.Include("Messages").Include("SourceUser").Include("TargetUser")
-            .Where(m => m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
-          {
-            var startingMessageId = dictionary.ContainsKey(initialMessage.Id.ToString("D")) ? dictionary[initialMessage.Id.ToString("D")] : -1;
+            var startingMessageId = dictionary.ContainsKey(initialMessage.Id.ToString("D"))
+              ? dictionary[initialMessage.Id.ToString("D")]
+              : -1;
             var unreadMessages = context.Messages.Include("SourceUser").Include("TargetUser").Include("Hint")
               .Where(m => m.Id > startingMessageId && m.FirstMessageId == initialMessage.Id).ToList();
 
@@ -109,23 +98,33 @@ namespace RestWcfApplication.Root.Update
             result.Add(initialMessageResult);
           }
 
-          var notifications = context.Notifications.Where(n => n.UserId == userIdParsed && n.Id > startingNotificationId).ToList();
-          ;
-
           context.SaveChanges();
-
-          GC.Collect();
-
-          toSend.Type = EMessagesTypesToClient.MultipleMessages;
-          toSend.MultipleMessages = result;
-          toSend.Notifications = notifications;
-            
-          return CommManager.SendMessage(toSend);
         }
+
+        List<Notification> notifications;
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+          
+          notifications = context.Notifications.Where(n => n.UserId == userIdParsed && n.Id > startingNotificationId).ToList();
+        }
+
+
+        GC.Collect();
+
+        toSend.Type = EMessagesTypesToClient.MultipleMessages;
+        toSend.MultipleMessages = result;
+        toSend.Notifications = notifications;
+
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {
-        throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Error = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
       }
     }
 
@@ -133,17 +132,11 @@ namespace RestWcfApplication.Root.Update
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var dictionary = JsonConvert.DeserializeObject<Dictionary<string, int>>(text);
-        if (dictionary == null)
+        Dictionary<string, int> dictionary;
+        User sourceUser;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out dictionary, out sourceUser, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
@@ -152,65 +145,68 @@ namespace RestWcfApplication.Root.Update
         var maxChatMessageId = dictionary.ContainsKey("maxChatMessageId") ? dictionary["maxChatMessageId"] : -1;
         var chatMessageId = dictionary.ContainsKey("chatMessageId") ? dictionary["chatMessageId"] : -1;
 
+        var initialMessage = SharedHelper.QueryForObject<FirstMessage>("FirstMessages", m => m.Id == initialMessageId);
+        if (initialMessage == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
+          return CommManager.SendMessage(toSend);
+        }
+
+        var realTargetUserId = initialMessage.SourceUserId == userIdParsed
+          ? initialMessage.TargetUserId
+          : initialMessage.SourceUserId;
+        var realTargetUser = SharedHelper.QueryForObject<User>("Users", u => u.Id == realTargetUserId);
+        if (realTargetUser == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
+          return CommManager.SendMessage(toSend);
+        }
+
+        bool sendPush = false;
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          var user = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (user == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
-
-          user.LastSeen = DateTime.Now.ToString("u");
-
-          var initialMessage = context.FirstMessages.SingleOrDefault(m => m.Id == initialMessageId);
-          if (initialMessage == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
-
-          var realTargetUserId = initialMessage.SourceUserId == userIdParsed
-            ? initialMessage.TargetUserId
-            : initialMessage.SourceUserId;
-          var realTargetUser = context.Users.FirstOrDefault(u => u.Id == realTargetUserId);
-
-          var sendPush = false;
           var userMessages =
-            context.Messages.Include("Hint").Where(m => m.ReceivedState < (int)EMessageReceivedState.MessageStateReadByClient
-              && ((maxChatMessageId > -1 && m.Id <= maxChatMessageId) || (chatMessageId > -1 && m.Id == chatMessageId))
-              && m.TargetUserId == userIdParsed && m.SourceUserId == realTargetUserId);
+            context.Messages.Include("Hint")
+              .Where(m => m.ReceivedState < (int) EMessageReceivedState.MessageStateReadByClient
+                          &&
+                          ((maxChatMessageId > -1 && m.Id <= maxChatMessageId) ||
+                           (chatMessageId > -1 && m.Id == chatMessageId))
+                          && m.TargetUserId == userIdParsed && m.SourceUserId == realTargetUserId);
           foreach (var userMessage in userMessages)
           {
             // check for text message or it's a specific media message
             if (chatMessageId > -1 || (userMessage.Hint.PictureLink == null && userMessage.Hint.VideoLink == null))
             {
-              userMessage.ReceivedState = (int)EMessageReceivedState.MessageStateReadByClient;
+              userMessage.ReceivedState = (int) EMessageReceivedState.MessageStateReadByClient;
               sendPush = true;
             }
           }
 
           context.SaveChanges();
-
-          if (sendPush && realTargetUser != null && realTargetUser.DeviceId != null)
-          {
-            var userName = user.FirstName != null ? user.FirstName + " " + user.LastName : user.DisplayName;
-            PushManager.PushToIos(realTargetUser.DeviceId, string.Format("{0} just read your message!", userName));
-          }
-
-          GC.Collect();
-
-          toSend.Type = EMessagesTypesToClient.Ok;
-          return CommManager.SendMessage(toSend);
         }
+
+        if (sendPush && realTargetUser.DeviceId != null)
+        {
+          var userName = sourceUser.FirstName != null ? sourceUser.FirstName + " " + sourceUser.LastName : sourceUser.DisplayName;
+          PushManager.PushToIos(realTargetUser.DeviceId, string.Format("{0} just read your message!", userName));
+        }
+
+        GC.Collect();
+
+        toSend.Type = EMessagesTypesToClient.Ok;
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {
-        throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Error = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
       }
     }
 
@@ -218,35 +214,20 @@ namespace RestWcfApplication.Root.Update
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var contactsList = JsonConvert.DeserializeObject<List<List<string>>>(text);
-        if (contactsList == null)
+        List<List<string>> contactsList;
+        User sourceUser;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out contactsList, out sourceUser, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
-        var sourceUserIdParsed = int.Parse(userId);
-
+        Dictionary<string, List<string>> resultList = null;
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          var user = context.Users.SingleOrDefault(u => u.Id == sourceUserIdParsed);
-          if (user != null)
-          {
-            user.LastSeen = DateTime.Now.ToString("u");
-
-            context.SaveChanges();
-          }
-
-          var resultList = new Dictionary<string,List<string>>();
+          resultList = new Dictionary<string, List<string>>();
           foreach (var contactPhoneNumberList in contactsList)
           {
             foreach (var phoneNumber in contactPhoneNumberList)
@@ -255,22 +236,26 @@ namespace RestWcfApplication.Root.Update
 
               if (contact != null)
               {
-                resultList[phoneNumber] = new List<string>() {contact.LastSeen,contact.ProfileImageLink};
+                resultList[phoneNumber] = new List<string>() {contact.LastSeen, contact.ProfileImageLink};
                 break;
               }
             }
           }
-
-          GC.Collect();
-
-          toSend.Type = EMessagesTypesToClient.Ok;
-          toSend.MultipleMessages = resultList;
-          return CommManager.SendMessage(toSend);
         }
+
+        GC.Collect();
+
+        toSend.Type = EMessagesTypesToClient.Ok;
+        toSend.MultipleMessages = resultList;
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {
-        throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Error = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
       }
     }
   }

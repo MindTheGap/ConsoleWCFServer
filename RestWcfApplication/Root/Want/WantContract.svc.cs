@@ -12,10 +12,13 @@ using RestWcfApplication.Communications;
 using RestWcfApplication.DB;
 using System.ServiceModel.Activation;
 using System.Drawing;
+using RestWcfApplication.Root.Shared;
 
 namespace RestWcfApplication.Root.Want
 {
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
+  [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
+                   ConcurrencyMode = ConcurrencyMode.Multiple)]
   public class WantContract : IWantContract
   {
     private const string DefaultEmptyMessage = @"Guess Who...";
@@ -28,50 +31,37 @@ namespace RestWcfApplication.Root.Want
       return string.IsNullOrEmpty(s) || s == "(null)";
     }
 
-    public string UpdateIWantUserByPhoneNumber(string userId, string targetPhoneNumber, Stream data)
+    public string UpdateIWantUserByPhoneNumber(string userId, string targetPhoneNumber, Stream stream)
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
+        Dictionary<string, dynamic> jsonObject;
+        User sourceUser;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        {
+          return CommManager.SendMessage(toSend);
+        }
 
-        var reader = new StreamReader(data);
-        var text = reader.ReadToEnd();
+        var sourceUserId = sourceUser.Id;
+        var guessLimit = jsonObject.ContainsKey("guessLimit") ? int.Parse(jsonObject["guessLimit"]) : 3;
+        var hint = jsonObject["hint"];
+        var hintImageLink = jsonObject.ContainsKey("hintImageLink") ? jsonObject["hintImageLink"] : null;
+        var hintVideoLink = jsonObject.ContainsKey("hintVideoLink") ? jsonObject["hintVideoLink"] : null;
+
+        var hintNotUsed = IsStringEmpty(hint) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
+
+        var initialMessage = SharedHelper.QueryForObject<FirstMessage>("FirstMessages",
+          u => ((u.SourceUserId == sourceUserId && u.TargetUser.PhoneNumber == targetPhoneNumber)
+                || (u.TargetUserId == sourceUserId && u.SourceUser.PhoneNumber == targetPhoneNumber)));
 
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
-          if (jsonObject == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.text = text;
-            toSend.ErrorInfo = ErrorDetails.BadArguments;
-            return CommManager.SendMessage(toSend);
-          }
+          context.Users.Attach(sourceUser);
 
-          var guessLimit = jsonObject.ContainsKey("guessLimit") ? int.Parse(jsonObject["guessLimit"]) : 3;
-          var hint = jsonObject["hint"];
-          var hintImageLink = jsonObject.ContainsKey("hintImageLink") ? jsonObject["hintImageLink"] : null;
-          var hintVideoLink = jsonObject.ContainsKey("hintVideoLink") ? jsonObject["hintVideoLink"] : null;
-
-          // check if userId corresponds to phoneNumber
-          var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (sourceUser == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
-
-          sourceUser.LastSeen = DateTime.Now.ToString("u");
           sourceUser.Coins += 5;
-
-          var hintNotUsed = IsStringEmpty(hint) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
-          var initialMessage =
-            context.FirstMessages.SingleOrDefault(u => ((u.SourceUserId == userIdParsed && u.TargetUser.PhoneNumber == targetPhoneNumber)
-                                                    ||  (u.TargetUserId == userIdParsed && u.SourceUser.PhoneNumber == targetPhoneNumber)));
 
           var newDate = DateTime.UtcNow.ToString("u");
           var newHint = new DB.Hint
@@ -82,7 +72,7 @@ namespace RestWcfApplication.Root.Want
           };
           var newMessage = new DB.Message()
           {
-            SourceUserId = userIdParsed,
+            SourceUserId = sourceUserId,
             Hint = newHint,
             Date = newDate,
             ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
@@ -92,7 +82,7 @@ namespace RestWcfApplication.Root.Want
             var newInitialMessage = new DB.FirstMessage()
             {
               Date = newDate,
-              SourceUserId = userIdParsed,
+              SourceUserId = sourceUserId,
               MaximumGuesses = guessLimit,
               GuessesUsed = 0,
               SubjectName = @""
@@ -102,6 +92,11 @@ namespace RestWcfApplication.Root.Want
 
             initialMessage = newInitialMessage;
           }
+          else
+          {
+            context.FirstMessages.Attach(initialMessage);
+          }
+
           newMessage.FirstMessage = initialMessage;
 
           context.Hints.Add(newHint);
@@ -112,25 +107,25 @@ namespace RestWcfApplication.Root.Want
           //  if so, check if he's also in the source user:
           //    if not, send him a message telling him someone (source user) is in him
           //    if so, love is in the air - connect chat between them
-          var targetUser = context.Users.SingleOrDefault(u => u.PhoneNumber == targetPhoneNumber);
+          var targetUser = SharedHelper.QueryForObject<User>("Users", u => u.PhoneNumber == targetPhoneNumber);
           if (targetUser == null)
           {
             // target user doesn't exist in the system yet
             // sending him an invitation sms
             Twilio.Twilio.SendInvitationMessage(sourceUser.FirstName + " " + sourceUser.LastName, targetPhoneNumber);
 
-            var newTargetUser = new DB.User() { PhoneNumber = targetPhoneNumber };
+            var newTargetUser = new User() { PhoneNumber = targetPhoneNumber };
 
             newMessage.TargetUser = newMessage.TargetUser = newTargetUser;
             initialMessage.TargetUser = newTargetUser;
 
-            var newSystemMessageHintSms = new DB.Hint()
+            var newSystemMessageHintSms = new Hint()
             {
               Text = SentSms
             };
             var newSystemMessageSms = new DB.Message()
             {
-              SourceUserId = userIdParsed,
+              SourceUserId = sourceUserId,
               TargetUser = newTargetUser,
               FirstMessage = initialMessage,
               Hint = newSystemMessageHintSms,
@@ -164,18 +159,18 @@ namespace RestWcfApplication.Root.Want
           }
 
           // checking if target user is in source user also
-          if (initialMessage.TargetUserId == userIdParsed)
+          if (initialMessage.TargetUserId == sourceUserId)
           {
             // target user is in source user also - love is in the air
             // enabling a chat between them by sending the target user id to the source user
 
-            var newSystemMessageHintMatch = new DB.Hint()
+            var newSystemMessageHintMatch = new Hint()
             {
               Text = MatchFound
             };
             var newSystemMessageMatch = new DB.Message()
             {
-              SourceUserId = userIdParsed,
+              SourceUserId = sourceUserId,
               TargetUser = targetUser,
               FirstMessage = initialMessage,
               Hint = newSystemMessageHintMatch,
@@ -216,7 +211,7 @@ namespace RestWcfApplication.Root.Want
           };
           var newSystemMessage = new DB.Message()
           {
-            SourceUserId = userIdParsed,
+            SourceUserId = sourceUserId,
             TargetUser = targetUser,
             FirstMessage = initialMessage,
             Hint = newSystemMessageHint,
@@ -252,57 +247,51 @@ namespace RestWcfApplication.Root.Want
       }
     }
 
-    public string UpdateIWantUserByFacebookId(string userId, string facebookId, Stream data)
+    public string UpdateIWantUserByFacebookId(string userId, string facebookId, Stream stream)
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(data);
-        var text = reader.ReadToEnd();
-
-        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
-        if (jsonObject == null)
+        Dictionary<string, dynamic> jsonObject;
+        User sourceUser;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
+        var sourceUserId = sourceUser.Id;
         var hint = jsonObject["hint"];
         var hintImageLink = jsonObject.ContainsKey("hintImageLink") ? jsonObject["hintImageLink"] : null;
         var hintVideoLink = jsonObject.ContainsKey("hintVideoLink") ? jsonObject["hintVideoLink"] : null;
+
+        var targetUser = SharedHelper.QueryForObject<User>("Users", u => u.FacebookUserId == facebookId);
+        if (targetUser == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
+          return CommManager.SendMessage(toSend);
+        }
+
+        var hintNotUsed = IsStringEmpty(hint) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
+        var initialMessage = SharedHelper.QueryForObject<FirstMessage>("FirstMessages",
+          u => ((u.SourceUserId == sourceUserId && u.TargetUser.Id == targetUser.Id)
+                || (u.TargetUserId == sourceUserId && u.SourceUser.Id == targetUser.Id)));
+
+        var messageExists = false;
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          messageExists = context.Messages.Any(m => m.SourceUserId == targetUser.Id && m.TargetUserId == sourceUserId);
+        }
 
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          // check if userId corresponds to phoneNumber
-          var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (sourceUser == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
+          context.Users.Attach(sourceUser);
 
-          sourceUser.LastSeen = DateTime.Now.ToString("u");
           sourceUser.Coins += 5;
-
-          var targetUser = context.Users.FirstOrDefault(u => u.FacebookUserId == facebookId);
-          if (targetUser == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
-
-          var hintNotUsed = IsStringEmpty(hint) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
-          var firstMessage =
-            context.FirstMessages.SingleOrDefault(u => ((u.SourceUserId == userIdParsed && u.TargetUser.Id == targetUser.Id)
-                                                    || (u.TargetUserId == userIdParsed && u.SourceUser.Id == targetUser.Id)));
 
           var newDate = DateTime.UtcNow.ToString("u");
           var newHint = new DB.Hint
@@ -313,25 +302,30 @@ namespace RestWcfApplication.Root.Want
           };
           var newMessage = new DB.Message()
           {
-            SourceUserId = userIdParsed,
+            SourceUserId = sourceUserId,
             TargetUserId = targetUser.Id,
             Hint = newHint,
             Date = newDate,
-            ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
+            ReceivedState = (int) EMessageReceivedState.MessageStateSentToServer
           };
-          if (firstMessage == null)
+          if (initialMessage == null)
           {
-            firstMessage = new FirstMessage()
+            initialMessage = new FirstMessage()
             {
               Date = newDate,
-              SourceUserId = userIdParsed,
+              SourceUserId = sourceUserId,
               TargetUserId = targetUser.Id,
               SubjectName = @""
             };
 
-            context.FirstMessages.Add(firstMessage);
+            context.FirstMessages.Add(initialMessage);
           }
-          newMessage.FirstMessage = firstMessage;
+          else
+          {
+            context.FirstMessages.Attach(initialMessage);
+          }
+
+          newMessage.FirstMessage = initialMessage;
 
           context.Hints.Add(newHint);
           context.Messages.Add(newMessage);
@@ -341,7 +335,6 @@ namespace RestWcfApplication.Root.Want
           //    if so, love is in the air - connect chat between them
 
           // checking if target user is in source user also
-          var messageExists = context.Messages.Any(m => m.SourceUserId == targetUser.Id && m.TargetUserId == userIdParsed);
           if (messageExists)
           {
             // target user is in source user also - love is in the air
@@ -353,18 +346,18 @@ namespace RestWcfApplication.Root.Want
             };
             var newSystemMessageMatch = new DB.Message()
             {
-              SourceUserId = userIdParsed,
+              SourceUserId = sourceUserId,
               TargetUser = targetUser,
-              FirstMessage = firstMessage,
+              FirstMessage = initialMessage,
               Hint = newSystemMessageHintMatch,
               Date = newDate,
               SystemMessageState = 1,
-              ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
+              ReceivedState = (int) EMessageReceivedState.MessageStateSentToServer
             };
 
             context.Messages.Add(newSystemMessageMatch);
 
-            firstMessage.MatchFound = true;
+            initialMessage.MatchFound = true;
 
             context.SaveChanges();
 
@@ -381,7 +374,7 @@ namespace RestWcfApplication.Root.Want
             toSend.Coins = sourceUser.Coins;
             toSend.ChatMessage = newMessage;
             toSend.SystemMessage = newSystemMessageMatch;
-            toSend.InitialMessage = firstMessage;
+            toSend.InitialMessage = initialMessage;
             return CommManager.SendMessage(toSend);
           }
 
@@ -395,13 +388,13 @@ namespace RestWcfApplication.Root.Want
           };
           var newSystemMessage = new DB.Message()
           {
-            SourceUserId = userIdParsed,
+            SourceUserId = sourceUserId,
             TargetUser = targetUser,
-            FirstMessage = firstMessage,
+            FirstMessage = initialMessage,
             Hint = newSystemMessageHint,
             Date = newDate,
             SystemMessageState = 1,
-            ReceivedState = (int)EMessageReceivedState.MessageStateSentToClient
+            ReceivedState = (int) EMessageReceivedState.MessageStateSentToClient
           };
 
           context.Messages.Add(newSystemMessage);
@@ -417,11 +410,11 @@ namespace RestWcfApplication.Root.Want
 
           GC.Collect();
 
-          toSend.Type = (int)EMessagesTypesToClient.Ok;
+          toSend.Type = (int) EMessagesTypesToClient.Ok;
           toSend.Coins = sourceUser.Coins;
           toSend.ChatMessage = newMessage;
           toSend.SystemMessage = newSystemMessage;
-          toSend.InitialMessage = firstMessage;
+          toSend.InitialMessage = initialMessage;
           return CommManager.SendMessage(toSend);
         }
       }
@@ -431,75 +424,55 @@ namespace RestWcfApplication.Root.Want
       }
     }
 
-    public string UpdateIWantUserExistingMessage(string userId, string initialMessageId, Stream data)
+    public string UpdateIWantUserExistingMessage(string userId, string initialMessageId, Stream stream)
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(data);
-        var text = reader.ReadToEnd();
-
-        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
-        if (jsonObject == null)
+        Dictionary<string, dynamic> jsonObject;
+        User sourceUser;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
+        var sourceUserId = sourceUser.Id;
         var messageText = jsonObject.ContainsKey("text") ? jsonObject["text"] : null;
         var messageImageLink = jsonObject.ContainsKey("imageLink") ? jsonObject["imageLink"] : null;
         var messageVideoLink = jsonObject.ContainsKey("videoLink") ? jsonObject["videoLink"] : null;
         var thumbnailImage = jsonObject.ContainsKey("ThumbnailImage") ? Convert.FromBase64String(jsonObject["ThumbnailImage"]) : null;
         var size = jsonObject.ContainsKey("Size") ? jsonObject["Size"] : null;
 
+        var initialMessageIdReal = Convert.ToInt32(initialMessageId);
+
+        var initialMessage = SharedHelper.QueryForObject<FirstMessage>("FirstMessages", fm => fm.Id == initialMessageIdReal);
+        if (initialMessage == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.ErrorInfo = ErrorDetails.BadArguments;
+          return CommManager.SendMessage(toSend);
+        }
+
+        var targetUserId = initialMessage.SourceUserId == sourceUserId ? initialMessage.TargetUserId : initialMessage.SourceUserId;
+        var targetUser = SharedHelper.QueryForObject<User>("Users", u => u.Id == targetUserId);
+        if (targetUser == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
+          return CommManager.SendMessage(toSend);
+        }
+
+        DB.Message newMessage = null;
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          // check if userId corresponds to phoneNumber
-          var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (sourceUser == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
+          context.Users.Attach(sourceUser);
 
-          sourceUser.LastSeen = DateTime.Now.ToString("u");
-
-          var initialMessageIdReal = Convert.ToInt32(initialMessageId);
-          var firstMessage = context.FirstMessages.SingleOrDefault(fm => fm.Id == initialMessageIdReal);
-          if (firstMessage == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
-
-          if (firstMessage.SourceUserId == userIdParsed)
-          {
-            sourceUser.Coins += 2;
-          }
-          else
-          {
-            sourceUser.Coins -= 2;
-          }
-
-          var targetUserId = firstMessage.SourceUserId == userIdParsed ? firstMessage.TargetUserId : firstMessage.SourceUserId;
-          var targetUser = context.Users.SingleOrDefault(u => u.Id == targetUserId);
-          if (targetUser == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
+          sourceUser.Coins += initialMessage.SourceUserId == sourceUserId ? 2 : -2;
 
           var newDate = DateTime.UtcNow.ToString("u");
-          var newHint = new DB.Hint
+          var newHint = new Hint
           {
             Text = messageText,
             PictureLink = messageImageLink,
@@ -507,38 +480,35 @@ namespace RestWcfApplication.Root.Want
             ThumbnailImage = thumbnailImage,
             Size = size
           };
-          var newMessage = new DB.Message()
+          newMessage = new DB.Message()
           {
-            SourceUserId = userIdParsed,
+            SourceUserId = sourceUserId,
             TargetUserId = targetUser.Id,
-            FirstMessage = firstMessage,
+            FirstMessage = initialMessage,
             Hint = newHint,
             Date = newDate,
-            ReceivedState = (int)EMessageReceivedState.MessageStateSentToServer
+            ReceivedState = (int) EMessageReceivedState.MessageStateSentToServer
           };
 
           context.Hints.Add(newHint);
           context.Messages.Add(newMessage);
 
-          // target user does not want source user yet so:
-          //  sending target user the message from source user
-
           context.SaveChanges();
-
-          //targetUser.PhoneNumber = string.Empty;
-
-          if (targetUser.DeviceId != null)
-          {
-            PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"You have a new message!");
-          }
-
-          GC.Collect();
-
-          toSend.Type = (int)EMessagesTypesToClient.Ok;
-          toSend.Coins = sourceUser.Coins;
-          toSend.Message = newMessage;
-          return CommManager.SendMessage(toSend);
         }
+
+        //targetUser.PhoneNumber = string.Empty;
+
+        if (targetUser.DeviceId != null)
+        {
+          PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"You have a new message!");
+        }
+
+        GC.Collect();
+
+        toSend.Type = (int)EMessagesTypesToClient.Ok;
+        toSend.Coins = sourceUser.Coins;
+        toSend.Message = newMessage;
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {

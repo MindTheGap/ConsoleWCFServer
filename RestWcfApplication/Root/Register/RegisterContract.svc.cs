@@ -16,11 +16,14 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 using RestWcfApplication.PushSharp;
+using RestWcfApplication.Root.Shared;
 using Twilio;
 
 namespace RestWcfApplication.Root.Register
 {
   [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
+  [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single,
+                   ConcurrencyMode = ConcurrencyMode.Multiple)]
   public class RegisterContract : IRegisterContract
   {
     private const int DefaultCoinsForNewUsers = 0;
@@ -29,36 +32,29 @@ namespace RestWcfApplication.Root.Register
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
-        if (jsonObject == null)
+        Dictionary<string, dynamic> jsonObject;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObject(stream, out jsonObject, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
         var phoneNumber = jsonObject["phoneNumber"] as string;
         var validationCode = jsonObject["validationCode"];
 
+        var user = SharedHelper.QueryForObject<User>("Users", u => u.PhoneNumber == phoneNumber);
+        if (user == null)
+        {
+          toSend.Type = EMessagesTypesToClient.Error;
+          toSend.ErrorInfo = ErrorDetails.PhoneNumberDoesNotExist;
+          return CommManager.SendMessage(toSend);
+        }
+
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber);
-          if (!userList.Any())
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.PhoneNumberDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
-
-          var user = userList.First();
+          context.Users.Attach(user);
 
           //if (user.VerificationCode != validationCode)
           //{
@@ -71,17 +67,21 @@ namespace RestWcfApplication.Root.Register
           user.Verified = true;
 
           context.SaveChanges();
-
-          GC.Collect();
-
-          toSend.Type = EMessagesTypesToClient.Ok;
-          toSend.User = user;
-          return CommManager.SendMessage(toSend);
         }
+
+        GC.Collect();
+
+        toSend.Type = EMessagesTypesToClient.Ok;
+        toSend.User = user;
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {
-        throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Error = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
       }
     }
 
@@ -89,79 +89,66 @@ namespace RestWcfApplication.Root.Register
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
-        if (jsonObject == null)
+        Dictionary<string, dynamic> jsonObject;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObject(stream, out jsonObject, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
         var phoneNumber = jsonObject["phoneNumber"] as string;
 
-        using (var context = new Entities())
+        var user = SharedHelper.QueryForObject<User>("Users", u => u.PhoneNumber == phoneNumber);
+
+        var verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
+
+        if (user != null)
         {
-          context.Configuration.ProxyCreationEnabled = false;
-
-          int verificationCode = -1;
-          var userList = context.Users.Where(u => u.PhoneNumber == phoneNumber);
-          var user = userList.FirstOrDefault();
-          if (user != null)
+          using (var context = new Entities())
           {
-            //if (user.Verified)
-            //{
-            //  toSend.Type = EMessagesTypesToClient.SystemMessage;
-            //  toSend.SystemMessage = ESystemMessageState.AlreadyRegisteredAndVerified;
-            //  toSend.UserId = user.Id.ToString("d");
-            //  return CommManager.SendMessage(toSend);
-            //}
-            //else
-            //{
+            context.Configuration.ProxyCreationEnabled = false;
+
+            context.Users.Attach(user);
+
             user.Verified = false;
-
-            verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
-
             user.VerificationCode = verificationCode.ToString("d");
+
             context.SaveChanges();
-
-            GC.Collect();
-
-            toSend.Type = EMessagesTypesToClient.SystemMessage;
-            toSend.SystemMessage = ESystemMessageState.VerificationCodeSent;
-            toSend.UserId = user.Id.ToString("d");
-            return CommManager.SendMessage(toSend);
-            //}
           }
-
-          verificationCode = Twilio.Twilio.SendVerificationCode(phoneNumber);
-
-          var newUser = new User()
-          {
-            PhoneNumber = phoneNumber, 
-            Coins = DefaultCoinsForNewUsers,
-            Verified = false, 
-            VerificationCode = verificationCode.ToString("d")
-          };
-          context.Users.Add(newUser);
-          context.SaveChanges();
-
-          GC.Collect();
-
-          toSend.Type = EMessagesTypesToClient.SystemMessage;
-          toSend.SystemMessage = ESystemMessageState.RegisterSuccessfully | ESystemMessageState.VerificationCodeSent;
-          toSend.UserId = newUser.Id.ToString("d");
-          return CommManager.SendMessage(toSend);
         }
+        else
+        {
+          using (var context = new Entities())
+          {
+            context.Configuration.ProxyCreationEnabled = false;
+
+            user = new User()
+            {
+              PhoneNumber = phoneNumber,
+              Coins = DefaultCoinsForNewUsers,
+              Verified = false,
+              VerificationCode = verificationCode.ToString("d")
+            };
+            context.Users.Add(user);
+
+            context.SaveChanges();
+          }
+        }
+
+        GC.Collect();
+
+        toSend.Type = EMessagesTypesToClient.SystemMessage;
+        toSend.SystemMessage = ESystemMessageState.VerificationCodeSent;
+        toSend.UserId = user.Id.ToString("d");
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {
-        throw new FaultException("Something went wrong. exception: " + e.Message + ". InnerException: " + e.InnerException);
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.Error = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
       }
     }
 
@@ -169,20 +156,15 @@ namespace RestWcfApplication.Root.Register
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
-        if (jsonObject == null)
+        Dictionary<string, dynamic> jsonObject;
+        User sourceUser;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
+        var sourceUserId = sourceUser.Id;
         var name = jsonObject.ContainsKey("name") ? jsonObject["name"] : null;
         var firstName = jsonObject.ContainsKey("firstName") ? jsonObject["firstName"] : null;
         var lastName = jsonObject.ContainsKey("lastName") ? jsonObject["lastName"] : null;
@@ -196,15 +178,7 @@ namespace RestWcfApplication.Root.Register
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          // check if userId corresponds to phoneNumber
-          var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (sourceUser == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
+          context.Users.Attach(sourceUser);
 
           if (name != null) sourceUser.DisplayName = name;
           if (firstName != null) sourceUser.FirstName = firstName;
@@ -213,9 +187,23 @@ namespace RestWcfApplication.Root.Register
           if (facebookUserId != null) sourceUser.FacebookUserId = facebookUserId;
           if (deviceId != null) sourceUser.DeviceId = deviceId;
           if (profileImageLink != null) sourceUser.ProfileImageLink = profileImageLink;
-          sourceUser.LastSeen = DateTime.Now.ToString("u");
 
-          var sourceUserName = firstName != null ? firstName + " " + lastName : name;
+          context.SaveChanges();
+        }
+
+        var anyNotifications = false;
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          anyNotifications = context.Notifications.Any(n => n.UserId == sourceUserId);
+        }
+
+        var sourceUserName = firstName != null ? firstName + " " + lastName : name;
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
 
           if (contacts != null)
           {
@@ -228,7 +216,7 @@ namespace RestWcfApplication.Root.Register
                 {
                   if (contactUser.DeviceId != null)
                   {
-                    if (!context.Messages.Any(m => m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
+                    if (!context.Messages.Any(m => m.SourceUserId == sourceUserId || m.TargetUserId == sourceUserId))
                     {
                       PushManager.PushToIos(contactUser.DeviceId,
                         string.Format("{0} just joined IAmInToo! Feel free to be into them!", sourceUserName));
@@ -240,12 +228,17 @@ namespace RestWcfApplication.Root.Register
               }
             }
           }
+        }
 
-          if (!context.Notifications.Any(n => n.UserId == userIdParsed))
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          if (!anyNotifications)
           {
             var newNotification = new DB.Notification
             {
-              UserId = sourceUser.Id, 
+              UserId = sourceUser.Id,
               Text = "Welcome to IAmInToo!"
             };
 
@@ -253,12 +246,12 @@ namespace RestWcfApplication.Root.Register
           }
 
           context.SaveChanges();
-
-          GC.Collect();
-
-          toSend.Type = EMessagesTypesToClient.Ok;
-          return CommManager.SendMessage(toSend);
         }
+
+        GC.Collect();
+
+        toSend.Type = EMessagesTypesToClient.Ok;
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {
@@ -274,17 +267,11 @@ namespace RestWcfApplication.Root.Register
     {
       try
       {
-        dynamic toSend = new ExpandoObject();
-
-        var reader = new StreamReader(stream);
-        var text = reader.ReadToEnd();
-
-        var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(text);
-        if (jsonObject == null)
+        Dictionary<string, dynamic> jsonObject;
+        User sourceUser;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
         {
-          toSend.Type = EMessagesTypesToClient.Error;
-          toSend.text = text;
-          toSend.ErrorInfo = ErrorDetails.BadArguments;
           return CommManager.SendMessage(toSend);
         }
 
@@ -297,15 +284,7 @@ namespace RestWcfApplication.Root.Register
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          // check if userId corresponds to phoneNumber
-          var userIdParsed = Convert.ToInt32(userId);
-          var sourceUser = context.Users.SingleOrDefault(u => u.Id == userIdParsed);
-          if (sourceUser == null)
-          {
-            toSend.Type = EMessagesTypesToClient.Error;
-            toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;
-            return CommManager.SendMessage(toSend);
-          }
+          context.Users.Attach(sourceUser);
 
           sourceUser.FirstName = firstName;
           sourceUser.LastName = lastName;
@@ -314,12 +293,12 @@ namespace RestWcfApplication.Root.Register
           sourceUser.LastSeen = DateTime.Now.ToString("u");
 
           context.SaveChanges();
-
-          GC.Collect();
-
-          toSend.Type = EMessagesTypesToClient.Ok;
-          return CommManager.SendMessage(toSend);
         }
+
+        GC.Collect();
+
+        toSend.Type = EMessagesTypesToClient.Ok;
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {
@@ -347,10 +326,12 @@ namespace RestWcfApplication.Root.Register
           context.Database.ExecuteSqlCommand("DELETE FROM Hint");
 
           context.SaveChanges();
-
-          toSend.Type = EMessagesTypesToClient.Ok;
-          return CommManager.SendMessage(toSend);
         }
+
+        GC.Collect();
+
+        toSend.Type = EMessagesTypesToClient.Ok;
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {
@@ -375,10 +356,12 @@ namespace RestWcfApplication.Root.Register
           context.Database.ExecuteSqlCommand("DELETE FROM [User]");
 
           context.SaveChanges();
-
-          toSend.Type = EMessagesTypesToClient.Ok;
-          return CommManager.SendMessage(toSend);
         }
+
+        GC.Collect();
+
+        toSend.Type = EMessagesTypesToClient.Ok;
+        return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
       {
