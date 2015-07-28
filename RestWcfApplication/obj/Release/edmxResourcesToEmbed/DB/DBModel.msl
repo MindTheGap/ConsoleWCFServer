@@ -2,7 +2,7 @@
 <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
   <EntityContainerMapping StorageEntityContainer="ChildTubeMainDBModelStoreContainer" CdmEntityContainer="Entities">
     <EntitySetMapping Name="Tokens">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Token">
+      <EntityTypeMapping TypeName="MainDBModel.Token">
         <MappingFragment StoreEntitySet="Token">
           <ScalarProperty Name="Code" ColumnName="Code" />
           <ScalarProperty Name="UserId" ColumnName="UserId" />
@@ -10,7 +10,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="Hints">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
+      <EntityTypeMapping TypeName="MainDBModel.Hint">
         <MappingFragment StoreEntitySet="Hint">
           <ScalarProperty Name="Size" ColumnName="Size" />
           <ScalarProperty Name="ThumbnailImage" ColumnName="ThumbnailImage" />
@@ -22,7 +22,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="Users">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
+      <EntityTypeMapping TypeName="MainDBModel.User">
         <MappingFragment StoreEntitySet="User">
           <ScalarProperty Name="Coins" ColumnName="Coins" />
           <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
@@ -42,7 +42,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="FirstMessages">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
+      <EntityTypeMapping TypeName="MainDBModel.FirstMessage">
         <MappingFragment StoreEntitySet="FirstMessage">
           <ScalarProperty Name="GuessesUsed" ColumnName="GuessesUsed" />
           <ScalarProperty Name="MaximumGuesses" ColumnName="MaximumGuesses" />
@@ -60,7 +60,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="Messages">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
+      <EntityTypeMapping TypeName="MainDBModel.Message">
         <MappingFragment StoreEntitySet="Message">
           <ScalarProperty Name="HintId" ColumnName="HintId" />
           <ScalarProperty Name="SystemMessageState" ColumnName="SystemMessageState" />
@@ -74,7 +74,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="Notifications">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Notification">
+      <EntityTypeMapping TypeName="MainDBModel.Notification">
         <MappingFragment StoreEntitySet="Notification">
           <ScalarProperty Name="SenderUserId" ColumnName="SenderUserId" />
           <ScalarProperty Name="CoinAmount" ColumnName="CoinAmount" />
@@ -85,7 +85,7 @@
       </EntityTypeMapping>
     </EntitySetMapping>
     <EntitySetMapping Name="Products">
-      <EntityTypeMapping TypeName="ChildTubeMainDBModel.Product">
+      <EntityTypeMapping TypeName="MainDBModel.Product">
         <MappingFragment StoreEntitySet="Product">
           <ScalarProperty Name="CoinsAmount" ColumnName="CoinsAmount" />
           <ScalarProperty Name="ProductId" ColumnName="ProductId" />

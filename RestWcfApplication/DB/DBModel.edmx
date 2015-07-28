@@ -230,153 +230,48 @@
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="ChildTubeMainDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="MainDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
-          <FunctionImport Name="prEpisodeDelete">
-          <Parameter Name="EpisodeID" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="prEpisodeInsert" ReturnType="Collection(ChildTubeMainDBModel.prEpisodeInsert_Result)">
-            <Parameter Name="TvSeriesID" Mode="In" Type="Int32" />
-            <Parameter Name="EpisodeNumber" Mode="In" Type="Int32" />
-            <Parameter Name="URLPath" Mode="In" Type="String" />
-            <Parameter Name="SeriesNumber" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="prEpisodeSelect" ReturnType="Collection(ChildTubeMainDBModel.prEpisodeSelect_Result)">
-          <Parameter Name="EpisodeID" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="prEpisodeUpdate" ReturnType="Collection(ChildTubeMainDBModel.prEpisodeUpdate_Result)">
-            <Parameter Name="EpisodeID" Mode="In" Type="Int32" />
-            <Parameter Name="TvSeriesID" Mode="In" Type="Int32" />
-            <Parameter Name="EpisodeNumber" Mode="In" Type="Int32" />
-            <Parameter Name="URLPath" Mode="In" Type="String" />
-            <Parameter Name="SeriesNumber" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="prTVSeriesDelete">
-          <Parameter Name="TvSeriesID" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="prTVSeriesInsert" ReturnType="Collection(ChildTubeMainDBModel.prTVSeriesInsert_Result)">
-            <Parameter Name="Name" Mode="In" Type="String" />
-            <Parameter Name="Hits" Mode="In" Type="Int32" />
-            <Parameter Name="SeriesImagePath" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="prTVSeriesSelect" ReturnType="Collection(ChildTubeMainDBModel.prTVSeriesSelect_Result)">
-          <Parameter Name="TvSeriesID" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="prTVSeriesUpdate" ReturnType="Collection(ChildTubeMainDBModel.prTVSeriesUpdate_Result)">
-            <Parameter Name="TvSeriesID" Mode="In" Type="Int32" />
-            <Parameter Name="Name" Mode="In" Type="String" />
-            <Parameter Name="Hits" Mode="In" Type="Int32" />
-            <Parameter Name="SeriesImagePath" Mode="In" Type="String" />
-          </FunctionImport>
-          <FunctionImport Name="prUserDelete">
-          <Parameter Name="Id" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="prUserInsert" ReturnType="Collection(ChildTubeMainDBModel.prUserInsert_Result)">
-            <Parameter Name="Email" Mode="In" Type="String" />
-            <Parameter Name="Activity" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="prUserSelect" ReturnType="Collection(ChildTubeMainDBModel.prUserSelect_Result)">
-          <Parameter Name="Id" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <FunctionImport Name="prUserUpdate" ReturnType="Collection(ChildTubeMainDBModel.prUserUpdate_Result)">
-            <Parameter Name="Id" Mode="In" Type="Int32" />
-            <Parameter Name="Email" Mode="In" Type="String" />
-            <Parameter Name="Activity" Mode="In" Type="Int32" />
-          </FunctionImport>
-          <EntitySet Name="Tokens" EntityType="ChildTubeMainDBModel.Token" />
-          <EntitySet Name="Hints" EntityType="ChildTubeMainDBModel.Hint" />
-          <EntitySet Name="Users" EntityType="ChildTubeMainDBModel.User" />
-          <EntitySet Name="FirstMessages" EntityType="ChildTubeMainDBModel.FirstMessage" />
-          <EntitySet Name="Messages" EntityType="ChildTubeMainDBModel.Message" />
-          <AssociationSet Name="FK_FirstMessage_SourceUser" Association="ChildTubeMainDBModel.FK_FirstMessage_SourceUser">
+          <EntitySet Name="Tokens" EntityType="MainDBModel.Token" />
+          <EntitySet Name="Hints" EntityType="MainDBModel.Hint" />
+          <EntitySet Name="Users" EntityType="MainDBModel.User" />
+          <EntitySet Name="FirstMessages" EntityType="MainDBModel.FirstMessage" />
+          <EntitySet Name="Messages" EntityType="MainDBModel.Message" />
+          <AssociationSet Name="FK_FirstMessage_SourceUser" Association="MainDBModel.FK_FirstMessage_SourceUser">
             <End Role="User" EntitySet="Users" />
             <End Role="FirstMessage" EntitySet="FirstMessages" />
           </AssociationSet>
-          <AssociationSet Name="FK_FirstMessage_TargetUser" Association="ChildTubeMainDBModel.FK_FirstMessage_TargetUser">
+          <AssociationSet Name="FK_FirstMessage_TargetUser" Association="MainDBModel.FK_FirstMessage_TargetUser">
             <End Role="User" EntitySet="Users" />
             <End Role="FirstMessage" EntitySet="FirstMessages" />
           </AssociationSet>
-          <AssociationSet Name="FK_Message_FirstMessage" Association="ChildTubeMainDBModel.FK_Message_FirstMessage">
+          <AssociationSet Name="FK_Message_FirstMessage" Association="MainDBModel.FK_Message_FirstMessage">
             <End Role="FirstMessage" EntitySet="FirstMessages" />
             <End Role="Message" EntitySet="Messages" />
           </AssociationSet>
-          <AssociationSet Name="FK_Message_Hint" Association="ChildTubeMainDBModel.FK_Message_Hint">
+          <AssociationSet Name="FK_Message_Hint" Association="MainDBModel.FK_Message_Hint">
             <End Role="Hint" EntitySet="Hints" />
             <End Role="Message" EntitySet="Messages" />
           </AssociationSet>
-          <AssociationSet Name="FK_Message_SourceUser" Association="ChildTubeMainDBModel.FK_Message_SourceUser">
+          <AssociationSet Name="FK_Message_SourceUser" Association="MainDBModel.FK_Message_SourceUser">
             <End Role="User" EntitySet="Users" />
             <End Role="Message" EntitySet="Messages" />
           </AssociationSet>
-          <AssociationSet Name="FK_Message_TargetUser" Association="ChildTubeMainDBModel.FK_Message_TargetUser">
+          <AssociationSet Name="FK_Message_TargetUser" Association="MainDBModel.FK_Message_TargetUser">
             <End Role="User" EntitySet="Users" />
             <End Role="Message" EntitySet="Messages" />
           </AssociationSet>
-          <EntitySet Name="Notifications" EntityType="ChildTubeMainDBModel.Notification" />
-          <AssociationSet Name="FK_Notification_User" Association="ChildTubeMainDBModel.FK_Notification_User">
+          <EntitySet Name="Notifications" EntityType="MainDBModel.Notification" />
+          <AssociationSet Name="FK_Notification_User" Association="MainDBModel.FK_Notification_User">
             <End Role="User" EntitySet="Users" />
             <End Role="Notification" EntitySet="Notifications" />
           </AssociationSet>
-          <AssociationSet Name="FK_Notification_SenderUser" Association="ChildTubeMainDBModel.FK_Notification_SenderUser">
+          <AssociationSet Name="FK_Notification_SenderUser" Association="MainDBModel.FK_Notification_SenderUser">
             <End Role="User" EntitySet="Users" />
             <End Role="Notification" EntitySet="Notifications" />
           </AssociationSet>
-          <EntitySet Name="Products" EntityType="ChildTubeMainDBModel.Product" />
+          <EntitySet Name="Products" EntityType="MainDBModel.Product" />
           </EntityContainer>
-        <ComplexType Name="prEpisodeInsert_Result">
-          <Property Type="Int32" Name="EpisodeID" Nullable="false" />
-          <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
-          <Property Type="Int32" Name="EpisodeNumber" Nullable="false" />
-          <Property Type="String" Name="URLPath" Nullable="false" MaxLength="500" />
-          <Property Type="Int32" Name="SeriesNumber" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="prEpisodeSelect_Result">
-          <Property Type="Int32" Name="EpisodeID" Nullable="false" />
-          <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
-          <Property Type="Int32" Name="EpisodeNumber" Nullable="false" />
-          <Property Type="String" Name="URLPath" Nullable="false" MaxLength="500" />
-          <Property Type="Int32" Name="SeriesNumber" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="prEpisodeUpdate_Result">
-          <Property Type="Int32" Name="EpisodeID" Nullable="false" />
-          <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
-          <Property Type="Int32" Name="EpisodeNumber" Nullable="false" />
-          <Property Type="String" Name="URLPath" Nullable="false" MaxLength="500" />
-          <Property Type="Int32" Name="SeriesNumber" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="prTVSeriesInsert_Result">
-          <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
-          <Property Type="String" Name="Name" Nullable="false" MaxLength="500" />
-          <Property Type="Int32" Name="Hits" Nullable="false" />
-          <Property Type="String" Name="SeriesImagePath" Nullable="true" MaxLength="500" />
-        </ComplexType>
-        <ComplexType Name="prTVSeriesSelect_Result">
-          <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
-          <Property Type="String" Name="Name" Nullable="false" MaxLength="500" />
-          <Property Type="Int32" Name="Hits" Nullable="false" />
-          <Property Type="String" Name="SeriesImagePath" Nullable="true" MaxLength="500" />
-        </ComplexType>
-        <ComplexType Name="prTVSeriesUpdate_Result">
-          <Property Type="Int32" Name="TvSeriesID" Nullable="false" />
-          <Property Type="String" Name="Name" Nullable="false" MaxLength="500" />
-          <Property Type="Int32" Name="Hits" Nullable="false" />
-          <Property Type="String" Name="SeriesImagePath" Nullable="true" MaxLength="500" />
-        </ComplexType>
-        <ComplexType Name="prUserInsert_Result">
-          <Property Type="Int32" Name="Id" Nullable="false" />
-          <Property Type="String" Name="Email" Nullable="false" MaxLength="100" />
-          <Property Type="Int32" Name="Activity" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="prUserSelect_Result">
-          <Property Type="Int32" Name="Id" Nullable="false" />
-          <Property Type="String" Name="Email" Nullable="false" MaxLength="100" />
-          <Property Type="Int32" Name="Activity" Nullable="true" />
-        </ComplexType>
-        <ComplexType Name="prUserUpdate_Result">
-          <Property Type="Int32" Name="Id" Nullable="false" />
-          <Property Type="String" Name="Email" Nullable="false" MaxLength="100" />
-          <Property Type="Int32" Name="Activity" Nullable="true" />
-        </ComplexType>
         <EntityType Name="Token">
           <Key>
             <PropertyRef Name="UserId" />
@@ -393,7 +288,7 @@
           <Property Name="PictureLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="VideoLink" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="ThumbnailImage" Type="Binary" MaxLength="Max" FixedLength="false" />
-          <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
+          <NavigationProperty Name="Messages" Relationship="MainDBModel.FK_Message_Hint" FromRole="Hint" ToRole="Message" />
           <Property Name="Size" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="User">
@@ -413,13 +308,13 @@
           <Property Name="Verified" Type="Boolean" Nullable="false" />
           <Property Name="DeviceId" Type="String" MaxLength="64" FixedLength="false" Unicode="false" />
           <Property Name="DisplayName" Type="String" MaxLength="60" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="SourceUserFirstMessages" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="User" ToRole="FirstMessage" />
-          <NavigationProperty Name="TargetUserFirstMessages" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="User" ToRole="FirstMessage" />
-          <NavigationProperty Name="SourceUserMessages" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
-          <NavigationProperty Name="TargetUserMessages" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
+          <NavigationProperty Name="SourceUserFirstMessages" Relationship="MainDBModel.FK_FirstMessage_SourceUser" FromRole="User" ToRole="FirstMessage" />
+          <NavigationProperty Name="TargetUserFirstMessages" Relationship="MainDBModel.FK_FirstMessage_TargetUser" FromRole="User" ToRole="FirstMessage" />
+          <NavigationProperty Name="SourceUserMessages" Relationship="MainDBModel.FK_Message_SourceUser" FromRole="User" ToRole="Message" />
+          <NavigationProperty Name="TargetUserMessages" Relationship="MainDBModel.FK_Message_TargetUser" FromRole="User" ToRole="Message" />
           <Property Name="Coins" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Notifications" Relationship="ChildTubeMainDBModel.FK_Notification_User" FromRole="User" ToRole="Notification" />
-          <NavigationProperty Name="SenderUserNotifications" Relationship="ChildTubeMainDBModel.FK_Notification_SenderUser" FromRole="User" ToRole="Notification" />
+          <NavigationProperty Name="Notifications" Relationship="MainDBModel.FK_Notification_User" FromRole="User" ToRole="Notification" />
+          <NavigationProperty Name="SenderUserNotifications" Relationship="MainDBModel.FK_Notification_SenderUser" FromRole="User" ToRole="Notification" />
         </EntityType>
         <EntityType Name="FirstMessage">
           <Key>
@@ -433,9 +328,9 @@
           <Property Name="SubjectName" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="SourceUserDeleted" Type="Boolean" Nullable="false" />
           <Property Name="TargetUserDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" FromRole="FirstMessage" ToRole="User" />
-          <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" FromRole="FirstMessage" ToRole="User" />
-          <NavigationProperty Name="Messages" Relationship="ChildTubeMainDBModel.FK_Message_FirstMessage" FromRole="FirstMessage" ToRole="Message" />
+          <NavigationProperty Name="SourceUser" Relationship="MainDBModel.FK_FirstMessage_SourceUser" FromRole="FirstMessage" ToRole="User" />
+          <NavigationProperty Name="TargetUser" Relationship="MainDBModel.FK_FirstMessage_TargetUser" FromRole="FirstMessage" ToRole="User" />
+          <NavigationProperty Name="Messages" Relationship="MainDBModel.FK_Message_FirstMessage" FromRole="FirstMessage" ToRole="Message" />
           <Property Name="LastTimeSourceUserTyped" Type="DateTime" Precision="3" />
           <Property Name="LastTimeTargetUserTyped" Type="DateTime" Precision="3" />
           <Property Name="MaximumGuesses" Type="Int32" Nullable="false" />
@@ -453,14 +348,14 @@
           <Property Name="ReceivedState" Type="Int32" Nullable="false" />
           <Property Name="SystemMessageState" Type="Int32" />
           <Property Name="HintId" Type="Int32" />
-          <NavigationProperty Name="FirstMessage" Relationship="ChildTubeMainDBModel.FK_Message_FirstMessage" FromRole="Message" ToRole="FirstMessage" />
-          <NavigationProperty Name="Hint" Relationship="ChildTubeMainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
-          <NavigationProperty Name="SourceUser" Relationship="ChildTubeMainDBModel.FK_Message_SourceUser" FromRole="Message" ToRole="User" />
-          <NavigationProperty Name="TargetUser" Relationship="ChildTubeMainDBModel.FK_Message_TargetUser" FromRole="Message" ToRole="User" />
+          <NavigationProperty Name="FirstMessage" Relationship="MainDBModel.FK_Message_FirstMessage" FromRole="Message" ToRole="FirstMessage" />
+          <NavigationProperty Name="Hint" Relationship="MainDBModel.FK_Message_Hint" FromRole="Message" ToRole="Hint" />
+          <NavigationProperty Name="SourceUser" Relationship="MainDBModel.FK_Message_SourceUser" FromRole="Message" ToRole="User" />
+          <NavigationProperty Name="TargetUser" Relationship="MainDBModel.FK_Message_TargetUser" FromRole="Message" ToRole="User" />
         </EntityType>
         <Association Name="FK_FirstMessage_SourceUser">
-          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
-          <End Type="ChildTubeMainDBModel.FirstMessage" Role="FirstMessage" Multiplicity="*" />
+          <End Type="MainDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="MainDBModel.FirstMessage" Role="FirstMessage" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="User">
               <PropertyRef Name="Id" />
@@ -471,8 +366,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_FirstMessage_TargetUser">
-          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
-          <End Type="ChildTubeMainDBModel.FirstMessage" Role="FirstMessage" Multiplicity="*" />
+          <End Type="MainDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="MainDBModel.FirstMessage" Role="FirstMessage" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="User">
               <PropertyRef Name="Id" />
@@ -483,8 +378,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Message_FirstMessage">
-          <End Type="ChildTubeMainDBModel.FirstMessage" Role="FirstMessage" Multiplicity="1" />
-          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+          <End Type="MainDBModel.FirstMessage" Role="FirstMessage" Multiplicity="1" />
+          <End Type="MainDBModel.Message" Role="Message" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="FirstMessage">
               <PropertyRef Name="Id" />
@@ -495,8 +390,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Message_Hint">
-          <End Type="ChildTubeMainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
-          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+          <End Type="MainDBModel.Hint" Role="Hint" Multiplicity="0..1" />
+          <End Type="MainDBModel.Message" Role="Message" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Hint">
               <PropertyRef Name="Id" />
@@ -507,8 +402,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Message_SourceUser">
-          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
-          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+          <End Type="MainDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="MainDBModel.Message" Role="Message" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="User">
               <PropertyRef Name="Id" />
@@ -519,8 +414,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Message_TargetUser">
-          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
-          <End Type="ChildTubeMainDBModel.Message" Role="Message" Multiplicity="*" />
+          <End Type="MainDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="MainDBModel.Message" Role="Message" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="User">
               <PropertyRef Name="Id" />
@@ -538,13 +433,13 @@
           <Property Name="UserId" Type="Int32" Nullable="false" />
           <Property Name="Text" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="CoinAmount" Type="Int32" />
-          <NavigationProperty Name="User" Relationship="ChildTubeMainDBModel.FK_Notification_User" FromRole="Notification" ToRole="User" />
+          <NavigationProperty Name="User" Relationship="MainDBModel.FK_Notification_User" FromRole="Notification" ToRole="User" />
           <Property Name="SenderUserId" Type="Int32" />
-          <NavigationProperty Name="SenderUser" Relationship="ChildTubeMainDBModel.FK_Notification_SenderUser" FromRole="Notification" ToRole="User" />
+          <NavigationProperty Name="SenderUser" Relationship="MainDBModel.FK_Notification_SenderUser" FromRole="Notification" ToRole="User" />
         </EntityType>
         <Association Name="FK_Notification_User">
-          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="1" />
-          <End Type="ChildTubeMainDBModel.Notification" Role="Notification" Multiplicity="*" />
+          <End Type="MainDBModel.User" Role="User" Multiplicity="1" />
+          <End Type="MainDBModel.Notification" Role="Notification" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="User">
               <PropertyRef Name="Id" />
@@ -555,8 +450,8 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Notification_SenderUser">
-          <End Type="ChildTubeMainDBModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="ChildTubeMainDBModel.Notification" Role="Notification" Multiplicity="*" />
+          <End Type="MainDBModel.User" Role="User" Multiplicity="0..1" />
+          <End Type="MainDBModel.Notification" Role="Notification" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="User">
               <PropertyRef Name="Id" />
@@ -581,7 +476,7 @@
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="ChildTubeMainDBModelStoreContainer" CdmEntityContainer="Entities">
           <EntitySetMapping Name="Tokens">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Token">
+            <EntityTypeMapping TypeName="MainDBModel.Token">
               <MappingFragment StoreEntitySet="Token">
                 <ScalarProperty Name="Code" ColumnName="Code" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
@@ -589,7 +484,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Hints">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Hint">
+            <EntityTypeMapping TypeName="MainDBModel.Hint">
               <MappingFragment StoreEntitySet="Hint">
                 <ScalarProperty Name="Size" ColumnName="Size" />
                 <ScalarProperty Name="ThumbnailImage" ColumnName="ThumbnailImage" />
@@ -601,7 +496,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Users">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.User">
+            <EntityTypeMapping TypeName="MainDBModel.User">
               <MappingFragment StoreEntitySet="User">
                 <ScalarProperty Name="Coins" ColumnName="Coins" />
                 <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
@@ -621,7 +516,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="FirstMessages">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.FirstMessage">
+            <EntityTypeMapping TypeName="MainDBModel.FirstMessage">
               <MappingFragment StoreEntitySet="FirstMessage">
                 <ScalarProperty Name="GuessesUsed" ColumnName="GuessesUsed" />
                 <ScalarProperty Name="MaximumGuesses" ColumnName="MaximumGuesses" />
@@ -639,7 +534,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Messages">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Message">
+            <EntityTypeMapping TypeName="MainDBModel.Message">
               <MappingFragment StoreEntitySet="Message">
                 <ScalarProperty Name="HintId" ColumnName="HintId" />
                 <ScalarProperty Name="SystemMessageState" ColumnName="SystemMessageState" />
@@ -653,7 +548,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Notifications">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Notification">
+            <EntityTypeMapping TypeName="MainDBModel.Notification">
               <MappingFragment StoreEntitySet="Notification">
                 <ScalarProperty Name="SenderUserId" ColumnName="SenderUserId" />
                 <ScalarProperty Name="CoinAmount" ColumnName="CoinAmount" />
@@ -664,7 +559,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Products">
-            <EntityTypeMapping TypeName="ChildTubeMainDBModel.Product">
+            <EntityTypeMapping TypeName="MainDBModel.Product">
               <MappingFragment StoreEntitySet="Product">
                 <ScalarProperty Name="CoinsAmount" ColumnName="CoinsAmount" />
                 <ScalarProperty Name="ProductId" ColumnName="ProductId" />

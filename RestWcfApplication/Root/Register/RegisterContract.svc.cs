@@ -69,8 +69,6 @@ namespace RestWcfApplication.Root.Register
           context.SaveChanges();
         }
 
-        GC.Collect();
-
         toSend.Type = EMessagesTypesToClient.Ok;
         toSend.User = user;
         return CommManager.SendMessage(toSend);
@@ -79,7 +77,7 @@ namespace RestWcfApplication.Root.Register
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -135,8 +133,6 @@ namespace RestWcfApplication.Root.Register
           }
         }
 
-        GC.Collect();
-
         toSend.Type = EMessagesTypesToClient.SystemMessage;
         toSend.SystemMessage = ESystemMessageState.VerificationCodeSent;
         toSend.UserId = user.Id.ToString("d");
@@ -146,7 +142,7 @@ namespace RestWcfApplication.Root.Register
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -248,8 +244,6 @@ namespace RestWcfApplication.Root.Register
           context.SaveChanges();
         }
 
-        GC.Collect();
-
         toSend.Type = EMessagesTypesToClient.Ok;
         return CommManager.SendMessage(toSend);
       }
@@ -257,7 +251,7 @@ namespace RestWcfApplication.Root.Register
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -295,8 +289,6 @@ namespace RestWcfApplication.Root.Register
           context.SaveChanges();
         }
 
-        GC.Collect();
-
         toSend.Type = EMessagesTypesToClient.Ok;
         return CommManager.SendMessage(toSend);
       }
@@ -304,7 +296,7 @@ namespace RestWcfApplication.Root.Register
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -320,15 +312,13 @@ namespace RestWcfApplication.Root.Register
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          context.Database.ExecuteSqlCommand("DELETE FROM Notification");
-          context.Database.ExecuteSqlCommand("DELETE FROM Message");
-          context.Database.ExecuteSqlCommand("DELETE FROM FirstMessage");
-          context.Database.ExecuteSqlCommand("DELETE FROM Hint");
+          context.Database.ExecuteSqlCommand("DELETE FROM [Notification]");
+          context.Database.ExecuteSqlCommand("DELETE FROM [Message]");
+          context.Database.ExecuteSqlCommand("DELETE FROM [FirstMessage]");
+          context.Database.ExecuteSqlCommand("DELETE FROM [Hint]");
 
           context.SaveChanges();
         }
-
-        GC.Collect();
 
         toSend.Type = EMessagesTypesToClient.Ok;
         return CommManager.SendMessage(toSend);
@@ -337,7 +327,7 @@ namespace RestWcfApplication.Root.Register
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Exception = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -358,8 +348,6 @@ namespace RestWcfApplication.Root.Register
           context.SaveChanges();
         }
 
-        GC.Collect();
-
         toSend.Type = EMessagesTypesToClient.Ok;
         return CommManager.SendMessage(toSend);
       }
@@ -367,7 +355,7 @@ namespace RestWcfApplication.Root.Register
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Exception = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -419,7 +407,7 @@ namespace RestWcfApplication.Root.Register
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Exception = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }

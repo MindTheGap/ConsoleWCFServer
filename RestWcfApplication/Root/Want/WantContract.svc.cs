@@ -44,16 +44,27 @@ namespace RestWcfApplication.Root.Want
         }
 
         var sourceUserId = sourceUser.Id;
-        var guessLimit = jsonObject.ContainsKey("guessLimit") ? int.Parse(jsonObject["guessLimit"]) : 3;
+        var guessLimitStr = jsonObject.ContainsKey("guessLimit") ? jsonObject["guessLimit"] as string : string.Empty;
+        var guessLimit = 3;
+        if (!string.IsNullOrEmpty(guessLimitStr))
+        {
+          guessLimit = int.Parse(guessLimitStr);
+        }
         var hint = jsonObject["hint"];
         var hintImageLink = jsonObject.ContainsKey("hintImageLink") ? jsonObject["hintImageLink"] : null;
         var hintVideoLink = jsonObject.ContainsKey("hintVideoLink") ? jsonObject["hintVideoLink"] : null;
 
         var hintNotUsed = IsStringEmpty(hint) && IsStringEmpty(hintImageLink) && IsStringEmpty(hintVideoLink);
 
-        var initialMessage = SharedHelper.QueryForObject<FirstMessage>("FirstMessages",
-          u => ((u.SourceUserId == sourceUserId && u.TargetUser.PhoneNumber == targetPhoneNumber)
-                || (u.TargetUserId == sourceUserId && u.SourceUser.PhoneNumber == targetPhoneNumber)));
+        FirstMessage initialMessage;
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          initialMessage = context.FirstMessages.Include("TargetUser").SingleOrDefault(
+            u => ((u.SourceUserId == sourceUserId && u.TargetUser.PhoneNumber == targetPhoneNumber)
+                  || (u.TargetUserId == sourceUserId && u.SourceUser.PhoneNumber == targetPhoneNumber)));
+        }
 
         using (var context = new Entities())
         {
@@ -140,8 +151,6 @@ namespace RestWcfApplication.Root.Want
 
             context.SaveChanges();
 
-            GC.Collect();
-
             toSend.Type = (int)EMessagesTypesToClient.Ok;
             toSend.Coins = sourceUser.Coins;
             toSend.InitialMessage = initialMessage;
@@ -149,6 +158,8 @@ namespace RestWcfApplication.Root.Want
             toSend.ChatMessage = newMessage;
             return CommManager.SendMessage(toSend);
           }
+
+          context.Users.Attach(targetUser);
 
           // target user exists
           newMessage.TargetUserId = targetUser.Id;
@@ -159,7 +170,7 @@ namespace RestWcfApplication.Root.Want
           }
 
           // checking if target user is in source user also
-          if (initialMessage.TargetUserId == sourceUserId)
+          if (targetUser.Id == sourceUserId)
           {
             // target user is in source user also - love is in the air
             // enabling a chat between them by sending the target user id to the source user
@@ -191,8 +202,6 @@ namespace RestWcfApplication.Root.Want
               PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Match was found!");
             }
 
-            GC.Collect();
-
             toSend.Type = (int)EMessagesTypesToClient.Ok;
             toSend.Coins = sourceUser.Coins;
             toSend.ChatMessage = newMessage;
@@ -212,7 +221,7 @@ namespace RestWcfApplication.Root.Want
           var newSystemMessage = new DB.Message()
           {
             SourceUserId = sourceUserId,
-            TargetUser = targetUser,
+            TargetUserId = targetUser.Id,
             FirstMessage = initialMessage,
             Hint = newSystemMessageHint,
             Date = newDate,
@@ -230,8 +239,6 @@ namespace RestWcfApplication.Root.Want
           {
             PushSharp.PushManager.PushToIos(targetUser.DeviceId, "Someone is in to you!");
           }
-
-          GC.Collect();
 
           toSend.Type = (int)EMessagesTypesToClient.Ok;
           toSend.Coins = sourceUser.Coins;
@@ -368,8 +375,6 @@ namespace RestWcfApplication.Root.Want
               PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Match was found!");
             }
 
-            GC.Collect();
-
             toSend.Type = (int) EMessagesTypesToClient.Ok;
             toSend.Coins = sourceUser.Coins;
             toSend.ChatMessage = newMessage;
@@ -407,8 +412,6 @@ namespace RestWcfApplication.Root.Want
           {
             PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"Someone is in to you!");
           }
-
-          GC.Collect();
 
           toSend.Type = (int) EMessagesTypesToClient.Ok;
           toSend.Coins = sourceUser.Coins;
@@ -468,6 +471,8 @@ namespace RestWcfApplication.Root.Want
           context.Configuration.ProxyCreationEnabled = false;
 
           context.Users.Attach(sourceUser);
+          context.Users.Attach(targetUser);
+          context.FirstMessages.Attach(initialMessage);
 
           sourceUser.Coins += initialMessage.SourceUserId == sourceUserId ? 2 : -2;
 
@@ -502,8 +507,6 @@ namespace RestWcfApplication.Root.Want
         {
           PushSharp.PushManager.PushToIos(targetUser.DeviceId, @"You have a new message!");
         }
-
-        GC.Collect();
 
         toSend.Type = (int)EMessagesTypesToClient.Ok;
         toSend.Coins = sourceUser.Coins;

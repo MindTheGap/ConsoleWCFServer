@@ -56,13 +56,13 @@ namespace RestWcfApplication.Root.Update
 
           result = new List<InitialMessageWithUnreadMessages>();
           foreach (
-            var initialMessage in context.FirstMessages.Include("Messages").Include("SourceUser").Include("TargetUser")
+            var initialMessage in context.FirstMessages
               .Where(m => m.SourceUserId == userIdParsed || m.TargetUserId == userIdParsed))
           {
             var startingMessageId = dictionary.ContainsKey(initialMessage.Id.ToString("D"))
               ? dictionary[initialMessage.Id.ToString("D")]
               : -1;
-            var unreadMessages = context.Messages.Include("SourceUser").Include("TargetUser").Include("Hint")
+            var unreadMessages = context.Messages.Include("Hint")
               .Where(m => m.Id > startingMessageId && m.FirstMessageId == initialMessage.Id).ToList();
 
             var initialMessageResult = new InitialMessageWithUnreadMessages()
@@ -109,8 +109,21 @@ namespace RestWcfApplication.Root.Update
           notifications = context.Notifications.Where(n => n.UserId == userIdParsed && n.Id > startingNotificationId).ToList();
         }
 
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
 
-        GC.Collect();
+          foreach (var initialMessageWithUnreadMessages in result)
+          {
+            var initialMessageSourceUser =
+              context.Users.First(u => u.Id == initialMessageWithUnreadMessages.InitialMessage.SourceUserId);
+            var targetUser =
+              context.Users.First(u => u.Id == initialMessageWithUnreadMessages.InitialMessage.TargetUserId);
+
+            initialMessageWithUnreadMessages.InitialMessage.TargetUser = targetUser;
+            initialMessageWithUnreadMessages.InitialMessage.SourceUser = initialMessageSourceUser;
+          }
+        }
 
         toSend.Type = EMessagesTypesToClient.MultipleMessages;
         toSend.MultipleMessages = result;
@@ -122,7 +135,7 @@ namespace RestWcfApplication.Root.Update
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -169,6 +182,9 @@ namespace RestWcfApplication.Root.Update
         {
           context.Configuration.ProxyCreationEnabled = false;
 
+          context.Users.Attach(realTargetUser);
+          context.FirstMessages.Attach(initialMessage);
+
           var userMessages =
             context.Messages.Include("Hint")
               .Where(m => m.ReceivedState < (int) EMessageReceivedState.MessageStateReadByClient
@@ -195,8 +211,6 @@ namespace RestWcfApplication.Root.Update
           PushManager.PushToIos(realTargetUser.DeviceId, string.Format("{0} just read your message!", userName));
         }
 
-        GC.Collect();
-
         toSend.Type = EMessagesTypesToClient.Ok;
         return CommManager.SendMessage(toSend);
       }
@@ -204,7 +218,7 @@ namespace RestWcfApplication.Root.Update
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -243,8 +257,6 @@ namespace RestWcfApplication.Root.Update
           }
         }
 
-        GC.Collect();
-
         toSend.Type = EMessagesTypesToClient.Ok;
         toSend.MultipleMessages = resultList;
         return CommManager.SendMessage(toSend);
@@ -253,7 +265,7 @@ namespace RestWcfApplication.Root.Update
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }

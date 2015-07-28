@@ -79,6 +79,7 @@ namespace RestWcfApplication.Root.IAP
             context.Configuration.ProxyCreationEnabled = false;
 
             context.Users.Attach(sourceUser);
+            context.Products.Attach(product);
 
             sourceUser.Coins += product.CoinsAmount;
 
@@ -201,7 +202,7 @@ namespace RestWcfApplication.Root.IAP
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }

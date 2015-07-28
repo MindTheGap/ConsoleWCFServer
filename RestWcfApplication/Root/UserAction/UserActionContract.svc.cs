@@ -76,8 +76,11 @@ namespace RestWcfApplication.Root.UserAction
         {
           context.Configuration.ProxyCreationEnabled = false;
 
+          if (!guessedCorrectly) context.Users.Attach(guessedTargetUser);
           context.Users.Attach(sourceUser);
+          context.Users.Attach(realTargetUser);
           context.FirstMessages.Attach(initialMessage);
+
           sourceUser.Coins -= 5;
           initialMessage.GuessesUsed++;
 
@@ -154,7 +157,7 @@ namespace RestWcfApplication.Root.UserAction
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -217,7 +220,9 @@ namespace RestWcfApplication.Root.UserAction
         {
           context.Configuration.ProxyCreationEnabled = false;
 
+          if (!guessedCorrectly) context.Users.Attach(guessedTargetUser);
           context.Users.Attach(sourceUser);
+          context.Users.Attach(realTargetUser);
           context.FirstMessages.Attach(initialMessage);
 
           sourceUser.Coins -= 5;
@@ -295,7 +300,7 @@ namespace RestWcfApplication.Root.UserAction
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -358,6 +363,7 @@ namespace RestWcfApplication.Root.UserAction
           context.Configuration.ProxyCreationEnabled = false;
 
           context.Users.Attach(sourceUser);
+          context.FirstMessages.Attach(initialMessage);
 
           sourceUser.Coins -= 20;
 
@@ -385,7 +391,7 @@ namespace RestWcfApplication.Root.UserAction
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
@@ -458,7 +464,7 @@ namespace RestWcfApplication.Root.UserAction
       {
         dynamic toSend = new ExpandoObject();
         toSend.Type = EMessagesTypesToClient.Error;
-        toSend.Error = e.Message;
+        toSend.ErrorInfo = e.Message;
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }

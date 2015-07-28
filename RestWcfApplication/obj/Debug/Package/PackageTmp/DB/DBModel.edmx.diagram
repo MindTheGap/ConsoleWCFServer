@@ -5,21 +5,21 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="36b75844cfb34750aad46758bb442ecb" Name="Diagram1">
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.Token" Width="1.5" PointX="5.75" PointY="0.75" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.Hint" Width="1.5" PointX="2.875" PointY="5" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.User" Width="1.5" PointX="0.75" PointY="0.875" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.FirstMessage" Width="1.5" PointX="7.75" PointY="3.625" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.Message" Width="1.5" PointX="5.375" PointY="2.75" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_FirstMessage_SourceUser" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_FirstMessage_TargetUser" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_FirstMessage" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_Hint" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_SourceUser" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_Message_TargetUser" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.Notification" Width="1.5" PointX="3.375" PointY="0.5" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_Notification_User" />
-        <AssociationConnector Association="ChildTubeMainDBModel.FK_Notification_SenderUser" />
-        <EntityTypeShape EntityType="ChildTubeMainDBModel.Product" Width="1.5" PointX="5.375" PointY="7.75" />
+        <EntityTypeShape EntityType="MainDBModel.Token" Width="1.5" PointX="5.75" PointY="0.75" />
+        <EntityTypeShape EntityType="MainDBModel.Hint" Width="1.5" PointX="2.875" PointY="5" />
+        <EntityTypeShape EntityType="MainDBModel.User" Width="1.5" PointX="0.75" PointY="0.875" />
+        <EntityTypeShape EntityType="MainDBModel.FirstMessage" Width="1.5" PointX="7.75" PointY="3.625" />
+        <EntityTypeShape EntityType="MainDBModel.Message" Width="1.5" PointX="5.375" PointY="2.75" />
+        <AssociationConnector Association="MainDBModel.FK_FirstMessage_SourceUser" />
+        <AssociationConnector Association="MainDBModel.FK_FirstMessage_TargetUser" />
+        <AssociationConnector Association="MainDBModel.FK_Message_FirstMessage" />
+        <AssociationConnector Association="MainDBModel.FK_Message_Hint" />
+        <AssociationConnector Association="MainDBModel.FK_Message_SourceUser" />
+        <AssociationConnector Association="MainDBModel.FK_Message_TargetUser" />
+        <EntityTypeShape EntityType="MainDBModel.Notification" Width="1.5" PointX="3.375" PointY="0.5" />
+        <AssociationConnector Association="MainDBModel.FK_Notification_User" />
+        <AssociationConnector Association="MainDBModel.FK_Notification_SenderUser" />
+        <EntityTypeShape EntityType="MainDBModel.Product" Width="1.5" PointX="5.375" PointY="7.75" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
