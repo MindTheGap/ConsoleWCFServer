@@ -20,6 +20,8 @@
         <AssociationConnector Association="MainDBModel.FK_Notification_User" />
         <AssociationConnector Association="MainDBModel.FK_Notification_SenderUser" />
         <EntityTypeShape EntityType="MainDBModel.Product" Width="1.5" PointX="5.375" PointY="7.75" />
+        <EntityTypeShape EntityType="MainDBModel.Log" Width="1.5" PointX="3" PointY="8.375" />
+        <AssociationConnector Association="MainDBModel.FK_Log_User" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -193,6 +193,9 @@
     <Compile Include="DB\Hint.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="DB\Log.cs">
+      <DependentUpon>DBModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="DB\Message.cs">
       <DependentUpon>DBModel.tt</DependentUpon>
     </Compile>

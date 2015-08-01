@@ -32,5 +32,6 @@ namespace RestWcfApplication.DB
         public virtual DbSet<Message> Messages { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Product> Products { get; set; }
+        public virtual DbSet<Log> Logs { get; set; }
     }
 }

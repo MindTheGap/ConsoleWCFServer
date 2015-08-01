@@ -14,6 +14,38 @@ namespace RestWcfApplication.Root.Shared
 {
   public static class SharedHelper
   {
+    public const int DefaultCoinsForNewUsers = 100;
+
+    public static string GetFullNameOrPhoneNumber(User user)
+    {
+      string fullName;
+      if (!string.IsNullOrEmpty(user.DisplayName))
+      {
+        fullName = user.DisplayName;
+      }
+      else
+      {
+        if (!String.IsNullOrEmpty(user.FirstName) || !String.IsNullOrEmpty(user.LastName))
+        {
+          if (!String.IsNullOrEmpty(user.FirstName))
+          {
+            fullName = user.FirstName +
+                       (!String.IsNullOrEmpty(user.LastName) ? " " + user.LastName : String.Empty);
+          }
+          else
+          {
+            fullName = user.LastName;
+          }
+        }
+        else
+        {
+          fullName = user.PhoneNumber;
+        }
+      }
+
+      return fullName;
+    }
+
     public static T QueryForObject<T>(string propertyName, Func<T, bool> predicate) where T : class
     {
       using (var context = new Entities())
@@ -52,7 +84,7 @@ namespace RestWcfApplication.Root.Shared
         return false;
       }
 
-      var sourceUserIdParsed = int.Parse(userId);
+      var sourceUserIdParsed = Int32.Parse(userId);
 
       using (var context = new Entities())
       {

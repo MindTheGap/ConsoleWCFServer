@@ -84,13 +84,13 @@ namespace RestWcfApplication.Root.UserAction
           sourceUser.Coins -= 5;
           initialMessage.GuessesUsed++;
 
-          var needsToPushToRealTargetUser = false;
+          var needsToPushToGuessedTargetUser = false;
           Notification newNotification = null;
           if (guessedCorrectly)
           {
             initialMessage.MatchFound = true;
 
-            var fullSourceUserName = GetFullNameOrPhoneNumber(sourceUser);
+            var fullSourceUserName = SharedHelper.GetFullNameOrPhoneNumber(sourceUser);
             newNotification = new Notification()
             {
               UserId = targetUserId,
@@ -100,7 +100,7 @@ namespace RestWcfApplication.Root.UserAction
 
             context.Notifications.Add(newNotification);
 
-            var fullTargetUserName = GetFullNameOrPhoneNumber(realTargetUser);
+            var fullTargetUserName = SharedHelper.GetFullNameOrPhoneNumber(realTargetUser);
             newNotification = new Notification
             {
               UserId = sourceUserId,
@@ -111,18 +111,46 @@ namespace RestWcfApplication.Root.UserAction
           }
           else
           {
-            var fullName = GetFullNameOrPhoneNumber(sourceUser);
+            var fullName = SharedHelper.GetFullNameOrPhoneNumber(sourceUser);
             if (guessedTargetUser != null && guessedTargetUser.Verified)
             {
+              var date = DateTime.UtcNow.ToString("u");
+              var newHint = new Hint()
+              {
+                Text = "Match Found"
+              };
               newNotification = new Notification
               {
                 UserId = guessedTargetUser.Id,
                 SenderUserId = sourceUserId,
                 Text = string.Format("{0} guessed you while trying to guess someone else", fullName)
               };
+              var newSystemMessage = new DB.Message()
+              {
+                SourceUserId = sourceUserId,
+                TargetUserId = targetUserId,
+                FirstMessage = initialMessage,
+                Hint = newHint,
+                Date = date,
+                SystemMessageState = 1,
+                ReceivedState = (int)EMessageReceivedState.MessageStateSentToClient
+              };
+              var newSystemMessageOpposite = new DB.Message()
+              {
+                SourceUserId = targetUserId,
+                TargetUserId = sourceUserId,
+                FirstMessage = initialMessage,
+                Hint = newHint,
+                Date = date,
+                SystemMessageState = 1,
+                ReceivedState = (int)EMessageReceivedState.MessageStateSentToClient
+              };
 
               context.Notifications.Add(newNotification);
-              needsToPushToRealTargetUser = true;
+              context.Hints.Add(newHint);
+              context.Messages.Add(newSystemMessage);
+              context.Messages.Add(newSystemMessageOpposite);
+              needsToPushToGuessedTargetUser = true;
             }
 
             newNotification = new Notification
@@ -141,7 +169,7 @@ namespace RestWcfApplication.Root.UserAction
           {
             PushManager.PushToIos(realTargetUser.DeviceId, "You have a new notification!");
           }
-          if (needsToPushToRealTargetUser && guessedTargetUser.DeviceId != null)
+          if (needsToPushToGuessedTargetUser && guessedTargetUser.DeviceId != null)
           {
             PushManager.PushToIos(guessedTargetUser.DeviceId, "You have a new notification!");
           }
@@ -234,7 +262,7 @@ namespace RestWcfApplication.Root.UserAction
           {
             initialMessage.MatchFound = true;
 
-            var fullSourceUserName = GetFullNameOrPhoneNumber(sourceUser);
+            var fullSourceUserName = SharedHelper.GetFullNameOrPhoneNumber(sourceUser);
             newNotification = new Notification()
             {
               UserId = targetUserId,
@@ -244,7 +272,7 @@ namespace RestWcfApplication.Root.UserAction
 
             context.Notifications.Add(newNotification);
 
-            var fullTargetUserName = GetFullNameOrPhoneNumber(realTargetUser);
+            var fullTargetUserName = SharedHelper.GetFullNameOrPhoneNumber(realTargetUser);
             newNotification = new Notification
             {
               UserId = sourceUserId,
@@ -255,7 +283,7 @@ namespace RestWcfApplication.Root.UserAction
           }
           else
           {
-            var fullName = GetFullNameOrPhoneNumber(sourceUser);
+            var fullName = SharedHelper.GetFullNameOrPhoneNumber(sourceUser);
             if (guessedTargetUser != null && guessedTargetUser.Verified)
             {
               newNotification = new Notification
@@ -306,28 +334,6 @@ namespace RestWcfApplication.Root.UserAction
       }
     }
 
-    private static string GetFullNameOrPhoneNumber(User user)
-    {
-      string fullName;
-      if (!string.IsNullOrEmpty(user.FirstName) || !string.IsNullOrEmpty(user.LastName))
-      {
-        if (!string.IsNullOrEmpty(user.FirstName))
-        {
-          fullName = user.FirstName +
-                     (!string.IsNullOrEmpty(user.LastName) ? " " + user.LastName : string.Empty);
-        }
-        else
-        {
-          fullName = user.LastName;
-        }
-      }
-      else
-      {
-        fullName = user.PhoneNumber;
-      }
-      return fullName;
-    }
-
     public string OpenChat(string userId, Stream stream)
     {
       try
@@ -370,7 +376,7 @@ namespace RestWcfApplication.Root.UserAction
           var newNotification = new Notification();
           newNotification.UserId = initialMessage.SourceUserId;
           newNotification.SenderUserId = sourceUserId;
-          var fullName = GetFullNameOrPhoneNumber(sourceUser);
+          var fullName = SharedHelper.GetFullNameOrPhoneNumber(sourceUser);
           newNotification.Text = string.Format("{0} opened chat with you!", fullName);
 
           context.Notifications.Add(newNotification);

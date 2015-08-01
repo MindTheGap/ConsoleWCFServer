@@ -28,6 +28,15 @@
     <Property Name="ThumbnailImage" Type="image" />
     <Property Name="Size" Type="nvarchar" MaxLength="50" />
   </EntityType>
+  <EntityType Name="Log">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Date" Type="datetime" Nullable="false" />
+    <Property Name="UserId" Type="int" />
+    <Property Name="Message" Type="nvarchar" MaxLength="4000" Nullable="false" />
+  </EntityType>
   <EntityType Name="Message">
     <Key>
       <PropertyRef Name="Id" />
@@ -109,6 +118,18 @@
       </Dependent>
     </ReferentialConstraint>
   </Association>
+  <Association Name="FK_Log_User">
+    <End Role="User" Type="Self.User" Multiplicity="0..1" />
+    <End Role="Log" Type="Self.Log" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Log">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
   <Association Name="FK_Message_FirstMessage">
     <End Role="FirstMessage" Type="Self.FirstMessage" Multiplicity="1" />
     <End Role="Message" Type="Self.Message" Multiplicity="*" />
@@ -184,6 +205,7 @@
   <EntityContainer Name="ChildTubeMainDBModelStoreContainer">
     <EntitySet Name="FirstMessage" EntityType="Self.FirstMessage" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Hint" EntityType="Self.Hint" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Log" EntityType="Self.Log" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Message" EntityType="Self.Message" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Notification" EntityType="Self.Notification" Schema="dbo" store:Type="Tables" />
     <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
@@ -196,6 +218,10 @@
     <AssociationSet Name="FK_FirstMessage_TargetUser" Association="Self.FK_FirstMessage_TargetUser">
       <End Role="User" EntitySet="User" />
       <End Role="FirstMessage" EntitySet="FirstMessage" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Log_User" Association="Self.FK_Log_User">
+      <End Role="User" EntitySet="User" />
+      <End Role="Log" EntitySet="Log" />
     </AssociationSet>
     <AssociationSet Name="FK_Message_FirstMessage" Association="Self.FK_Message_FirstMessage">
       <End Role="FirstMessage" EntitySet="FirstMessage" />

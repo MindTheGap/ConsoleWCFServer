@@ -22,6 +22,7 @@ namespace RestWcfApplication.DB
             this.TargetUserMessages = new HashSet<Message>();
             this.Notifications = new HashSet<Notification>();
             this.SenderUserNotifications = new HashSet<Notification>();
+            this.Logs = new HashSet<Log>();
         }
     
         public int Id { get; set; }
@@ -45,5 +46,6 @@ namespace RestWcfApplication.DB
         public virtual ICollection<Message> TargetUserMessages { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<Notification> SenderUserNotifications { get; set; }
+        public virtual ICollection<Log> Logs { get; set; }
     }
 }

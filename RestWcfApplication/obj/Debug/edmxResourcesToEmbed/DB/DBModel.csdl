@@ -40,6 +40,11 @@
       <End Role="Notification" EntitySet="Notifications" />
     </AssociationSet>
     <EntitySet Name="Products" EntityType="MainDBModel.Product" />
+    <EntitySet Name="Logs" EntityType="MainDBModel.Log" />
+    <AssociationSet Name="FK_Log_User" Association="MainDBModel.FK_Log_User">
+      <End Role="User" EntitySet="Users" />
+      <End Role="Log" EntitySet="Logs" />
+    </AssociationSet>
   </EntityContainer>
   <EntityType Name="Token">
     <Key>
@@ -84,6 +89,7 @@
     <Property Name="Coins" Type="Int32" Nullable="false" />
     <NavigationProperty Name="Notifications" Relationship="MainDBModel.FK_Notification_User" FromRole="User" ToRole="Notification" />
     <NavigationProperty Name="SenderUserNotifications" Relationship="MainDBModel.FK_Notification_SenderUser" FromRole="User" ToRole="Notification" />
+    <NavigationProperty Name="Logs" Relationship="MainDBModel.FK_Log_User" FromRole="User" ToRole="Log" />
   </EntityType>
   <EntityType Name="FirstMessage">
     <Key>
@@ -238,4 +244,26 @@
     <Property Name="ProductId" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
     <Property Name="CoinsAmount" Type="Int32" Nullable="false" />
   </EntityType>
+  <EntityType Name="Log">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="UserId" Type="Int32" />
+    <Property Name="Message" Type="String" Nullable="false" MaxLength="4000" FixedLength="false" Unicode="true" />
+    <NavigationProperty Name="User" Relationship="MainDBModel.FK_Log_User" FromRole="Log" ToRole="User" />
+  </EntityType>
+  <Association Name="FK_Log_User">
+    <End Type="MainDBModel.User" Role="User" Multiplicity="0..1" />
+    <End Type="MainDBModel.Log" Role="Log" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="User">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Log">
+        <PropertyRef Name="UserId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
 </Schema>

@@ -85,5 +85,16 @@ namespace RestWcfApplication.Root.Register
       BodyStyle = WebMessageBodyStyle.Bare, 
       UriTemplate = "hellopush?deviceId={deviceId}")]
     string HelloPush(string deviceId, Stream data);
+
+    /// <summary>
+    /// returns "hello" string for testing
+    /// </summary>
+    /// <returns>"hello"</returns>
+    [OperationContract]
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare,
+      UriTemplate = "logMessage?userId={userId}")]
+    string LogMessage(string userId, Stream data);
   }
 }

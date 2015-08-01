@@ -26,8 +26,6 @@ namespace RestWcfApplication.Root.Register
                    ConcurrencyMode = ConcurrencyMode.Multiple)]
   public class RegisterContract : IRegisterContract
   {
-    private const int DefaultCoinsForNewUsers = 0;
-
     public string VerifyValidationCode(Stream stream)
     {
       try
@@ -64,6 +62,7 @@ namespace RestWcfApplication.Root.Register
           //}
 
           user.LastSeen = DateTime.Now.ToString("u");
+          user.Coins = SharedHelper.DefaultCoinsForNewUsers;
           user.Verified = true;
 
           context.SaveChanges();
@@ -123,7 +122,7 @@ namespace RestWcfApplication.Root.Register
             user = new User()
             {
               PhoneNumber = phoneNumber,
-              Coins = DefaultCoinsForNewUsers,
+              Coins = SharedHelper.DefaultCoinsForNewUsers,
               Verified = false,
               VerificationCode = verificationCode.ToString("d")
             };
@@ -195,53 +194,117 @@ namespace RestWcfApplication.Root.Register
           anyNotifications = context.Notifications.Any(n => n.UserId == sourceUserId);
         }
 
-        var sourceUserName = firstName != null ? firstName + " " + lastName : name;
-
+        List<FirstMessage> initialMessages;
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          if (contacts != null)
-          {
-            foreach (var phoneNumbers in contacts)
-            {
-              foreach (string phoneNumber in phoneNumbers)
-              {
-                var contactUser = context.Users.SingleOrDefault(u => u.PhoneNumber == phoneNumber);
-                if (contactUser != null)
-                {
-                  if (contactUser.DeviceId != null)
-                  {
-                    if (!context.Messages.Any(m => m.SourceUserId == sourceUserId || m.TargetUserId == sourceUserId))
-                    {
-                      PushManager.PushToIos(contactUser.DeviceId,
-                        string.Format("{0} just joined IAmInToo! Feel free to be into them!", sourceUserName));
-                    }
-                  }
+          initialMessages = context.FirstMessages.Where(f => f.TargetUserId == sourceUserId).ToList();
+        }
 
-                  break;
-                }
+        var date = DateTime.UtcNow.ToString("u");
+
+        if (!anyNotifications)
+        {
+          using (var context = new Entities())
+          {
+            context.Configuration.ProxyCreationEnabled = false;
+
+            foreach (var initialMessage in initialMessages)
+            {
+              context.FirstMessages.Attach(initialMessage);
+
+              var realSourceUser = context.Users.FirstOrDefault(user => user.Id == initialMessage.SourceUserId);
+              if (realSourceUser == null)
+              {
+                toSend.Type = EMessagesTypesToClient.Error;
+                toSend.ErrorInfo = ErrorDetails.BadArguments;
+                return CommManager.SendMessage(toSend);
+              }
+
+              var fullSourceUserName = SharedHelper.GetFullNameOrPhoneNumber(sourceUser);
+              var newNotification = new DB.Notification()
+              {
+                UserId = initialMessage.SourceUserId,
+                SenderUserId = sourceUserId,
+                Text = string.Format("{0} just joined IAmInToo!", fullSourceUserName)
+              };
+              var newHint = new Hint()
+              {
+                Text = string.Format("{0} joined IAmInToo", fullSourceUserName),
+              };
+              var newSystemMessage = new DB.Message()
+              {
+                SourceUserId = initialMessage.SourceUserId,
+                TargetUserId = sourceUserId,
+                FirstMessage = initialMessage,
+                Hint = newHint,
+                Date = date,
+                SystemMessageState = 1,
+                ReceivedState = (int)EMessageReceivedState.MessageStateSentToClient
+              };
+
+              context.Hints.Add(newHint);
+              context.Notifications.Add(newNotification);
+              context.Messages.Add(newSystemMessage);
+
+              if (realSourceUser.DeviceId != null)
+              {
+                PushManager.PushToIos(realSourceUser.DeviceId, "You have a new notification!");
               }
             }
+
+            context.SaveChanges();
           }
         }
 
-        using (var context = new Entities())
+        if (contacts != null)
         {
-          context.Configuration.ProxyCreationEnabled = false;
+          //using (var context = new Entities())
+          //{
+          //  context.Configuration.ProxyCreationEnabled = false;
 
-          if (!anyNotifications)
+          //  foreach (var phoneNumbers in contacts)
+          //  {
+          //    foreach (string phoneNumber in phoneNumbers)
+          //    {
+          //      var contactUser = context.Users.SingleOrDefault(u => u.PhoneNumber == phoneNumber);
+          //      if (contactUser != null)
+          //      {
+          //        if (contactUser.DeviceId != null && !deviceIdsToPush.Contains(contactUser.DeviceId))
+          //        {
+          //          if (!context.Messages.Any(m => m.SourceUserId == sourceUserId || m.TargetUserId == sourceUserId))
+          //          {
+          //            PushManager.PushToIos(contactUser.DeviceId,
+          //              string.Format("{0} just joined IAmInToo! Feel free to be into them!", sourceUserName));
+          //          }
+          //        }
+
+          //        break;
+          //      }
+          //    }
+          //  }
+          //}
+        }
+
+        if (!anyNotifications)
+        {
+          using (var context = new Entities())
           {
+            context.Configuration.ProxyCreationEnabled = false;
+
             var newNotification = new DB.Notification
             {
               UserId = sourceUser.Id,
-              Text = "Welcome to IAmInToo!"
+              Text =
+                string.Format("Welcome to IAmInToo! You have been awarded {0} coins!",
+                  SharedHelper.DefaultCoinsForNewUsers)
             };
 
             context.Notifications.Add(newNotification);
-          }
 
-          context.SaveChanges();
+            context.SaveChanges();
+          }
         }
 
         toSend.Type = EMessagesTypesToClient.Ok;
@@ -285,6 +348,50 @@ namespace RestWcfApplication.Root.Register
           sourceUser.Email = email;
           sourceUser.FacebookUserId = facebookUserId;
           sourceUser.LastSeen = DateTime.Now.ToString("u");
+
+          context.SaveChanges();
+        }
+
+        toSend.Type = EMessagesTypesToClient.Ok;
+        return CommManager.SendMessage(toSend);
+      }
+      catch (Exception e)
+      {
+        dynamic toSend = new ExpandoObject();
+        toSend.Type = EMessagesTypesToClient.Error;
+        toSend.ErrorInfo = e.Message;
+        toSend.InnerMessage = e.InnerException;
+        return CommManager.SendMessage(toSend);
+      }
+    }
+
+    public string LogMessage(string userId, Stream stream)
+    {
+      try
+      {
+        Dictionary<string, dynamic> jsonObject;
+        dynamic toSend;
+        if (!SharedHelper.DeserializeObject(stream, out jsonObject, out toSend))
+        {
+          return CommManager.SendMessage(toSend);
+        }
+
+        var userIdParsed = (!string.IsNullOrEmpty(userId) ? (int?)Convert.ToInt32(userId) : null);
+
+        var message = jsonObject["message"];
+
+        using (var context = new Entities())
+        {
+          context.Configuration.ProxyCreationEnabled = false;
+
+          var newLog = new Log()
+          {
+            Date = DateTime.Now,
+            Message = message,
+            UserId = userIdParsed
+          };
+
+          context.Logs.Add(newLog);
 
           context.SaveChanges();
         }
@@ -411,6 +518,28 @@ namespace RestWcfApplication.Root.Register
         toSend.InnerMessage = e.InnerException;
         return CommManager.SendMessage(toSend);
       }
+    }
+
+    public static string GetFullNameOrPhoneNumber(string firstName, string lastName, string phoneNumber)
+    {
+      string fullName;
+      if (!String.IsNullOrEmpty(firstName) || !String.IsNullOrEmpty(lastName))
+      {
+        if (!String.IsNullOrEmpty(firstName))
+        {
+          fullName = firstName +
+                     (!String.IsNullOrEmpty(lastName) ? " " + lastName : String.Empty);
+        }
+        else
+        {
+          fullName = lastName;
+        }
+      }
+      else
+      {
+        fullName = phoneNumber;
+      }
+      return fullName;
     }
   }
 }
