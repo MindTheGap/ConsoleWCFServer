@@ -76,7 +76,7 @@ namespace RestWcfApplication.Root.UserAction
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          if (!guessedCorrectly) context.Users.Attach(guessedTargetUser);
+          if (!guessedCorrectly && guessedTargetUser != null) context.Users.Attach(guessedTargetUser);
           context.Users.Attach(sourceUser);
           context.Users.Attach(realTargetUser);
           context.FirstMessages.Attach(initialMessage);
