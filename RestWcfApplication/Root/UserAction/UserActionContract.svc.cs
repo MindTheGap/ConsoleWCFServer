@@ -19,14 +19,14 @@ namespace RestWcfApplication.Root.UserAction
                    ConcurrencyMode = ConcurrencyMode.Multiple)]
   public class UserActionContract : IUserActionContract
   {
-    public string GuessContactUser(string userId, System.IO.Stream stream)
+    public string GuessContactUser(string userId, string token, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }
@@ -76,7 +76,7 @@ namespace RestWcfApplication.Root.UserAction
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          if (!guessedCorrectly && guessedTargetUser != null) context.Users.Attach(guessedTargetUser);
+          if (!guessedCorrectly && guessedTargetUser != null && guessedTargetUser.Id != sourceUser.Id) context.Users.Attach(guessedTargetUser);
           context.Users.Attach(sourceUser);
           context.Users.Attach(realTargetUser);
           context.FirstMessages.Attach(initialMessage);
@@ -191,14 +191,14 @@ namespace RestWcfApplication.Root.UserAction
       }
     }
 
-    public string GuessFacebookContactUser(string userId, Stream stream)
+    public string GuessFacebookContactUser(string userId, string token, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }
@@ -334,14 +334,14 @@ namespace RestWcfApplication.Root.UserAction
       }
     }
 
-    public string OpenChat(string userId, Stream stream)
+    public string OpenChat(string userId, string token, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }
@@ -403,14 +403,14 @@ namespace RestWcfApplication.Root.UserAction
       }
     }
 
-    public string UserIsTyping(string userId, System.IO.Stream stream)
+    public string UserIsTyping(string userId, string token, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }

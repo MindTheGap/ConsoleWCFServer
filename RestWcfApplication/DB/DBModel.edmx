@@ -96,6 +96,7 @@
           <Property Name="LastSeen" Type="nvarchar" MaxLength="500" />
           <Property Name="DeviceId" Type="varchar" MaxLength="64" />
           <Property Name="VerificationCode" Type="nvarchar" MaxLength="50" />
+          <Property Name="Token" Type="nvarchar" MaxLength="50" />
           <Property Name="Verified" Type="bit" Nullable="false" />
           <Property Name="Coins" Type="bigint" Nullable="false" />
         </EntityType>
@@ -120,18 +121,6 @@
             </Principal>
             <Dependent Role="FirstMessage">
               <PropertyRef Name="TargetUserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Log_User">
-          <End Role="User" Type="Self.User" Multiplicity="0..1" />
-          <End Role="Log" Type="Self.Log" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Log">
-              <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -224,10 +213,6 @@
             <End Role="User" EntitySet="User" />
             <End Role="FirstMessage" EntitySet="FirstMessage" />
           </AssociationSet>
-          <AssociationSet Name="FK_Log_User" Association="Self.FK_Log_User">
-            <End Role="User" EntitySet="User" />
-            <End Role="Log" EntitySet="Log" />
-          </AssociationSet>
           <AssociationSet Name="FK_Message_FirstMessage" Association="Self.FK_Message_FirstMessage">
             <End Role="FirstMessage" EntitySet="FirstMessage" />
             <End Role="Message" EntitySet="Message" />
@@ -298,10 +283,6 @@
           </AssociationSet>
           <EntitySet Name="Products" EntityType="MainDBModel.Product" />
           <EntitySet Name="Logs" EntityType="MainDBModel.Log" />
-          <AssociationSet Name="FK_Log_User" Association="MainDBModel.FK_Log_User">
-            <End Role="User" EntitySet="Users" />
-            <End Role="Log" EntitySet="Logs" />
-          </AssociationSet>
           </EntityContainer>
         <EntityType Name="Token">
           <Key>
@@ -346,7 +327,7 @@
           <Property Name="Coins" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Notifications" Relationship="MainDBModel.FK_Notification_User" FromRole="User" ToRole="Notification" />
           <NavigationProperty Name="SenderUserNotifications" Relationship="MainDBModel.FK_Notification_SenderUser" FromRole="User" ToRole="Notification" />
-          <NavigationProperty Name="Logs" Relationship="MainDBModel.FK_Log_User" FromRole="User" ToRole="Log" />
+          <Property Name="Token" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="FirstMessage">
           <Key>
@@ -509,20 +490,7 @@
           <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UserId" Type="Int32" />
           <Property Name="Message" Type="String" Nullable="false" MaxLength="4000" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="User" Relationship="MainDBModel.FK_Log_User" FromRole="Log" ToRole="User" />
         </EntityType>
-        <Association Name="FK_Log_User">
-          <End Type="MainDBModel.User" Role="User" Multiplicity="0..1" />
-          <End Type="MainDBModel.Log" Role="Log" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="User">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Log">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -552,6 +520,7 @@
           <EntitySetMapping Name="Users">
             <EntityTypeMapping TypeName="MainDBModel.User">
               <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="Token" ColumnName="Token" />
                 <ScalarProperty Name="Coins" ColumnName="Coins" />
                 <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
                 <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />

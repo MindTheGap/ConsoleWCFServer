@@ -25,14 +25,14 @@ namespace RestWcfApplication.Root.IAP
     private const string AppleIapSandboxUrl = "https://sandbox.itunes.apple.com/verifyReceipt";
     private const string AppleIapProductionUrl = "https://buy.itunes.apple.com/verifyReceipt";
 
-    public string Purchase(string userId, Stream stream)
+    public string Purchase(string userId, string token, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }
@@ -174,14 +174,14 @@ namespace RestWcfApplication.Root.IAP
       return true;
     }
 
-    public string GetAllPurchases(string userId, Stream stream)
+    public string GetAllPurchases(string userId, string token, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }

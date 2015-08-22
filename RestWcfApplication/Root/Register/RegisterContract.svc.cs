@@ -17,6 +17,7 @@ using System.ServiceModel;
 using System.Text;
 using RestWcfApplication.PushSharp;
 using RestWcfApplication.Root.Shared;
+using RestWcfApplication.Utils;
 using Twilio;
 
 namespace RestWcfApplication.Root.Register
@@ -48,6 +49,8 @@ namespace RestWcfApplication.Root.Register
           return CommManager.SendMessage(toSend);
         }
 
+        var token = RandomString(20);
+
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
@@ -64,12 +67,14 @@ namespace RestWcfApplication.Root.Register
           user.LastSeen = DateTime.Now.ToString("u");
           user.Coins = SharedHelper.DefaultCoinsForNewUsers;
           user.Verified = true;
+          user.Token = token;
 
           context.SaveChanges();
         }
 
         toSend.Type = EMessagesTypesToClient.Ok;
         toSend.User = user;
+        toSend.Token = token;
         return CommManager.SendMessage(toSend);
       }
       catch (Exception e)
@@ -147,14 +152,14 @@ namespace RestWcfApplication.Root.Register
       }
     }
 
-    public string RegisterUserInformation(string userId, Stream stream)
+    public string RegisterUserInformation(string userId, string token, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }
@@ -320,14 +325,14 @@ namespace RestWcfApplication.Root.Register
       }
     }
 
-    public string RegisterUserFbInformation(string userId, Stream stream)
+    public string RegisterUserFbInformation(string userId, string token, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }
@@ -378,20 +383,28 @@ namespace RestWcfApplication.Root.Register
 
         var userIdParsed = (!string.IsNullOrEmpty(userId) ? (int?)Convert.ToInt32(userId) : null);
 
-        var message = jsonObject["message"];
+        var message = jsonObject["message"] as string;
+
+        var allMessages = message.Split(new[] {";;;"}, StringSplitOptions.RemoveEmptyEntries);
 
         using (var context = new Entities())
         {
           context.Configuration.ProxyCreationEnabled = false;
 
-          var newLog = new Log()
+          foreach (var msg in allMessages)
           {
-            Date = DateTime.Now,
-            Message = message,
-            UserId = userIdParsed
-          };
+            foreach (var chunk in msg.SplitToChunks(3500))
+            {
+              var newLog = new Log()
+              {
+                Date = DateTime.Now,
+                Message = chunk,
+                UserId = userIdParsed
+              };
 
-          context.Logs.Add(newLog);
+              context.Logs.Add(newLog);
+            }
+          }
 
           context.SaveChanges();
         }
@@ -540,6 +553,25 @@ namespace RestWcfApplication.Root.Register
         fullName = phoneNumber;
       }
       return fullName;
+    }
+
+    private static readonly Random Random = new Random((int)DateTime.Now.Ticks);
+    private string RandomString(int size)
+    {
+      var builder = new StringBuilder();
+      for (int i = 0; i < size; i++)
+      {
+        var ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * Random.NextDouble() + 65)));
+        builder.Append(ch);
+      }
+
+      return builder.ToString();
+    }
+
+    static IEnumerable<string> Split(string str, int chunkSize)
+    {
+      return Enumerable.Range(0, str.Length / chunkSize)
+          .Select(i => str.Substring(i * chunkSize, chunkSize));
     }
   }
 }

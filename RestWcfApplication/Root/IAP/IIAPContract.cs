@@ -19,14 +19,14 @@ namespace RestWcfApplication.Root.IAP
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "purchase?userId={userId}")]
-    string Purchase(string userId, Stream stream);
+      UriTemplate = "purchase?userId={userId}&token={token}")]
+    string Purchase(string userId, string token, Stream stream);
 
     [OperationContract]
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "getPurchases?userId={userId}")]
-    string GetAllPurchases(string userId, Stream stream);
+      UriTemplate = "getPurchases?userId={userId}&token={token}")]
+    string GetAllPurchases(string userId, string token, Stream stream);
   }
 }

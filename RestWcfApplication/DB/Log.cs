@@ -18,7 +18,5 @@ namespace RestWcfApplication.DB
         public System.DateTime Date { get; set; }
         public Nullable<int> UserId { get; set; }
         public string Message { get; set; }
-    
-        public virtual User User { get; set; }
     }
 }

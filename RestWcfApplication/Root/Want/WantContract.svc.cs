@@ -31,14 +31,14 @@ namespace RestWcfApplication.Root.Want
       return string.IsNullOrEmpty(s) || s == "(null)";
     }
 
-    public string UpdateIWantUserByPhoneNumber(string userId, string targetPhoneNumber, Stream stream)
+    public string UpdateIWantUserByPhoneNumber(string userId, string token, string targetPhoneNumber, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }
@@ -254,19 +254,25 @@ namespace RestWcfApplication.Root.Want
       }
     }
 
-    public string UpdateIWantUserByFacebookId(string userId, string facebookId, Stream stream)
+    public string UpdateIWantUserByFacebookId(string userId, string token, string facebookId, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }
 
         var sourceUserId = sourceUser.Id;
+        var guessLimitStr = jsonObject.ContainsKey("guessLimit") ? jsonObject["guessLimit"] as string : string.Empty;
+        var guessLimit = 3;
+        if (!string.IsNullOrEmpty(guessLimitStr))
+        {
+          guessLimit = int.Parse(guessLimitStr);
+        }
         var hint = jsonObject["hint"];
         var hintImageLink = jsonObject.ContainsKey("hintImageLink") ? jsonObject["hintImageLink"] : null;
         var hintVideoLink = jsonObject.ContainsKey("hintVideoLink") ? jsonObject["hintVideoLink"] : null;
@@ -297,6 +303,7 @@ namespace RestWcfApplication.Root.Want
           context.Configuration.ProxyCreationEnabled = false;
 
           context.Users.Attach(sourceUser);
+          context.Users.Attach(targetUser);
 
           sourceUser.Coins += 5;
 
@@ -322,6 +329,8 @@ namespace RestWcfApplication.Root.Want
               Date = newDate,
               SourceUserId = sourceUserId,
               TargetUserId = targetUser.Id,
+              MaximumGuesses = guessLimit,
+              GuessesUsed = 0,
               SubjectName = @""
             };
 
@@ -427,14 +436,14 @@ namespace RestWcfApplication.Root.Want
       }
     }
 
-    public string UpdateIWantUserExistingMessage(string userId, string initialMessageId, Stream stream)
+    public string UpdateIWantUserExistingMessage(string userId, string token, string initialMessageId, Stream stream)
     {
       try
       {
         Dictionary<string, dynamic> jsonObject;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out jsonObject, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out jsonObject, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }

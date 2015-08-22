@@ -14,8 +14,8 @@ namespace RestWcfApplication.Root.UserAction
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "guessContactUser?userId={userId}")]
-    string GuessContactUser(string userId, Stream stream);
+      UriTemplate = "guessContactUser?userId={userId}&token={token}")]
+    string GuessContactUser(string userId, string token, Stream stream);
 
     /// <summary>
     /// registers the user to the system and returns his new userId
@@ -24,8 +24,8 @@ namespace RestWcfApplication.Root.UserAction
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "guessFacebookContactUser?userId={userId}")]
-    string GuessFacebookContactUser(string userId, Stream stream);
+      UriTemplate = "guessFacebookContactUser?userId={userId}&token={token}")]
+    string GuessFacebookContactUser(string userId, string token, Stream stream);
 
     /// <summary>
     /// registers the user to the system and returns his new userId
@@ -34,8 +34,8 @@ namespace RestWcfApplication.Root.UserAction
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "openChat?userId={userId}")]
-    string OpenChat(string userId, Stream stream);
+      UriTemplate = "openChat?userId={userId}&token={token}")]
+    string OpenChat(string userId, string token, Stream stream);
 
     /// <summary>
     /// registers the user to the system and returns his new userId
@@ -44,7 +44,7 @@ namespace RestWcfApplication.Root.UserAction
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "typing?userId={userId}")]
-    string UserIsTyping(string userId, Stream stream);
+      UriTemplate = "typing?userId={userId}&token={token}")]
+    string UserIsTyping(string userId, string token, Stream stream);
   }
 }

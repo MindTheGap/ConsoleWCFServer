@@ -76,7 +76,7 @@ namespace RestWcfApplication.Root.Shared
       return true;
     }
 
-    public static bool DeserializeObjectAndUpdateLastSeen<T>(string userId, Stream stream, out T deserializedObject, out User sourceUser, out dynamic toSend) where T : class
+    public static bool DeserializeObjectAndUpdateLastSeen<T>(string userId, string token, Stream stream, out T deserializedObject, out User sourceUser, out dynamic toSend) where T : class
     {
       if (!DeserializeObject(stream, out deserializedObject, out toSend))
       {
@@ -91,7 +91,7 @@ namespace RestWcfApplication.Root.Shared
         context.Configuration.ProxyCreationEnabled = false;
 
         sourceUser = context.Users.SingleOrDefault(u => u.Id == sourceUserIdParsed);
-        if (sourceUser == null)
+        if (sourceUser == null || sourceUser.Token != token)
         {
           toSend.Type = EMessagesTypesToClient.Error;
           toSend.ErrorInfo = ErrorDetails.UserIdDoesNotExist;

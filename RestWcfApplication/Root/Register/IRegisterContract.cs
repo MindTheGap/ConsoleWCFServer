@@ -40,8 +40,8 @@ namespace RestWcfApplication.Root.Register
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "updateUserInformation?userId={userId}")]
-    string RegisterUserInformation(string userId, Stream stream);
+      UriTemplate = "updateUserInformation?userId={userId}&token={token}")]
+    string RegisterUserInformation(string userId, string token, Stream stream);
 
     /// <summary>
     /// registers the user to the system and returns his new userId
@@ -50,8 +50,8 @@ namespace RestWcfApplication.Root.Register
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "updateUserFBInformation?userId={userId}")]
-    string RegisterUserFbInformation(string userId, Stream stream);
+      UriTemplate = "updateUserFBInformation?userId={userId}&token={token}")]
+    string RegisterUserFbInformation(string userId, string token, Stream stream);
 
     /// <summary>
     /// returns "hello" string for testing

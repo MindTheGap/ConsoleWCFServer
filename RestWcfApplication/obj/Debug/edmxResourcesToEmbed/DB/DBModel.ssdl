@@ -91,6 +91,7 @@
     <Property Name="LastSeen" Type="nvarchar" MaxLength="500" />
     <Property Name="DeviceId" Type="varchar" MaxLength="64" />
     <Property Name="VerificationCode" Type="nvarchar" MaxLength="50" />
+    <Property Name="Token" Type="nvarchar" MaxLength="50" />
     <Property Name="Verified" Type="bit" Nullable="false" />
     <Property Name="Coins" Type="bigint" Nullable="false" />
   </EntityType>
@@ -115,18 +116,6 @@
       </Principal>
       <Dependent Role="FirstMessage">
         <PropertyRef Name="TargetUserId" />
-      </Dependent>
-    </ReferentialConstraint>
-  </Association>
-  <Association Name="FK_Log_User">
-    <End Role="User" Type="Self.User" Multiplicity="0..1" />
-    <End Role="Log" Type="Self.Log" Multiplicity="*" />
-    <ReferentialConstraint>
-      <Principal Role="User">
-        <PropertyRef Name="Id" />
-      </Principal>
-      <Dependent Role="Log">
-        <PropertyRef Name="UserId" />
       </Dependent>
     </ReferentialConstraint>
   </Association>
@@ -218,10 +207,6 @@
     <AssociationSet Name="FK_FirstMessage_TargetUser" Association="Self.FK_FirstMessage_TargetUser">
       <End Role="User" EntitySet="User" />
       <End Role="FirstMessage" EntitySet="FirstMessage" />
-    </AssociationSet>
-    <AssociationSet Name="FK_Log_User" Association="Self.FK_Log_User">
-      <End Role="User" EntitySet="User" />
-      <End Role="Log" EntitySet="Log" />
     </AssociationSet>
     <AssociationSet Name="FK_Message_FirstMessage" Association="Self.FK_Message_FirstMessage">
       <End Role="FirstMessage" EntitySet="FirstMessage" />

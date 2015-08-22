@@ -32,14 +32,14 @@ namespace RestWcfApplication.Root.Update
                    ConcurrencyMode = ConcurrencyMode.Multiple)]
   public class UpdateContract : IUpdateContract
   {
-    public string GetAllInitialMessages(string userId, Stream stream)
+    public string GetAllInitialMessages(string userId, string token, Stream stream)
     {
       try
       {
         Dictionary<string, int> dictionary;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out dictionary, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out dictionary, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }
@@ -141,14 +141,14 @@ namespace RestWcfApplication.Root.Update
       }
     }
 
-    public string ReadUserChatMessages(string userId, Stream stream)
+    public string ReadUserChatMessages(string userId, string token, Stream stream)
     {
       try
       {
         Dictionary<string, int> dictionary;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out dictionary, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out dictionary, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }
@@ -224,14 +224,14 @@ namespace RestWcfApplication.Root.Update
       }
     }
 
-    public string GetUserContactsLastSeenAndProfileImageLinks(string userId, Stream stream)
+    public string GetUserContactsLastSeenAndProfileImageLinks(string userId, string token, Stream stream)
     {
       try
       {
         List<List<string>> contactsList;
         User sourceUser;
         dynamic toSend;
-        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, stream, out contactsList, out sourceUser, out toSend))
+        if (!SharedHelper.DeserializeObjectAndUpdateLastSeen(userId, token, stream, out contactsList, out sourceUser, out toSend))
         {
           return CommManager.SendMessage(toSend);
         }

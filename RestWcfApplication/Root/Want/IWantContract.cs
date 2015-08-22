@@ -15,30 +15,21 @@ namespace RestWcfApplication.Root.Want
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare, 
-      UriTemplate = "iamin?userId={userId}&targetPhoneNumber={targetPhoneNumber}")]
-    string UpdateIWantUserByPhoneNumber(string userId, string targetPhoneNumber, Stream stream);
-
-    [OperationContract]
-    [WebInvoke(Method = "POST",
-      RequestFormat = WebMessageFormat.Json,
-      BodyStyle = WebMessageBodyStyle.Bare, 
-      UriTemplate = "iaminfacebook?userId={userId}&facebookId={facebookId}")]
-    string UpdateIWantUserByFacebookId(string userId, string facebookId, Stream stream);
+      UriTemplate = "iamin?userId={userId}&token={token}&targetPhoneNumber={targetPhoneNumber}")]
+    string UpdateIWantUserByPhoneNumber(string userId, string token, string targetPhoneNumber, Stream stream);
 
     [OperationContract]
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "iaminnewmessage?userId={userId}&initialMessageId={initialMessageId}")]
-    string UpdateIWantUserExistingMessage(string userId, string initialMessageId, Stream stream);
+      UriTemplate = "iaminfacebook?userId={userId}&token={token}&facebookId={facebookId}")]
+    string UpdateIWantUserByFacebookId(string userId, string token, string facebookId, Stream stream);
 
-    //[OperationContract]
-    //[WebInvoke(Method = "POST", UriTemplate = "askforclue?userId={userId}&sourcePhoneNumber={sourcePhoneNumber}&targetUserId={targetUserId}")]
-    //string UpdateAskForClue(string userId, string sourcePhoneNumber, string targetUserId, Stream data);
-
-    //[OperationContract]
-    //[WebInvoke(Method = "POST", UriTemplate = "match?userId={userId}&targetUserId={targetUserId}&firstMessageId={firstMessageId}&hintImageLink={hintImageLink}&hintVideoLink={hintVideoLink}")]
-    //string UpdateIWantUserByChatMessage(string userId, string targetUserId, string firstMessageId,
-    //          string hintImageLink, string hintVideoLink, Stream data);
+    [OperationContract]
+    [WebInvoke(Method = "POST",
+      RequestFormat = WebMessageFormat.Json,
+      BodyStyle = WebMessageBodyStyle.Bare,
+      UriTemplate = "iaminnewmessage?userId={userId}&token={token}&initialMessageId={initialMessageId}")]
+    string UpdateIWantUserExistingMessage(string userId, string token, string initialMessageId, Stream stream);
   }
 }

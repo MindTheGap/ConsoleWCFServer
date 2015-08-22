@@ -16,18 +16,18 @@ namespace RestWcfApplication.Root.Update
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "getAllInitialMessages?userId={userId}")]
-    string GetAllInitialMessages(string userId, Stream stream);
+      UriTemplate = "getAllInitialMessages?userId={userId}&token={token}")]
+    string GetAllInitialMessages(string userId, string token, Stream stream);
 
     [OperationContract]
     [WebInvoke(Method = "POST",
       RequestFormat = WebMessageFormat.Json,
       BodyStyle = WebMessageBodyStyle.Bare,
-      UriTemplate = "readUserChatMessages?userId={userId}")]
-    string ReadUserChatMessages(string userId, Stream stream);
+      UriTemplate = "readUserChatMessages?userId={userId}&token={token}")]
+    string ReadUserChatMessages(string userId, string token, Stream stream);
 
     [OperationContract]
-    [WebInvoke(Method = "POST", UriTemplate = "getUserContactsLastSeenAndProfileImageLinks?userId={userId}")]
-    string GetUserContactsLastSeenAndProfileImageLinks(string userId, Stream stream);
+    [WebInvoke(Method = "POST", UriTemplate = "getUserContactsLastSeenAndProfileImageLinks?userId={userId}&token={token}")]
+    string GetUserContactsLastSeenAndProfileImageLinks(string userId, string token, Stream stream);
   }
 }

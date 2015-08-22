@@ -238,6 +238,7 @@
       <DependentUpon>RegisterContract.svc</DependentUpon>
     </Compile>
     <Compile Include="Twilio\Twilio.cs" />
+    <Compile Include="Utils\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
